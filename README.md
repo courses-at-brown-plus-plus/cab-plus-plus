@@ -34,6 +34,8 @@ _Features:_
 * A GUI to filter out by department(s), by the years/semesters in which courses are offered, etc.
 * A place for people to report issues with the way courses are listed (for example, if a course has a prerequisite but it isn't listed under the prerequisite section of C@B so it would have to be manually added in, or a course changes between semesters and the prerequisites need to be updated)
 
+TA Approval (dlichen): Rejected, there is no algorithmic complexity to this.
+
 ### Idea 2 - Digital Gardening
 _Problem:_
 A lot of people have their own personal collection of notes for random topics, but it's usually stored in folders as 
@@ -64,6 +66,8 @@ _Critical features:_
 * Being able to see and interact with other players: socket connections and broadcasting to players in close 
   proximity might be difficult
 
+TA Approval (dlichen): Rejected, there is no algorithmic complexity in this project, it's primarily data visualization. 
+
 ### Idea 3 - Physics Simulator
 _Problem:_ Physics can be difficult for beginners because concepts are hard to visualize.
 
@@ -79,6 +83,10 @@ _Features:_
 * Physics simulation demos - Written lessons/explanations accompanied by simulations the user can interact with
   * For example: An optics simulation where the user can adjust the angle that a laser hits the surface of a body of water, and can see how the change in incident angle affects the refracted angle
 * If time: allow users to upload notes / videos / questions related to the topic
+
+TA Approval (dlichen): Rejected, no algorithmic complexity.
+
+Please resubmit before the end of the week with augmentations on these ideas or new ideas. You need significant algorithmic complexity in your projects, they shouldn't just be data visualization projects. 
 
 **Mentor TA:** _Put your mentor TA's name and email here once you're assigned one!_
 
