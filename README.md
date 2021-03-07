@@ -21,6 +21,8 @@ _Project Idea:_ C@B prerequisite/track visualization: a directed graph of course
 higher level courses. This would not only allow people to see the courses they're interested in and what is 
 required to take them, but would also make for an interesting visualization as to how much diversity there is in 
 courses at Brown and how they overlap by department. This would also help visualize prerequisites and how many there are.
+In addition, this would connect to a recommendation system that can help pick out courses that are similar to courses
+they have taken and enjoyed.
 
 _Framework/Languages:_
 * React/JS for the frontend
@@ -33,6 +35,7 @@ _Features:_
 * Data grabbed from C@B to keep updated with current courses and what courses are offered in the semester
 * A GUI to filter out by department(s), by the years/semesters in which courses are offered, etc.
 * A place for people to report issues with the way courses are listed (for example, if a course has a prerequisite but it isn't listed under the prerequisite section of C@B so it would have to be manually added in, or a course changes between semesters and the prerequisites need to be updated)
+* A recommendation system that recommends courses based on concentration, what courses have been taken, and what prerequisites have been taken. It would recommend similar courses based on what departments are similar, what level of courses have been taken most recently, and the critical review scores for course ratings and how much time commitment the courses have.
 
 TA Approval (dlichen): Rejected, there is no algorithmic complexity to this.
 
@@ -66,12 +69,16 @@ _Critical features:_
 * Being able to see and interact with other players: socket connections and broadcasting to players in close 
   proximity might be difficult
 
+_Additional critical features to improve algorithmic complexity:_
+* Collision detection with quad trees
+* A recommendation algorithm, that cross-references a user's note-base with another's, checking for similarities in words and overall documents. This generates suggestions for a random entity to show up to users, and lead them towards another user's digital garden. The similarities enable users to explore other gardens that might be interesting to them, and it's easier to find other users who have things in common with them :D
+
 TA Approval (dlichen): Rejected, there is no algorithmic complexity in this project, it's primarily data visualization. 
 
 ### Idea 3 - Physics Simulator
 _Problem:_ Physics can be difficult for beginners because concepts are hard to visualize.
 
-_Project Description:_ A platform to host physics tutorials accompanied by diagrams/simulations (e.g. collision model 
+_Project Description:_ A platform to host physics tutorials accompanied by simulations (e.g. collision model 
 for momentum, gravitational potential/attraction, optics, etc. -- depending on how much time we have).
 
 _Proposed Languages & Frameworks:_
@@ -83,6 +90,14 @@ _Features:_
 * Physics simulation demos - Written lessons/explanations accompanied by simulations the user can interact with
   * For example: An optics simulation where the user can adjust the angle that a laser hits the surface of a body of water, and can see how the change in incident angle affects the refracted angle
 * If time: allow users to upload notes / videos / questions related to the topic
+
+**New Addition/Clarification**
+
+* Simulations would be fairly algorithmically and/or mathematically complex; Examples could include 
+  - Calculating electric potential or current at different points in a circuit based on minimal information about resistances or battery voltage is an interesting graph problem.
+  - Figuring out the pressure of water at different points in a pipe based on pressure such that potential and kinetic energy remain constant is another interesting graph problem.
+  - Monte-Carlo simulations for many-body systems like galaxies or ideal gas particle behavior. This strategy takes a situation that would typically require a computationally expensive integral and uses an probabiity-based algorithm to make the calculation more efficient.
+  - Simulations of the n-body problem in physics for planetary orbits, which would at the very least require some differential equation modelling.
 
 TA Approval (dlichen): Rejected, no algorithmic complexity.
 
