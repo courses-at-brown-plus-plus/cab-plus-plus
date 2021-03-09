@@ -103,6 +103,10 @@ TA Approval (dlichen): Rejected, no algorithmic complexity.
 
 Please resubmit before the end of the week with augmentations on these ideas or new ideas. You need significant algorithmic complexity in your projects, they shouldn't just be data visualization projects. 
 
+
+TA Approval for resubmission:
+Approved for the physics idea! I still don't think the garden algorithm would be complex enough? But if you guys have a defined algorithm you guys are certain about I would discuss that with your mentor TA when you get one. So that's still a maybe, but I think the physics idea is one that feels more algorithmically complex.
+
 **Mentor TA:** _Put your mentor TA's name and email here once you're assigned one!_
 
 ## Meetings
