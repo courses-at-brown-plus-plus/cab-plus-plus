@@ -13,7 +13,7 @@ _Kevin:_ Strengths - Web dev / frontend, React, Flask, Rails, Linux; Weaknesses 
 _William:_ Strengths - Python (e.g. Flask), machine learning (PyTorch), Express.js; Weaknesses - React, design
 
 **Project Idea(s):**
-### Idea 1: C@B Visualizer
+### Idea 1: C@B Visualizer (UPDATED)
 _Problem:_ Having a lot of interests comes with the struggle of keeping track of what courses are interesting, 
 what prerequisites are required for cool courses, and how to fit these courses into a schedule.
 
@@ -26,16 +26,25 @@ they have taken and enjoyed.
 
 _Framework/Languages:_
 * React/JS for the frontend
-* Java/Python for visualization and data processing
+* Python for visualization and data processing
 * Python (Selenium, Scrapy) for web scraping
-* Java (Spark)/Python (Flask)
+* Python (Flask)
 
 _Features:_
 * Course visualization in a directed graph
 * Data grabbed from C@B to keep updated with current courses and what courses are offered in the semester
 * A GUI to filter out by department(s), by the years/semesters in which courses are offered, etc.
 * A place for people to report issues with the way courses are listed (for example, if a course has a prerequisite but it isn't listed under the prerequisite section of C@B so it would have to be manually added in, or a course changes between semesters and the prerequisites need to be updated)
-* A recommendation system that recommends courses based on concentration, what courses have been taken, and what prerequisites have been taken. It would recommend similar courses based on what departments are similar, what level of courses have been taken most recently, and the critical review scores for course ratings and how much time commitment the courses have.
+
+_Algorithmic Complexity Features:_
+* A recommendation system that recommends courses based on concentration, what courses have been taken, and what 
+  prerequisites have been taken. Additional factors such as course difficulty and professor ratings can be scraped from
+  the Critical Review and added/ranked by the user depending on what they care most about.
+* Underlying implementation is a dynamically updating algorithm that determines the probability of course similarity 
+  based on the probability matrices of correlations between departments and other courses that have been taken by 
+  the user, which will have to be updated every time new courses are added or new user information is provided.
+* We are hoping to use Python for the backend of this project because there is a significant amount of data 
+  science/machine learning and web scraping involved, which we are most familiar with in Python.
 
 TA Approval (dlichen): Rejected, there is no algorithmic complexity to this.
 
