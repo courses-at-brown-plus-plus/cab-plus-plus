@@ -2,6 +2,9 @@ import React, {useState, useRef, useEffect} from 'react';
 import { Node, Edge } from './Graph';
 
 
+const NODE_WIDTH = 80;
+const NODE_HEIGHT = 50;
+
 function GraphView(props) {
   const canvasRef = useRef(null);
 
@@ -29,11 +32,13 @@ function GraphView(props) {
 
   function drawNode(ctx, node, x, y) {
     ctx.fillStyle = 'white';
-    ctx.fillRect(x, y, 70, 40);
+    ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
     ctx.strokeStyle = 'black';
-    ctx.strokeRect(x, y, 70, 40);
+    ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
     ctx.fillStyle = 'black';
-    ctx.fillText(node.id, x + 10, y + 10);
+    ctx.font = "14px Helvetica";
+    ctx.textAlign = "center";
+    ctx.fillText(node.id, x - NODE_WIDTH / 2 + NODE_WIDTH / 2, y - NODE_HEIGHT / 2 + 20);
   }
 
   // Separate nodes into layers
@@ -68,18 +73,35 @@ function GraphView(props) {
 
     let layers = layerGraph(props.graph);
 
-    let y = 10;
+
+    let nodeCoords = new Map();
+    let y = 40;
     for (let i = 0; i < layers.length; i++) {
-      let x = 10;
       for (let j = 0; j < layers[i].length; j++) {
-        drawNode(ctx, layers[i][j], x, y);
-        for (let k = 0; k < layers[i][j].edges.length; k++) {
-          
-        }
+        // center nodes horizontally
+        let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
+        nodeCoords.set(layers[i][j], [x, y]);
         x += 100;
       }
       y += 100;
     }
+
+    for (let [node, coords] of nodeCoords.entries()) {
+      console.log([node, coords])
+      drawNode(ctx, node, coords[0], coords[1]);
+      ctx.beginPath();
+      for (let i = 0; i < node.edges.length; i++) {
+        let edge = node.edges[i];
+        let start = nodeCoords.get(props.graph.get(edge.start));
+        ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
+        let end = nodeCoords.get(props.graph.get(edge.end));
+        ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+      }
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+      ctx.closePath();
+    }
+
   }, []);
 
   return (
