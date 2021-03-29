@@ -30,10 +30,13 @@ function GraphView(props) {
   function drawNode(ctx, node, x, y) {
     ctx.fillStyle = 'white';
     ctx.fillRect(x, y, 70, 40);
+    ctx.strokeStyle = 'black';
+    ctx.strokeRect(x, y, 70, 40);
     ctx.fillStyle = 'black';
     ctx.fillText(node.id, x + 10, y + 10);
   }
 
+  // Separate nodes into layers
   function layerGraph(nodeGraph) {
     let nodesRemaining = Array.from(nodeGraph.values());
     let layers = [getStartNodes(nodeGraph)];
@@ -60,16 +63,19 @@ function GraphView(props) {
     let canvas = canvasRef.current;
     let ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = '#eee';
     ctx.fillRect(0, 0, props.width, props.height);
 
     let layers = layerGraph(props.graph);
 
-    let y = 0;
+    let y = 10;
     for (let i = 0; i < layers.length; i++) {
-      let x = 0;
+      let x = 10;
       for (let j = 0; j < layers[i].length; j++) {
         drawNode(ctx, layers[i][j], x, y);
+        for (let k = 0; k < layers[i][j].edges.length; k++) {
+          
+        }
         x += 100;
       }
       y += 100;
