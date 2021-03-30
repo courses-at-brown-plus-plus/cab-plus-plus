@@ -1,6 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
-import { Node, Edge } from './Graph';
-import { Heap } from 'heap-js';
+import React, {useRef, useEffect} from 'react';
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -34,7 +32,7 @@ function topoSort(nodeGraph) {
       visit(nodeGraph.get(edge.end));
     }
 
-    temp = temp.filter(x => x.id != node.id);
+    temp = temp.filter(x => x.id !== node.id);
     perm.push(node);
     result.unshift(node);
   }
@@ -91,7 +89,6 @@ function layerGraph(nodeGraph) {
 
 function GraphView(props) {
   const canvasRef = useRef(null);
-  const graph = useRef(null);
 
   function drawNode(ctx, node, x, y) {
     ctx.fillStyle = 'white';
@@ -141,7 +138,7 @@ function GraphView(props) {
       ctx.closePath();
     }
 
-  }, []);
+  }, [props.graph, props.height, props.width]);
 
   return (
     <div>
