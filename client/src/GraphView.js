@@ -1,34 +1,97 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { Node, Edge } from './Graph';
-
+import { Heap } from 'heap-js';
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
 
-function GraphView(props) {
-  const canvasRef = useRef(null);
+function nodeToEdgeGraph(nodeGraph) {
+  let result = new Set();
+  for (let node of nodeGraph.values()) {
+    for (let edge of node.edges) {
+      result.add(edge);
+    }
+  }
+  return Array.from(result);
+}
 
-  const graph = useRef(null);
+//DFS for topological sorting
+function topoSort(nodeGraph) {
+  let perm = [];
+  let temp = [];
+  let result = [];
 
-  function nodeToEdgeGraph(nodeGraph) {
-    let result = new Set();
+  function visit(node) {
+    if (perm.includes(node)) {
+      return true;
+    } if (temp.includes(node)) {
+      return false;
+    }
+
+    temp.push(node);
+
+    for (let edge of node.edges) {
+      visit(nodeGraph.get(edge.end));
+    }
+
+    temp = temp.filter(x => x.id != node.id);
+    perm.push(node);
+    result.unshift(node);
+  }
+
+  while (perm.length !== nodeGraph.size) {
+    let n;
     for (let node of nodeGraph.values()) {
-      for (let edge of node.edges) {
-        result.add(edge);
+      if (!perm.includes(node)) {
+        n = node;
+        break;
       }
     }
-    return Array.from(result);
+    visit(n);
   }
+  return result;
+}
 
-  //Given a graph, returns all nodes that are not the endpoint of an edge
-  function getStartNodes(nodeGraph) {
-    let result = new Map(nodeGraph);
-    let edges = nodeToEdgeGraph(nodeGraph);
-    for (let i = 0; i < edges.length; i++) {
-      result.delete(edges[i].end);
+function longestPath(nodeGraph) {
+  let edges = nodeToEdgeGraph(nodeGraph);
+  let sorted = topoSort(nodeGraph);
+  let lengths = new Map();
+  for (let node of sorted) {
+    let maxDist = 0;
+    for (let edge of edges) {
+      if (edge.end === node.id) {
+        if (lengths.get(nodeGraph.get(edge.start)) + 1 > maxDist) {
+          maxDist = lengths.get(nodeGraph.get(edge.start)) + 1;
+        }
+      }
     }
-    return Array.from(result.values());
+    lengths.set(node, maxDist);
   }
+  return lengths;
+}
+
+
+// Separate nodes into layers
+function layerGraph(nodeGraph) {
+  let depths = longestPath(nodeGraph)
+  let result = [];
+  for (let [node, depth] of depths.entries()) {
+    for (let j = 0; j <= depth - result.length; j++) {
+      result.push([])
+    }
+    result[depth].push(node);
+  }
+  return result;
+}
+
+
+
+
+
+
+function GraphView(props) {
+  const canvasRef = useRef(null);
+  const graph = useRef(null);
 
   function drawNode(ctx, node, x, y) {
     ctx.fillStyle = 'white';
@@ -39,29 +102,6 @@ function GraphView(props) {
     ctx.font = "14px Helvetica";
     ctx.textAlign = "center";
     ctx.fillText(node.id, x - NODE_WIDTH / 2 + NODE_WIDTH / 2, y - NODE_HEIGHT / 2 + 20);
-  }
-
-  // Separate nodes into layers
-  function layerGraph(nodeGraph) {
-    let nodesRemaining = Array.from(nodeGraph.values());
-    let layers = [getStartNodes(nodeGraph)];
-    nodesRemaining = nodesRemaining.filter(x => !layers[layers.length - 1].includes(x));
-
-    while (nodesRemaining.length > 0) {
-      let lastLayer = layers[layers.length - 1];
-      let newLayer = new Set();
-      for (let i = 0; i < lastLayer.length; i++) {
-        for (let j = 0; j < lastLayer[i].edges.length; j++) {
-          let node = nodeGraph.get(lastLayer[i].edges[j].end);
-          if (node !== undefined && nodesRemaining.includes(node)) {
-            newLayer.add(node);
-          }
-        }
-      }
-      nodesRemaining = nodesRemaining.filter(x => !newLayer.has(x));
-      layers.push(Array.from(newLayer));
-    }
-    return layers;
   }
 
   useEffect(() => {
@@ -87,7 +127,6 @@ function GraphView(props) {
     }
 
     for (let [node, coords] of nodeCoords.entries()) {
-      console.log([node, coords])
       drawNode(ctx, node, coords[0], coords[1]);
       ctx.beginPath();
       for (let i = 0; i < node.edges.length; i++) {
