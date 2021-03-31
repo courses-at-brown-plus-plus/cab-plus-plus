@@ -223,7 +223,7 @@ function GraphView(props) {
   let layersRef = useRef(null);
   let layers = layersRef.current;
 
-  const [activeNode, setActiveNode] = useState(null);
+  const [activeNodes, setActiveNodes] = useState([]);
 
   // Screen coordinates of center of each node
   const nodeCoords = useRef(new Map());
@@ -235,7 +235,7 @@ function GraphView(props) {
 
   function drawNode(ctx, node, x, y) {
     ctx.fillStyle = 'white';
-    if (node.id === activeNode) {
+    if (activeNodes.includes(node.id)) {
       ctx.fillRect(x - NODE_WIDTH / 2 - 5, y - NODE_HEIGHT / 2 - 5, NODE_WIDTH + 10, NODE_HEIGHT + 10);
       ctx.strokeStyle = 'black';
       ctx.strokeRect(x - NODE_WIDTH / 2 - 5, y - NODE_HEIGHT / 2 - 5, NODE_WIDTH + 10, NODE_HEIGHT + 10);
@@ -250,6 +250,16 @@ function GraphView(props) {
     ctx.fillText(node.id, x - NODE_WIDTH / 2 + NODE_WIDTH / 2, y - NODE_HEIGHT / 2 + 20);
   }
 
+  function makeActive(node, activeList) {
+    if (!nodeGraph.has(node)) {
+      return;
+    }
+    activeList.push(node);
+    for (let edge of nodeGraph.get(node).edges) {
+      makeActive(edge.end, activeList);
+    }
+  }
+
   function handleMouseMove(event) {
     let canvas = canvasRef.current;
     let mouseX = event.clientX - canvas.offsetLeft;
@@ -259,17 +269,20 @@ function GraphView(props) {
         && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 
         && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2) {
         nodeGraph.get(node).active = true;
-        setActiveNode(node);
+        let l = [];
+        makeActive(node, l);
+        setActiveNodes(l);
         return;
       }
     }
-    setActiveNode(null);
+    setActiveNodes([]);
   }
 
   useEffect(() => {
     let canvas = canvasRef.current;
     let ctx = canvas.getContext('2d');
 
+    ctx.clearRect(0, 0, props.width, props.height);
     ctx.fillStyle = '#eee';
     ctx.fillRect(0, 0, props.width, props.height);
 
@@ -295,11 +308,12 @@ function GraphView(props) {
           let end = nodeCoords.current.get(edge.end);
           ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
           ctx.strokeStyle = '#ccc';
-          if (edge.start === activeNode) {
+          if (activeNodes.includes(edge.start)) {
             ctx.strokeStyle = '#777';
             ctx.lineWidth = 2;
           }
           ctx.stroke();
+          ctx.lineWidth = 1;
         }
       }
       ctx.closePath();
