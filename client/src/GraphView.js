@@ -1,8 +1,10 @@
 import React, {useRef, useEffect} from 'react';
+import { CourseNode, Edge } from './Graph'
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
 
+// Convert from node represnetation to edge representation
 function nodeToEdgeGraph(nodeGraph) {
   let result = new Set();
   for (let node of nodeGraph.values()) {
@@ -13,7 +15,7 @@ function nodeToEdgeGraph(nodeGraph) {
   return Array.from(result);
 }
 
-//DFS for topological sorting
+// DFS implementation of topological sort
 function topoSort(nodeGraph) {
   let perm = [];
   let temp = [];
@@ -50,6 +52,7 @@ function topoSort(nodeGraph) {
   return result;
 }
 
+// Finds the length of the longest path from the top level of a DAG to every node
 function longestPath(nodeGraph) {
   let edges = nodeToEdgeGraph(nodeGraph);
   let sorted = topoSort(nodeGraph);
@@ -68,8 +71,7 @@ function longestPath(nodeGraph) {
   return lengths;
 }
 
-
-// Separate nodes into layers
+// Separate nodes of a DAG into layers based on length of longest path from top level
 function layerGraph(nodeGraph) {
   let depths = longestPath(nodeGraph)
   let result = [];
@@ -82,10 +84,56 @@ function layerGraph(nodeGraph) {
   return result;
 }
 
+function addDummyVertices(nodeGraph, layeredGraph) {
+  let depths = longestPath(nodeGraph);
+  for (let j = 0; j < layeredGraph.length - 1; j++) {
+    for (let k = 0; k < layeredGraph[j].length; k++) {
+      let node = layeredGraph[j][k]; 
+      for (let i = 0; i < node.edges.length; i++) {
+        let edge = node.edges[i];
+        let startDepth = j;
+        let endDepth = depths.get(nodeGraph.get(edge.end));
+        if (endDepth - startDepth === 1) {
+          continue;
+        }
+        let dNode = new CourseNode('' + i + ',' + j + ',' + k, [], [], true)
+        layeredGraph[j + 1].push(dNode)
+        nodeGraph.set('' + i + ',' + j + ',' + k, dNode)
+        node.edges[i] = new Edge(edge.start, dNode.id, 0);
+        dNode.edges.push(new Edge(dNode.id, edge.end));
+      }
+    }
+  }
+  console.log(layeredGraph);
+}
 
+//Detect crossings
+function countCrossings(layer1, layer2, edgeGraph) {
+  let crossings = 0;
+  for (let node1 of layer1) {
+    for (let edge1 of node1.edges) {
+      for (let node2 of layer1) {
+        for (let edge2 of node2) {
+          let start1 = layer1.indexOf(edge1.start);
+          let start2 = layer1.indexOf(edge2.start);
+          let end1 = layer2.indexOf(edge1.end);
+          let end2 = layer2.indexOf(edge2.end);
+          if (start1 !== start2 && end1 !== end2 &&
+            Math.sign(start1 - start2) !== Math.sign(end1 - end2)) {
+            crossings++;
+          }
+        }
+      }
+    }
+  }
+  return crossings / 2;
+}
 
-
-
+//Permute layer to minimize crossings
+function permuteLayer(n, layerGraph) {
+  let layer1 = layerGraph[n];
+  let layer2 = layerGraph[n + 1];
+}
 
 function GraphView(props) {
   const canvasRef = useRef(null);
@@ -108,8 +156,9 @@ function GraphView(props) {
     ctx.fillStyle = '#eee';
     ctx.fillRect(0, 0, props.width, props.height);
 
-    let layers = layerGraph(props.graph);
-
+    let nodeGraph = props.graph;
+    let layers = layerGraph(nodeGraph);
+    addDummyVertices(nodeGraph, layers);
 
     let nodeCoords = new Map();
     let y = 40;
@@ -117,20 +166,23 @@ function GraphView(props) {
       for (let j = 0; j < layers[i].length; j++) {
         // center nodes horizontally
         let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
-        nodeCoords.set(layers[i][j], [x, y]);
+        nodeCoords.set(layers[i][j].id, [x, y]);
         x += 100;
       }
       y += 100;
     }
 
     for (let [node, coords] of nodeCoords.entries()) {
-      drawNode(ctx, node, coords[0], coords[1]);
+
+      if (!node.isDummy) {
+        drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
+      }
       ctx.beginPath();
-      for (let i = 0; i < node.edges.length; i++) {
-        let edge = node.edges[i];
-        let start = nodeCoords.get(props.graph.get(edge.start));
+      for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
+        let edge = nodeGraph.get(node).edges[i];
+        let start = nodeCoords.get(edge.start);
         ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
-        let end = nodeCoords.get(props.graph.get(edge.end));
+        let end = nodeCoords.get(edge.end);
         ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
       }
       ctx.strokeStyle = 'black';
