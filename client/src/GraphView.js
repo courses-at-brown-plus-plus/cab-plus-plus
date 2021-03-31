@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import { CourseNode, Edge } from './Graph'
 
 const NODE_WIDTH = 80;
@@ -207,18 +207,63 @@ function removeDummyVertices(layeredGraph, nodeGraph) {
   }
 }
 
+function prepareGraph(nodeGraph) {
+  let result = layerGraph(nodeGraph);
+  addDummyVertices(nodeGraph, result);
+  result = permuteGraph(result, nodeGraph);
+  removeDummyVertices(result, nodeGraph);
+  return result;
+}
+
 function GraphView(props) {
   const canvasRef = useRef(null);
+  
+  let nodeGraphRef = useRef(props.graph);
+  let nodeGraph = nodeGraphRef.current;
+  let layersRef = useRef(null);
+  let layers = layersRef.current;
+
+  const [activeNode, setActiveNode] = useState(null);
+
+  // Screen coordinates of center of each node
+  const nodeCoords = useRef(new Map());
+
+  useEffect(() => {
+    layersRef.current = prepareGraph(nodeGraph)
+    layers = layersRef.current;
+  }, [])
 
   function drawNode(ctx, node, x, y) {
     ctx.fillStyle = 'white';
-    ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
-    ctx.strokeStyle = 'black';
-    ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
+    if (node.id === activeNode) {
+      ctx.fillRect(x - NODE_WIDTH / 2 - 5, y - NODE_HEIGHT / 2 - 5, NODE_WIDTH + 10, NODE_HEIGHT + 10);
+      ctx.strokeStyle = 'black';
+      ctx.strokeRect(x - NODE_WIDTH / 2 - 5, y - NODE_HEIGHT / 2 - 5, NODE_WIDTH + 10, NODE_HEIGHT + 10);
+    } else {
+      ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
+      ctx.strokeStyle = 'black';
+      ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
+    }
     ctx.fillStyle = 'black';
     ctx.font = "14px Helvetica";
     ctx.textAlign = "center";
     ctx.fillText(node.id, x - NODE_WIDTH / 2 + NODE_WIDTH / 2, y - NODE_HEIGHT / 2 + 20);
+  }
+
+  function handleMouseMove(event) {
+    let canvas = canvasRef.current;
+    let mouseX = event.clientX - canvas.offsetLeft;
+    let mouseY = event.clientY - canvas.offsetTop;
+    for (let [node, coords] of nodeCoords.current) {
+      if (nodeGraph.has(node)
+        && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 
+        && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2) {
+        nodeGraph.get(node).active = true;
+        setActiveNode(node);
+        return;
+      }
+    }
+    setActiveNode(null);
   }
 
   useEffect(() => {
@@ -228,46 +273,42 @@ function GraphView(props) {
     ctx.fillStyle = '#eee';
     ctx.fillRect(0, 0, props.width, props.height);
 
-    let nodeGraph = props.graph;
-    let layers = layerGraph(nodeGraph);
-    addDummyVertices(nodeGraph, layers);
-    layers = permuteGraph(layers, nodeGraph);
-    removeDummyVertices(layers, nodeGraph);
-
-    let nodeCoords = new Map();
     let y = 40;
     for (let i = 0; i < layers.length; i++) {
       for (let j = 0; j < layers[i].length; j++) {
         // center nodes horizontally
         let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
-        nodeCoords.set(layers[i][j].id, [x, y]);
+        nodeCoords.current.set(layers[i][j].id, [x, y]);
         x += 100;
       }
       y += 100;
     }
 
-    for (let [node, coords] of nodeCoords.entries()) {
+    for (let [node, coords] of nodeCoords.current.entries()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
         drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
         for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
           let edge = nodeGraph.get(node).edges[i];
-          let start = nodeCoords.get(edge.start);
+          let start = nodeCoords.current.get(edge.start);
           ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
-          let end = nodeCoords.get(edge.end);
+          let end = nodeCoords.current.get(edge.end);
           ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+          ctx.strokeStyle = '#ccc';
+          if (edge.start === activeNode) {
+            ctx.strokeStyle = '#777';
+            ctx.lineWidth = 2;
+          }
+          ctx.stroke();
         }
       }
-      ctx.strokeStyle = 'black';
-      ctx.stroke();
       ctx.closePath();
     }
-
-  }, [props.graph, props.height, props.width]);
+  });
 
   return (
     <div>
-      <canvas ref={canvasRef} width={props.width} height={props.height}/>
+      <canvas ref={canvasRef} width={props.width} height={props.height} onMouseMove={handleMouseMove}/>
     </div>
   );
 }

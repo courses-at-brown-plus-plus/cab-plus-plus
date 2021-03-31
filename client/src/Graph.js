@@ -4,6 +4,7 @@ class CourseNode {
     this.edges = edges;
     this.ports = ports;
     this.isDummy = isDummy;
+    this.active = false;
   }
 }
 
