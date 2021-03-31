@@ -4,7 +4,7 @@ import { CourseNode, Edge } from './Graph'
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
 
-// Convert from node represnetation to edge representation
+// Convert from node representation to edge representation
 function nodeToEdgeGraph(nodeGraph) {
   let result = new Set();
   for (let node of nodeGraph.values()) {
@@ -104,20 +104,19 @@ function addDummyVertices(nodeGraph, layeredGraph) {
       }
     }
   }
-  console.log(layeredGraph);
 }
 
-//Detect crossings
-function countCrossings(layer1, layer2, edgeGraph) {
+// Detect crossings
+function countCrossings(layer1, layer2, nodeGraph) {
   let crossings = 0;
   for (let node1 of layer1) {
     for (let edge1 of node1.edges) {
       for (let node2 of layer1) {
-        for (let edge2 of node2) {
-          let start1 = layer1.indexOf(edge1.start);
-          let start2 = layer1.indexOf(edge2.start);
-          let end1 = layer2.indexOf(edge1.end);
-          let end2 = layer2.indexOf(edge2.end);
+        for (let edge2 of node2.edges) {
+          let start1 = layer1.indexOf(nodeGraph.get(edge1.start));
+          let start2 = layer1.indexOf(nodeGraph.get(edge2.start));
+          let end1 = layer2.indexOf(nodeGraph.get(edge1.end));
+          let end2 = layer2.indexOf(nodeGraph.get(edge2.end));
           if (start1 !== start2 && end1 !== end2 &&
             Math.sign(start1 - start2) !== Math.sign(end1 - end2)) {
             crossings++;
@@ -129,10 +128,83 @@ function countCrossings(layer1, layer2, edgeGraph) {
   return crossings / 2;
 }
 
-//Permute layer to minimize crossings
-function permuteLayer(n, layerGraph) {
-  let layer1 = layerGraph[n];
-  let layer2 = layerGraph[n + 1];
+function countCrossingsGraph(layeredGraph, nodeGraph) {
+  let count = 0;
+  for (let i = 0; i < layeredGraph.length - 1; i++) {
+    count += countCrossings(layeredGraph[i], layeredGraph[i + 1], nodeGraph);
+  }
+  return count;
+}
+
+// Position each node between its neighbors
+function medianHeuristic(layer1, layer2) {
+  let medians = new Map();
+  for (let node2 of layer2) {
+    let l = [];
+    for (let i = 0; i < layer1.length; i++) {
+      let node1 = layer1[i];
+      for (let edge of node1.edges) {
+        if (edge.end === node2.id) {
+          l.push(i)
+        }
+      }
+    }
+    l.sort();
+    if (l.length % 2 === 0) {
+      medians.set(node2.id, (l[l.length / 2 - 1] + l[l.length / 2]) / 2)
+    } else {
+      medians.set(node2.id, l[(l.length - 1) / 2])
+    }
+  }
+  layer2.sort((a, b) => medians.get(a.id) - medians.get(b.id));
+  return layer2;
+}
+
+// Permute layer to minimize crossings
+function permuteGraph(layerGraph, nodeGraph) {
+  
+  for (let n = 1; n < layerGraph.length; n++) {
+    let layer1 = [...layerGraph[n - 1]];
+    let layer2 = [...layerGraph[n]];
+    layerGraph[n] =  medianHeuristic(layer1, layer2);
+  }
+
+
+  let minCross = countCrossingsGraph(layerGraph, nodeGraph);;
+  for (let i = 0; i < 10000; i++) {
+    let depth = 1 + Math.floor(Math.random() * (layerGraph.length - 1))
+    let left = Math.floor(Math.random() * (layerGraph[depth].length - 1))
+    let right = left + 1;
+    [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
+    let c2 = countCrossingsGraph(layerGraph, nodeGraph);
+    if (c2 > minCross) {
+      [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
+    } else {
+      minCross = c2;
+    }
+  }
+  return layerGraph
+}
+
+// For each dummy vertex, find both connected edges and replace with a single edge
+function removeDummyVertices(layeredGraph, nodeGraph) {
+  for (let i = 1; i < layeredGraph.length; i++) {
+    for (let j = 0; j < layeredGraph[i].length; j++) {
+      let dNode = layeredGraph[i][j];
+      if (dNode.isDummy) {
+        //Each dummy node has exactly one edge in both directions
+        let edge2 = dNode.edges[0];
+        for (let node of layeredGraph[i - 1]) {
+          for (let k = 0; k < node.edges.length; k++) {
+            if (node.edges[k].end === dNode.id) {
+              node.edges[k] = new Edge(node.id, edge2.end);
+              nodeGraph.delete(dNode.id);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 function GraphView(props) {
@@ -159,6 +231,8 @@ function GraphView(props) {
     let nodeGraph = props.graph;
     let layers = layerGraph(nodeGraph);
     addDummyVertices(nodeGraph, layers);
+    layers = permuteGraph(layers, nodeGraph);
+    removeDummyVertices(layers, nodeGraph);
 
     let nodeCoords = new Map();
     let y = 40;
@@ -173,17 +247,16 @@ function GraphView(props) {
     }
 
     for (let [node, coords] of nodeCoords.entries()) {
-
-      if (!node.isDummy) {
-        drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
-      }
       ctx.beginPath();
-      for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
-        let edge = nodeGraph.get(node).edges[i];
-        let start = nodeCoords.get(edge.start);
-        ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
-        let end = nodeCoords.get(edge.end);
-        ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+      if (nodeGraph.has(node)) {
+        drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
+        for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
+          let edge = nodeGraph.get(node).edges[i];
+          let start = nodeCoords.get(edge.start);
+          ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
+          let end = nodeCoords.get(edge.end);
+          ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+        }
       }
       ctx.strokeStyle = 'black';
       ctx.stroke();
