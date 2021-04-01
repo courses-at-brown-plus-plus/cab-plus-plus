@@ -1,9 +1,10 @@
 class CourseNode {
-  constructor(id, edges, ports, isDummy = false) {
+  constructor(id, edges, ports, isDummy = false, invisible = false) {
     this.id = id;
     this.edges = edges;
     this.ports = ports;
     this.isDummy = isDummy;
+    this.invisible = false;
     this.active = false;
   }
 }
