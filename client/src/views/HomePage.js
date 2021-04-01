@@ -1,4 +1,5 @@
 import React from 'react';
+import { Select, Button, Box, Flex } from "@chakra-ui/react"
 import GraphView from '../components/GraphView';
 import { Node, Edge } from '../components/Graph';
 
@@ -25,7 +26,35 @@ export default function HomePage() {
       <h1>Welcome to C@B++!</h1>
 
       <br/>
-      <GraphView width={800} height={600} graph={csGraph}/>
+
+      <center>
+        <GraphView width={800} height={600} graph={csGraph}/>
+
+        <Flex 
+          width={800} 
+          justify="space-between"
+          padding={3}
+        >
+
+          <Box>
+            <Button colorScheme="cyan"> Save Loadout </Button>
+          </Box>
+
+          <Box>
+            <Select 
+              bg="gray.600" 
+              color="white"
+              placeholder="Select concentration" 
+            >
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+            </Select>
+          </Box>
+
+        </Flex>
+
+      </center>
     </div>
   );
 }
