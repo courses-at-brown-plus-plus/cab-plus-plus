@@ -1,8 +1,10 @@
-class Node {
-  constructor(id, edges, ports) {
+class CourseNode {
+  constructor(id, edges, ports, isDummy = false) {
     this.id = id;
     this.edges = edges;
     this.ports = ports;
+    this.isDummy = isDummy;
+    this.active = false;
   }
 }
 
@@ -17,4 +19,4 @@ class Edge {
 //A node graph should be a Map of id : Node
 //An edge graph should be any collection of edges
 
-export { Node, Edge };
+export { CourseNode, Edge };
