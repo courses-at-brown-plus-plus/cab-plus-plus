@@ -22,6 +22,7 @@ function App() {
     // pass json data into map object when concentration selected (cache the generated map objects)
   }, []);
 
+
   function renderRoutes() {
     return (routes.map(({ path, Component }) => (
       <Route key={path} exact path={path}>
@@ -29,6 +30,7 @@ function App() {
       </Route>
     )));
   }
+
 
   return (
     <div className="App">

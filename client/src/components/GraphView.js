@@ -106,7 +106,7 @@ function addDummyVertices(nodeGraph, layeredGraph) {
   }
 }
 
-// Detect crossings
+// Detect crossings between two layers
 function countCrossings(layer1, layer2, nodeGraph) {
   let crossings = 0;
   for (let node1 of layer1) {
@@ -128,6 +128,7 @@ function countCrossings(layer1, layer2, nodeGraph) {
   return crossings / 2;
 }
 
+// Count all crossings throughout a graph
 function countCrossingsGraph(layeredGraph, nodeGraph) {
   let count = 0;
   for (let i = 0; i < layeredGraph.length - 1; i++) {
@@ -157,6 +158,7 @@ function medianHeuristic(layer1, layer2) {
     }
   }
   layer2.sort((a, b) => medians.get(a.id) - medians.get(b.id));
+
   return layer2;
 }
 
@@ -189,7 +191,7 @@ function permuteGraph(layerGraph, nodeGraph) {
 // For each dummy vertex, find both connected edges and replace with a single edge
 function removeDummyVertices(layeredGraph, nodeGraph) {
   for (let i = 1; i < layeredGraph.length; i++) {
-    for (let j = 0; j < layeredGraph[i].length; j++) {
+    for (let j = layeredGraph[i].length - 1; j >= 0; j--) {
       let dNode = layeredGraph[i][j];
       if (dNode.isDummy) {
         //Each dummy node has exactly one edge in both directions
@@ -199,12 +201,17 @@ function removeDummyVertices(layeredGraph, nodeGraph) {
             if (node.edges[k].end === dNode.id) {
               node.edges[k] = new Edge(node.id, edge2.end);
               nodeGraph.delete(dNode.id);
+              layeredGraph[i].splice(j, 1);
             }
           }
         }
       }
     }
   }
+}
+
+function addInvisibleNodes(layeredGraph) {
+  
 }
 
 function prepareGraph(nodeGraph) {
@@ -234,14 +241,16 @@ function GraphView(props) {
   }, [])
 
   function drawNode(ctx, node, x, y) {
+    let expand = 0;
+
     ctx.fillStyle = 'white';
     if (activeNodes.includes(node.id)) {
-      ctx.fillRect(x - NODE_WIDTH / 2 - 5, y - NODE_HEIGHT / 2 - 5, NODE_WIDTH + 10, NODE_HEIGHT + 10);
+      ctx.fillRect(x - NODE_WIDTH / 2 - expand, y - NODE_HEIGHT / 2 - expand, NODE_WIDTH + 2 * expand, NODE_HEIGHT + 2 * expand);
       ctx.strokeStyle = 'black';
-      ctx.strokeRect(x - NODE_WIDTH / 2 - 5, y - NODE_HEIGHT / 2 - 5, NODE_WIDTH + 10, NODE_HEIGHT + 10);
+      ctx.strokeRect(x - NODE_WIDTH / 2 - expand, y - NODE_HEIGHT / 2 - expand, NODE_WIDTH + 2 * expand, NODE_HEIGHT + 2 * expand);
     } else {
       ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
-      ctx.strokeStyle = 'black';
+      ctx.strokeStyle = '#ccc';
       ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
     }
     ctx.fillStyle = 'black';
@@ -272,18 +281,34 @@ function GraphView(props) {
         let l = [];
         makeActive(node, l);
         setActiveNodes(l);
+        canvas.style.cursor = 'pointer';
         return;
       }
     }
     setActiveNodes([]);
+    canvas.style.cursor = 'default';
   }
 
   useEffect(() => {
     let canvas = canvasRef.current;
     let ctx = canvas.getContext('2d');
+    ctx.translate(0.5, 0.5);
+
+
+    // Fix canvas blur
+    // https://dev.to/pahund/how-to-fix-blurry-text-on-html-canvases-on-mobile-phones-3iep
+    const ratio = Math.ceil(window.devicePixelRatio);
+    canvas.width = props.width * ratio;
+    canvas.height = props.height * ratio;
+    canvas.style.width = `${props.width}px`;
+    canvas.style.height = `${props.height}px`;
+    canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+
+
+
 
     ctx.clearRect(0, 0, props.width, props.height);
-    ctx.fillStyle = '#eee';
+    ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, props.width, props.height);
 
     let y = 40;
@@ -310,14 +335,13 @@ function GraphView(props) {
           ctx.strokeStyle = '#ccc';
           if (activeNodes.includes(edge.start)) {
             ctx.strokeStyle = '#777';
-            ctx.lineWidth = 2;
           }
           ctx.stroke();
-          ctx.lineWidth = 1;
         }
       }
       ctx.closePath();
     }
+    ctx.translate(-0.5, -0.5);
   });
 
   return (
