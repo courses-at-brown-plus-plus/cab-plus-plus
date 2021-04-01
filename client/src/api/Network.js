@@ -1,14 +1,25 @@
-import React, { useEffect } from 'react';
-import { Select, Button, Box, Flex } from "@chakra-ui/react"
-import GraphView from '../components/GraphView';
+
+import { createAsyncThunk } from '@reduxjs/toolkit'
+import { setPathwayData } from '../store/slices/appDataSlice';
+
 import { CourseNode, Edge } from '../components/Graph';
 
-import { useSelector } from 'react-redux';
-import { selectPathwayData } from '../store/slices/appDataSlice';
+export const getRequest = async (resource) => {
+  // const res = await axios.get(url + resource, {
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     'Access-Control-Allow-Origin': '*'
+  //   }
+  // });
 
-export default function HomePage() {
+  // dummy get request to wait for 2 seconds
+  const res = await setTimeout(() => {
+    return "get request dummy data";
+  }, 2);
+  return res;
+}
 
-  const pathwayData = useSelector(selectPathwayData);
+function generateDummyGraphs() {
 
   let csGraph = new Map();
   csGraph.set('CS15', new CourseNode('CS15', [new Edge('CS15', 'CS16', 0)], []));
@@ -33,49 +44,38 @@ export default function HomePage() {
   csGraph.set('CS171', new CourseNode('CS171', [], []));
   csGraph.set('CS1420', new CourseNode('CS1420', [], []));
 
-  return (
-    <div>
-      <h1>Welcome to C@B++!</h1>
+  let visaGraph = new Map();
+  visaGraph.set('VISA 0100', new CourseNode('VISA 0100', [new Edge('VISA 0100', 'VISA 0160', 0)], []));
+  visaGraph.set('VISA 0160', new CourseNode('VISA 0160', [], []));
 
-      <br/>
-
-      <center>
-        {
-          // pathwayData && pathwayData["Visual Art"] &&
-          //   <GraphView width={800} height={600} graph={pathwayData["Computer Science"]}/>
-        }
-        {
-          <GraphView width={800} height={600} graph={csGraph}/>
-        }
-
-        <Flex 
-          width={800} 
-          justify="space-between"
-          padding={3}
-        >
-
-          <Box>
-            <Button colorScheme="cyan"> Save Loadout </Button>
-          </Box>
-
-          <Box>
-            <Select 
-              bg="gray.600" 
-              color="white"
-              placeholder="Select concentration" 
-            >
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
-            </Select>
-          </Box>
-
-        </Flex>
-
-        { JSON.stringify(pathwayData) }
-
-      </center>
-    </div>
-  );
+  let ret = {
+    data: {
+      "Computer Science": csGraph, 
+      "Visual Art": visaGraph 
+    }
+  };
+  return ret;
 }
+
+export const GetPathwayData = createAsyncThunk(
+  'appData/getPathWayDataThunk', 
+  async (userData, { dispatch, rejectWithValue }) => {
+
+    getRequest("pathwayData/").then((res) => {
+      res = { 
+        data: {
+          concentration: "Computer Science",
+          graph: "hello it works!!!" 
+        }
+      };
+      console.log(JSON.stringify(res));
+      dispatch(setPathwayData(res.data));
+      return;
+    }, (err) => {
+      console.log("error in Network.GetPathwayData: " + JSON.stringify(err));
+      // dispatch(setStatus(err.response.status));
+      return rejectWithValue(err.message);
+    });
+  }
+);
 

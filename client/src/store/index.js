@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import thunk from 'redux-thunk';
+import appDataReducer from './slices/appDataSlice';
 
 export default configureStore({
   reducer: {
+    appData: appDataReducer
   }
 });
 
