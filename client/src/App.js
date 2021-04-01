@@ -1,6 +1,8 @@
 import './App.css';
 import { Route, Switch } from 'react-router-dom';
 import HomePage from './views/HomePage';
+import AppHeader from './components/AppHeader';
+import AppFooter from './components/AppFooter';
 
 const routes = [
   { path: '/', name: 'Home', Component: HomePage }
@@ -18,9 +20,11 @@ function App() {
 
   return (
     <div className="App">
+      <AppHeader />
       <Switch>
         { renderRoutes() }
       </Switch>
+      <AppFooter />
     </div>
   );
 }
