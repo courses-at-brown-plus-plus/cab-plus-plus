@@ -6,7 +6,7 @@ export default function AppFooter() {
   return (
     <div style={{marginBottom: "2rem", width: "100%"}}>
       Report an issue to us!! 
-      <Button variant="link"> Link </Button>
+      <Button variant="link" colorScheme="cyan"> Link </Button>
     </div>
   );
 }

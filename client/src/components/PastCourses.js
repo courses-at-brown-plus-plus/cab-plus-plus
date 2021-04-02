@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllCourseCodes, selectCoursesTaken, 
   addCourseTaken, removeCourseTaken} from '../store/slices/appDataSlice';
 
-import { InputGroup, Input, InputRightAddon, 
+import { InputGroup, Input, 
   Button, Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
 
 
@@ -34,7 +34,7 @@ export default function PastCourses(props) {
   }
 
   return (
-    <div style={{width: "24vw"}}>
+    <div style={{width: "20vw", marginRight: "3rem"}}>
       <InputGroup style={(courseExists) ? styles.inputGroup: styles.inputGroupError}>
         <Input 
           value={courseInputValue} 

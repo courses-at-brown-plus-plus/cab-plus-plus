@@ -5,11 +5,10 @@ export const slice = createSlice({
   initialState: {
     pathwayData: {"placeholderConcentration": "aGraph"},
     allCourseCodes: [],
-    coursesTaken: ['What']
+    coursesTaken: []
     // graph annotations
-    // courses taken
-    // undo tree for "courses taken" input
-    // undo tree for graph annotations
+    // undo tree for "courses taken" input?
+    // undo tree for graph annotations?
   }, 
   reducers: {
     setPathwayData: (state, action) => {

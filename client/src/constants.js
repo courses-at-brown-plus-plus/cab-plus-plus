@@ -7,6 +7,24 @@ export const COURSE_CODES = [
   "MATH0540"
 ]
 
+export const COURSE_DESCRIPTIONS = [
+  {
+    title: "VISA 0160 Foundation Painting", 
+    description: "[Course description from C@B]", 
+    link: "#"
+  }, 
+  {
+    title: "CSCI 1270 Database Management Systems", 
+    description: "[Course description from C@B]", 
+    link: "#"
+  }, 
+  {
+    title: "VISA 0150 Digital 2D Foundation", 
+    description: "[Course description from C@B]", 
+    link: "#"
+  }
+]
+
 export const PATHWAY_DATA = {
   "Computer Science": {
     'CS15': ['CS16'], 

@@ -3,8 +3,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import { setPathwayData, setAllCourseCodes } from '../store/slices/appDataSlice';
 import { PATHWAY_DATA, COURSE_CODES } from '../constants';
 
-import { CourseNode, Edge } from '../components/Graph';
-
 export const getRequest = async (resource) => {
   // const res = await axios.get(url + resource, {
   //   headers: {
@@ -17,6 +15,7 @@ export const getRequest = async (resource) => {
   const res = await setTimeout(() => {
     return "get request dummy data";
   }, 2);
+  return res;
 }
 
 export const GetPathwayData = createAsyncThunk(
