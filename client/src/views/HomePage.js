@@ -73,13 +73,12 @@ export default function HomePage() {
       <PastCourses />
 
       <center>
-        data from dummy csGraph variable
         <GraphView width={800} height={600} graph={csGraph}/>
-        <hr/>
-        <br/>
+        data from dummy csGraph variable
+        <hr/> <br/> <br/>
 
-        data from redux
         { renderGraph() }
+        data from redux
 
         <Flex 
           width={800} 
@@ -108,6 +107,12 @@ export default function HomePage() {
 
       </center>
 
+      <Box>
+        <Box p="5" style={styles.boxContainer}>
+          <h1><b>Saved Loadouts</b></h1>
+        </Box>
+      </Box>
+
     </React.Fragment>
   );
 
@@ -115,6 +120,16 @@ export default function HomePage() {
     return Object.keys(pathwayData).map((concentrationName) => (
       <option key={concentrationName} value={concentrationName}>{concentrationName}</option>
     ));
+  }
+}
+
+const styles = {
+  boxContainer: {
+    width: "14vw", 
+    marginLeft: "3rem",
+    minHeight: "30vh",
+    border: "2px solid black",
+    borderRadius: "1.6rem"
   }
 }
 
