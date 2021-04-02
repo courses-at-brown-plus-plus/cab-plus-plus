@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Select, Button, Box, Flex } from "@chakra-ui/react"
 import GraphView from '../components/GraphView';
 import { CourseNode, Edge } from '../components/Graph';
+import PastCourses from '../components/PastCourses';
 
 import { useSelector } from 'react-redux';
 import { selectPathwayData } from '../store/slices/appDataSlice';
@@ -68,14 +69,17 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      <br/>
+    <Flex justify="center" mt="8">
 
-      <center>
-        data from dummy csGraph variable
-        <GraphView width={800} height={600} graph={csGraph}/>
-        <hr/>
-        <br/>
+      <PastCourses />
+
+      <center style={{marginLeft: "3rem"}}>
+        {
+        // data from dummy csGraph variable
+        // <GraphView width={800} height={600} graph={csGraph}/>
+        // <hr/>
+        // <br/>
+        }
         data from redux
         { renderGraph() }
 
@@ -102,11 +106,11 @@ export default function HomePage() {
           </Box>
 
         </Flex>
-
         Selected Concentration: { selectedConcentration }
 
       </center>
-    </div>
+
+    </Flex>
   );
 
   function renderDropdownItems() {
