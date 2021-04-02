@@ -35,9 +35,11 @@ function App() {
   return (
     <div className="App">
       <AppHeader />
-      <Switch>
-        { renderRoutes() }
-      </Switch>
+      <div className="page-view">
+        <Switch>
+          { renderRoutes() }
+        </Switch>
+      </div>
       <AppFooter />
     </div>
   );

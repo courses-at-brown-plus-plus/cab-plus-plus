@@ -22,5 +22,18 @@ export const slice = createSlice({
 export const { setPathwayData } = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;
+// export const selectConcentrations = state => {
+//   let concentrations = Object.entries(state.appData.pathwayData).map(([concentrationName, values]) => {
+//     return baseCourse;
+//   });
+//   for (const [baseCourse, unlockedCourses] of Object.entries(concentrationInfo)) {
+//     let courseEdges = unlockedCourses.map((nextCourse) => {
+//       return new Edge(baseCourse, nextCourse, 0);
+//     });
+//     aGraph.set(baseCourse, new CourseNode(baseCourse, courseEdges, []));
+//   }
+//   return state.appData.pathwayData;
+
+// }
 
 export default slice.reducer;

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Select, Button, Box, Flex } from "@chakra-ui/react"
 import GraphView from '../components/GraphView';
 import { CourseNode, Edge } from '../components/Graph';
@@ -9,6 +9,11 @@ import { selectPathwayData } from '../store/slices/appDataSlice';
 export default function HomePage() {
 
   const pathwayData = useSelector(selectPathwayData);
+  const [selectedConcentration, setSelectedConcentration] = useState("");
+
+  function handleConcentrationChange(e) {
+    setSelectedConcentration(e.target.value);
+  }
 
   let csGraph = new Map();
   csGraph.set('CS15', new CourseNode('CS15', [new Edge('CS15', 'CS16', 0)], []));
@@ -33,20 +38,46 @@ export default function HomePage() {
   csGraph.set('CS171', new CourseNode('CS171', [], []));
   csGraph.set('CS1420', new CourseNode('CS1420', [], []));
 
+  function infoToGraph(concentrationInfo) {
+    let aGraph = new Map();
+    for (const [baseCourse, unlockedCourses] of Object.entries(concentrationInfo)) {
+      let courseEdges = unlockedCourses.map((nextCourse) => {
+        return new Edge(baseCourse, nextCourse, 0);
+      });
+      aGraph.set(baseCourse, new CourseNode(baseCourse, courseEdges, []));
+    }
+    return aGraph;
+  }
+
+  function renderGraph() {
+    console.log("rendering new graph for concentrationName: " + selectedConcentration);
+    let aGraph;
+    if (pathwayData && pathwayData[selectedConcentration]) {
+      aGraph = infoToGraph(pathwayData[selectedConcentration]);
+      return <GraphView width={800} height={600} graph={aGraph}/>;
+    }
+    else {
+      // empty graph; no concentration selected
+      let emptyGraph = new Map();
+      emptyGraph.set('MATH0520', new CourseNode('MATH0520', [new Edge('MATH0520', 'CS1420', 0)], []));
+      emptyGraph.set('CS1420', new CourseNode('CS1420', [], []));
+      emptyGraph.set('CS22', new CourseNode('CS22', [new Edge('CS22', 'CS1010', 0)], []));
+      emptyGraph.set('CS1010', new CourseNode('CS1010', [], []));
+      return <GraphView width={800} height={600} graph={emptyGraph}/>;
+    }
+  }
+
   return (
     <div>
-      <h1>Welcome to C@B++!</h1>
-
       <br/>
 
       <center>
-        {
-          // pathwayData && pathwayData["Visual Art"] &&
-          //   <GraphView width={800} height={600} graph={pathwayData["Computer Science"]}/>
-        }
-        {
-          <GraphView width={800} height={600} graph={csGraph}/>
-        }
+        data from dummy csGraph variable
+        <GraphView width={800} height={600} graph={csGraph}/>
+        <hr/>
+        <br/>
+        data from redux
+        { renderGraph() }
 
         <Flex 
           width={800} 
@@ -63,19 +94,25 @@ export default function HomePage() {
               bg="gray.600" 
               color="white"
               placeholder="Select concentration" 
+              value={selectedConcentration}
+              onChange={handleConcentrationChange}
             >
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              { renderDropdownItems() }
             </Select>
           </Box>
 
         </Flex>
 
-        { JSON.stringify(pathwayData) }
+        Selected Concentration: { selectedConcentration }
 
       </center>
     </div>
   );
+
+  function renderDropdownItems() {
+    return Object.keys(pathwayData).map((concentrationName) => (
+      <option key={concentrationName} value={concentrationName}>{concentrationName}</option>
+    ));
+  }
 }
 

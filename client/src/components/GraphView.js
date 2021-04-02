@@ -225,8 +225,9 @@ function prepareGraph(nodeGraph) {
 function GraphView(props) {
   const canvasRef = useRef(null);
   
-  let nodeGraphRef = useRef(props.graph);
-  let nodeGraph = nodeGraphRef.current;
+  // let nodeGraphRef = useRef(props.graph);
+  // let nodeGraph = nodeGraphRef.current;
+  let nodeGraph = props.graph;
   let layersRef = useRef(null);
   let layers = layersRef.current;
 
@@ -239,6 +240,11 @@ function GraphView(props) {
     layersRef.current = prepareGraph(nodeGraph)
     layers = layersRef.current;
   }, [])
+
+  useEffect(() => {
+    layersRef.current = prepareGraph(nodeGraph)
+    layers = layersRef.current;
+  }, [props.graph])
 
   function drawNode(ctx, node, x, y) {
     let expand = 0;
