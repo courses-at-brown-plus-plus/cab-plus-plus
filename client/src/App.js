@@ -7,7 +7,7 @@ import AppHeader from './components/AppHeader';
 import AppFooter from './components/AppFooter';
 
 import { useDispatch } from 'react-redux';
-import { GetPathwayData } from './api/Network';
+import { GetPathwayData, GetAllCourseCodes } from './api/Network';
 
 const routes = [
   { path: '/', name: 'Home', Component: HomePage }
@@ -19,6 +19,7 @@ function App() {
   useEffect(() => {
     // request all the graph node/edge data, store in redux
     dispatch(GetPathwayData());
+    dispatch(GetAllCourseCodes());
     // pass json data into map object when concentration selected (cache the generated map objects)
   }, []);
 

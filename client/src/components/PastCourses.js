@@ -1,31 +1,27 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAllCourseCodes, selectCoursesTaken, 
+  addCourseTaken, removeCourseTaken} from '../store/slices/appDataSlice';
+
 import { InputGroup, Input, InputRightAddon, 
   Button, Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
-// import './PastCourses.css';
+
 
 export default function PastCourses(props) {
+
+  const dispatch = useDispatch();
+  const allCourseCodes = useSelector(selectAllCourseCodes);
+  const coursesTaken = useSelector(selectCoursesTaken);
 
   const [courseExists, setCourseExists] = useState(true);
   const [courseInputValue, setCourseInputValue] = useState("");
 
-  // const [coursesTaken, setCoursesTaken] = useState(["CS19"]);
-  const courseOptions = [
-    "CS19", 
-    "CS30", 
-    "CS32", 
-    "MATH0520", 
-    "MATH0540"
-  ]
-  const [coursesTaken, setCoursesTaken] = useState(courseOptions);
-
   function handleAddCourse() {
-    if (courseOptions.includes(courseInputValue)) {
+    if (allCourseCodes.includes(courseInputValue)) {
       if (!coursesTaken.includes(courseInputValue)) {
-        console.log("adding tag: " + courseInputValue);
-        let newCoursesTaken = [...coursesTaken];
-        newCoursesTaken.push(courseInputValue);
-        setCoursesTaken(newCoursesTaken);
+        dispatch(addCourseTaken(courseInputValue));
       }
+      setCourseInputValue("");
       setCourseExists(true);
     }
     else {
@@ -34,12 +30,7 @@ export default function PastCourses(props) {
   }
 
   function handleCloseTag(courseName) {
-    let targetIndex = coursesTaken.indexOf(courseName);
-    let newCoursesTaken = [...coursesTaken];
-    if (targetIndex !== -1) {
-      newCoursesTaken.splice(targetIndex, 1);
-      setCoursesTaken(newCoursesTaken);
-    }
+    dispatch(removeCourseTaken(courseName));
   }
 
   return (
@@ -64,6 +55,7 @@ export default function PastCourses(props) {
               borderRadius="full"
               variant="solid"
               colorScheme="green"
+              key={aCourseName}
             >
               <TagLabel>{aCourseName}</TagLabel>
               <TagCloseButton onClick={() => handleCloseTag(aCourseName)} />
