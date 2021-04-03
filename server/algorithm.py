@@ -10,57 +10,82 @@ class CsvLoader(object):
         self.data = pd.read_csv(data_loc)
         self.headers = self.data.columns.tolist()
     
+    def __str__(self):
+        return self.data_loc
+
     def get_data(self, column: str = None):
-        if column is not None:
+        if column is None:
             return self.data
         else:
-            if column not in self.headers:
+            if column in self.headers:
                 return self.data[column]
             else:
                 return None
 
-class AlgorithmLoader(object):
+class TextComparison(object):
     def __init__(self, model_loc: str):
         self.model_loc = model_loc
         self.model = hub.load(model_loc)
+        self.data = None
     
+    def __str__(self):
+        return self.model_loc
+
     def use_similarity(self, base_document: str, documents: list):
         base_embeddings = self.model([base_document])
         embeddings = self.model(documents)
 
         scores = cosine_similarity(base_embeddings, embeddings).flatten()
         return scores
-
-        # highest_score = 0
-        # highest_score_index = 0
-        # for i, score in enumerate(scores):
-        #     if highest_score < score:
-        #         highest_score = score
-        #         highest_score_index = i
-
-        # most_similar_document = documents[highest_score_index]
-        # print("Most similar document by USE with the score:", most_similar_document, highest_score)
     
-    def get_cross_product(self, docs: list):
+    def get_cross_product_similarity(self, docs: list, names: list):
         doc_sims = []
         for doc in docs:
             doc_sims.append(self.use_similarity(doc, docs))
-        return doc_sims
+        self.data = pd.DataFrame(doc_sims, names, names)
 
+    def import_saved_similarity(self, filename: str):
+        self.data = pd.read_csv(filename, index_col=0)
+    
+    def save_scores(self, filename: str):
+        if self.data is not None:
+            self.data.to_csv(filename)
+            return True
+        else:
+            return False
+    
+    def get_data(self):
+        return self.data
 
+    def clear_data(self):
+        self.data = None
+    
+    def get_most_similar(self, column: str, num: int = 1):
+        if self.data is not None:
+            return sorted(list(zip(self.data.columns.tolist(), self.data[column])), key=lambda a: a[1], reverse=True)[1: num + 1]
+        else:
+            return None
 
-base_document = "This is an example sentence for the document to be compared"
-documents = ["This is an example sentence for the document to be compared", "This is the collection of documents to be compared against the base_document"]
+class MetadataComparison(object):
+    def __init__(self, metadata_loc: str):
+        self.metadata_loc = metadata_loc
+        self.data = CsvLoader(metadata_loc)
 
-algorithm = AlgorithmLoader("./models/universal-sentence-encoder_4")
-scores = algorithm.use_similarity(base_document, documents)
+    def __str__(self):
+        return self.metadata_loc
 
-highest_score = 0
-highest_score_index = 0
-for i, score in enumerate(scores):
-    if highest_score < score:
-        highest_score = score
-        highest_score_index = i
+class Algorithm(object):
+    def __init__(self, text_compare: TextComparison, metadata_compare: MetadataComparison):
+        self.text_compare = text_compare
+        self.metadata_compare = metadata_compare
 
-most_similar_document = documents[highest_score_index]
-print("Most similar document by USE with the score:", most_similar_document, highest_score)
+if __name__ == "__main__":
+    # data = CsvLoader("./data/CAB_v1.csv")
+    # algorithm = TextComparison("./models/universal-sentence-encoder_4")
+    # print(data.get_data("courseDesc"))
+    # algorithm.get_cross_product_similarity(data.get_data("courseDesc"), data.get_data("courseCode"))
+    # algorithm.save_scores("./data/similarities.csv")
+    
+    algorithm = TextComparison("./models/universal-sentence-encoder_4")
+    algorithm.import_saved_similarity("./data/similarities.csv")
+    print(algorithm.get_most_similar("CSCI 0330"))
