@@ -80,12 +80,12 @@ class Algorithm(object):
         self.metadata_compare = metadata_compare
 
 if __name__ == "__main__":
-    # data = CsvLoader("./data/CAB_v1.csv")
-    # algorithm = TextComparison("./models/universal-sentence-encoder_4")
-    # print(data.get_data("courseDesc"))
-    # algorithm.get_cross_product_similarity(data.get_data("courseDesc"), data.get_data("courseCode"))
-    # algorithm.save_scores("./data/similarities.csv")
-    
+    data = CsvLoader("./data/CAB_v1.csv")
     algorithm = TextComparison("./models/universal-sentence-encoder_4")
-    algorithm.import_saved_similarity("./data/similarities.csv")
-    print(algorithm.get_most_similar("CSCI 0330"))
+    print(data.get_data("courseDesc"))
+    algorithm.get_cross_product_similarity(data.get_data("courseDesc"), data.get_data("courseCode"))
+    algorithm.save_scores("./data/similarities.csv")
+
+    # algorithm = TextComparison("./models/universal-sentence-encoder_4")
+    # algorithm.import_saved_similarity("./data/similarities.csv")
+    # print(algorithm.get_most_similar("CSCI 0330"))

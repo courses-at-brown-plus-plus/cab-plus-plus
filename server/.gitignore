@@ -1,0 +1,5 @@
+# Large model files
+models/
+
+# Large data files
+data/similarities.csv
