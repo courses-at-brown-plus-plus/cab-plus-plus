@@ -1,8 +1,14 @@
 from sklearn.metrics.pairwise import cosine_similarity
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import tensorflow as tf
 import tensorflow_hub as hub
 import pandas as pd
+
+import sys
+import getopt
 
 class CsvLoader(object):
     def __init__(self, data_loc: str):
@@ -23,9 +29,14 @@ class CsvLoader(object):
                 return None
 
 class TextComparison(object):
-    def __init__(self, model_loc: str):
-        self.model_loc = model_loc
-        self.model = hub.load(model_loc)
+    def __init__(self, model_loc: str = None):
+        if model_loc is None:
+            self.model_loc = None
+            self.model = None
+        else:
+            self.model_loc = model_loc
+            self.model = hub.load(model_loc)
+
         self.data = None
     
     def __str__(self):
@@ -80,12 +91,44 @@ class Algorithm(object):
         self.metadata_compare = metadata_compare
 
 if __name__ == "__main__":
-    data = CsvLoader("./data/CAB_v1.csv")
-    algorithm = TextComparison("./models/universal-sentence-encoder_4")
-    print(data.get_data("courseDesc"))
-    algorithm.get_cross_product_similarity(data.get_data("courseDesc"), data.get_data("courseCode"))
-    algorithm.save_scores("./data/similarities.csv")
+    default_formatting_error = "Arguments not formatted properly. Run `python3 algorithm.py -h` to see the allowed argument formats."
 
-    # algorithm = TextComparison("./models/universal-sentence-encoder_4")
-    # algorithm.import_saved_similarity("./data/similarities.csv")
-    # print(algorithm.get_most_similar("CSCI 0330"))
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hs:d:m:c:")
+    except getopt.GetoptError:
+        print(default_formatting_error)
+        sys.exit()
+    
+    flags = [x[0] for x in opts]
+
+    if '-h' in flags:
+        print("Usage: python3 algorithm.py -m <model_location> -t <textdata_location> -s <save_location> \n OR \n" + 
+            "python3 algorithm.py -c <course_name> -d <similaritydata_location> [-n <num_recommendations>]")
+        sys.exit()
+    elif '-m' in flags and '-s' in flags and '-t' in flags:
+        model_loc = [x[1] for x in opts if x[0]=="-m"][0]
+        save_loc = [x[1] for x in opts if x[0]=="-s"][0]
+        data_loc = [x[1] for x in opts if x[0]=="-t"][0]
+
+        data = CsvLoader(data_loc)
+        algorithm = TextComparison(model_loc)
+        # print(data.get_data("courseDesc"))
+        algorithm.get_cross_product_similarity(data.get_data("courseDesc"), data.get_data("courseCode"))
+        algorithm.save_scores(save_loc)
+
+        sys.exit()
+    elif '-c' in flags and '-d' in flags:
+        course = [x[1] for x in opts if x[0]=="-c"][0]
+        similarity_data_loc = [x[1] for x in opts if x[0]=="-d"][0]
+
+        algorithm = TextComparison()
+        algorithm.import_saved_similarity(similarity_data_loc)
+
+        if '-n' in opts:
+            print(algorithm.get_most_similar(course, int([x[1] for x in opts if x[0]=="-n"][0])))
+        else:
+            print(algorithm.get_most_similar(course))
+        sys.exit()
+    else:
+        print(default_formatting_error)
+        sys.exit()
