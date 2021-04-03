@@ -137,7 +137,7 @@ function countCrossingsGraph(layeredGraph, nodeGraph) {
   return count;
 }
 
-// Position each node between its neighbors
+
 function medianHeuristic(layer1, layer2) {
   let medians = new Map();
   for (let node2 of layer2) {
@@ -157,8 +157,13 @@ function medianHeuristic(layer1, layer2) {
       medians.set(node2.id, l[(l.length - 1) / 2])
     }
   }
-  layer2.sort((a, b) => medians.get(a.id) - medians.get(b.id));
+  return medians;
+}
 
+// Position each node between its neighbors
+function sortByMedian(layer1, layer2) {
+  let medians = medianHeuristic(layer1, layer2)
+  layer2.sort((a, b) => medians.get(a.id) - medians.get(b.id));
   return layer2;
 }
 
@@ -168,20 +173,28 @@ function permuteGraph(layerGraph, nodeGraph) {
   for (let n = 1; n < layerGraph.length; n++) {
     let layer1 = [...layerGraph[n - 1]];
     let layer2 = [...layerGraph[n]];
-    layerGraph[n] =  medianHeuristic(layer1, layer2);
+    layerGraph[n] =  sortByMedian(layer1, layer2);
   }
 
 
-  let minCross = countCrossingsGraph(layerGraph, nodeGraph);;
+  let minCross = countCrossingsGraph(layerGraph, nodeGraph);
+
+
+
   for (let i = 0; i < 10000; i++) {
-    let depth = 1 + Math.floor(Math.random() * (layerGraph.length - 1))
+    let depth = Math.floor(Math.random() * (layerGraph.length - 1))
     let left = Math.floor(Math.random() * (layerGraph[depth].length - 1))
     let right = left + 1;
     [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
     let c2 = countCrossingsGraph(layerGraph, nodeGraph);
     if (c2 > minCross) {
       [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
-    } else {
+    } else if (c2 == minCross) {
+      if (layerGraph[depth][left].id > layerGraph[depth][right].id) {
+        [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
+      }
+    }
+    else {
       minCross = c2;
     }
   }
@@ -211,7 +224,30 @@ function removeDummyVertices(layeredGraph, nodeGraph) {
 }
 
 function addInvisibleNodes(layeredGraph) {
-  
+  for (let i = 1; i < layeredGraph.length; i++) {
+    let numInvis = layeredGraph[i - 1].length - layeredGraph[i].length;
+    let medians = medianHeuristic(layeredGraph[i - 1], layeredGraph[i]);
+    let currLayer = [...layeredGraph[i]];
+    let newLayer = [];
+
+    for (let j = 0; j < layeredGraph[i - 1].length; j++) {
+      if (currLayer.length === 0) {
+        break;
+      }
+      if (medians.get(currLayer[0].id) - j < 1) {
+        newLayer.push(currLayer.shift())
+      } else {
+        newLayer.push(new CourseNode('' + i + ',' + j, [], [], false, true));
+      }
+    }
+    newLayer = newLayer.concat(currLayer);
+    let targetLength = layeredGraph[i - 1].length - newLayer.length;
+    for (let j = 0; j < targetLength; j++) {
+      newLayer.push(new CourseNode('' + i + ',' + j * 100, [], [], false, true));
+    }
+    layeredGraph[i] = newLayer;
+
+  }
 }
 
 function prepareGraph(nodeGraph) {
@@ -219,6 +255,7 @@ function prepareGraph(nodeGraph) {
   addDummyVertices(nodeGraph, result);
   result = permuteGraph(result, nodeGraph);
   removeDummyVertices(result, nodeGraph);
+  addInvisibleNodes(result);
   return result;
 }
 
@@ -230,10 +267,15 @@ function GraphView(props) {
   let layersRef = useRef(null);
   let layers = layersRef.current;
 
+  const [xOffset, setXOffset] = useState(100.5);
+  const [yOffset, setYOffset] = useState(0.5);
+
   const [activeNodes, setActiveNodes] = useState([]);
 
   // Screen coordinates of center of each node
   const nodeCoords = useRef(new Map());
+
+  const [focus, setFocus] = useState(false);
 
   useEffect(() => {
     layersRef.current = prepareGraph(nodeGraph)
@@ -241,22 +283,22 @@ function GraphView(props) {
   }, [])
 
   function drawNode(ctx, node, x, y) {
-    let expand = 0;
-
-    ctx.fillStyle = 'white';
-    if (activeNodes.includes(node.id)) {
-      ctx.fillRect(x - NODE_WIDTH / 2 - expand, y - NODE_HEIGHT / 2 - expand, NODE_WIDTH + 2 * expand, NODE_HEIGHT + 2 * expand);
-      ctx.strokeStyle = 'black';
-      ctx.strokeRect(x - NODE_WIDTH / 2 - expand, y - NODE_HEIGHT / 2 - expand, NODE_WIDTH + 2 * expand, NODE_HEIGHT + 2 * expand);
-    } else {
-      ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
-      ctx.strokeStyle = '#ccc';
-      ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
+    if (focus && !activeNodes.includes(node.id)) {
+      ctx.globalAlpha = 0.5;
     }
+    ctx.fillStyle = 'white';
+    ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
+    if (activeNodes.includes(node.id)) {
+      ctx.strokeStyle = 'black';
+    } else {
+      ctx.strokeStyle = '#ccc';
+    }
+    ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
     ctx.fillStyle = 'black';
     ctx.font = "14px Helvetica";
     ctx.textAlign = "center";
     ctx.fillText(node.id, x - NODE_WIDTH / 2 + NODE_WIDTH / 2, y - NODE_HEIGHT / 2 + 20);
+    ctx.globalAlpha = 1;
   }
 
   function makeActive(node, activeList) {
@@ -273,26 +315,50 @@ function GraphView(props) {
     let canvas = canvasRef.current;
     let mouseX = event.clientX - canvas.offsetLeft;
     let mouseY = event.clientY - canvas.offsetTop;
+
+
     for (let [node, coords] of nodeCoords.current) {
       if (nodeGraph.has(node)
         && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 
         && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2) {
-        nodeGraph.get(node).active = true;
-        let l = [];
-        makeActive(node, l);
-        setActiveNodes(l);
+        if (!focus) {
+          nodeGraph.get(node).active = true;
+          let l = [];
+          makeActive(node, l);
+          setActiveNodes(l);
+        }
         canvas.style.cursor = 'pointer';
         return;
       }
     }
-    setActiveNodes([]);
+    if (!focus) {
+      setActiveNodes([]);
+    }
     canvas.style.cursor = 'default';
+  }
+
+  function handleMouseUp(event) {
+    let canvas = canvasRef.current;
+    let mouseX = event.clientX - canvas.offsetLeft;
+    let mouseY = event.clientY - canvas.offsetTop;
+    for (let [node, coords] of nodeCoords.current) {
+      if (nodeGraph.has(node)
+        && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 
+        && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2) {
+        setFocus(true);
+        nodeGraph.get(node).active = true;
+        let l = [];
+        makeActive(node, l);
+        setActiveNodes(l);
+        return;
+      }
+    }
+    setFocus(false);
   }
 
   useEffect(() => {
     let canvas = canvasRef.current;
     let ctx = canvas.getContext('2d');
-    ctx.translate(0.5, 0.5);
 
 
     // Fix canvas blur
@@ -316,37 +382,48 @@ function GraphView(props) {
       for (let j = 0; j < layers[i].length; j++) {
         // center nodes horizontally
         let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
-        nodeCoords.current.set(layers[i][j].id, [x, y]);
+        nodeCoords.current.set(layers[i][j].id, [x + xOffset, y + yOffset]);
         x += 100;
       }
       y += 100;
     }
 
+    let activeEdges = [];
     for (let [node, coords] of nodeCoords.current.entries()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
         drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
+
         for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
           let edge = nodeGraph.get(node).edges[i];
+          if (activeNodes.includes(edge.start)) {
+            activeEdges.push(edge)
+            continue;
+          }
           let start = nodeCoords.current.get(edge.start);
           ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
           let end = nodeCoords.current.get(edge.end);
           ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
           ctx.strokeStyle = '#ccc';
-          if (activeNodes.includes(edge.start)) {
-            ctx.strokeStyle = '#777';
-          }
           ctx.stroke();
         }
       }
       ctx.closePath();
     }
-    ctx.translate(-0.5, -0.5);
+    for (let edge of activeEdges) {
+      let start = nodeCoords.current.get(edge.start);
+      ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
+      let end = nodeCoords.current.get(edge.end);
+      ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+      ctx.strokeStyle = '#666';
+      ctx.stroke();
+    }
   });
 
   return (
     <div>
-      <canvas ref={canvasRef} width={props.width} height={props.height} onMouseMove={handleMouseMove}/>
+      <canvas ref={canvasRef} width={props.width} height={props.height} onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}/>
     </div>
   );
 }
