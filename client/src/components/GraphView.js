@@ -319,8 +319,8 @@ function GraphView(props) {
 
   function handleMouseMove(event) {
     let canvas = canvasRef.current;
-    let mouseX = event.clientX - canvas.offsetLeft;
-    let mouseY = event.clientY - canvas.offsetTop;
+    let mouseX = event.pageX - canvas.offsetLeft;
+    let mouseY = event.pageY - canvas.offsetTop;
 
 
     for (let [node, coords] of nodeCoords.current) {
@@ -345,8 +345,8 @@ function GraphView(props) {
 
   function handleMouseUp(event) {
     let canvas = canvasRef.current;
-    let mouseX = event.clientX - canvas.offsetLeft;
-    let mouseY = event.clientY - canvas.offsetTop;
+    let mouseX = event.pageX - canvas.offsetLeft;
+    let mouseY = event.pageY - canvas.offsetTop;
     for (let [node, coords] of nodeCoords.current) {
       if (nodeGraph.has(node)
         && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 
