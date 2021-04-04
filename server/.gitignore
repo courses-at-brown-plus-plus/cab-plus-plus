@@ -1,0 +1,5 @@
+# Large model files
+models/universal-sentence-encoder_4/
+
+# Large data files
+data/similarities.csv

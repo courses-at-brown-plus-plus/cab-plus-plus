@@ -137,9 +137,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Large model files
-server/models/
-
 # misc
 **.DS_Store**
 .idea/
