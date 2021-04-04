@@ -44,6 +44,8 @@ export default function HomePage() {
   csGraph.set('CS1420', new CourseNode('CS1420', [], []));
   csGraph.set('CS33', new CourseNode('CS33', [], []));
 
+  //csGraph = Object.fromEntries(csGraph);
+
   function infoToGraph(concentrationInfo) {
     let aGraph = new Map();
     for (const [baseCourse, unlockedCourses] of Object.entries(concentrationInfo)) {

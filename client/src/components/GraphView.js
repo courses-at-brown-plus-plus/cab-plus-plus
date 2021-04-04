@@ -7,7 +7,7 @@ const NODE_HEIGHT = 50;
 // Convert from node representation to edge representation
 function nodeToEdgeGraph(nodeGraph) {
   let result = new Set();
-  for (let node of nodeGraph.values()) {
+  for (let [id, node] of nodeGraph.entries()) {
     for (let edge of node.edges) {
       result.add(edge);
     }
@@ -181,7 +181,7 @@ function permuteGraph(layerGraph, nodeGraph) {
 
 
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 100; i++) {
     let depth = Math.floor(Math.random() * (layerGraph.length - 1))
     let left = Math.floor(Math.random() * (layerGraph[depth].length - 1))
     let right = left + 1;

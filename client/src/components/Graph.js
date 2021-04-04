@@ -17,7 +17,7 @@ class Edge {
   }
 }
 
-//A node graph should be a Map of id : Node
+//A node graph should be an object of id : Node
 //An edge graph should be any collection of edges
 
 export { CourseNode, Edge };
