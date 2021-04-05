@@ -5,7 +5,8 @@ export const slice = createSlice({
   initialState: {
     pathwayData: {"placeholderConcentration": "aGraph"},
     allCourseCodes: [],
-    coursesTaken: []
+    coursesTaken: [], 
+    recommendedCourses: []
     // graph annotations
     // undo tree for "courses taken" input?
     // undo tree for graph annotations?
@@ -16,6 +17,9 @@ export const slice = createSlice({
     },
     setAllCourseCodes: (state, action) => {
       state.allCourseCodes = action.payload;
+    },
+    setRecommendedCourses: (state, action) => {
+      state.recommendedCourses = action.payload;
     },
     addCourseTaken: (state, action) => {
       state.coursesTaken.push(action.payload);
@@ -32,11 +36,12 @@ export const slice = createSlice({
   }
 })
 
-export const { setPathwayData, setAllCourseCodes, addCourseTaken, removeCourseTaken } = slice.actions;
+export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, addCourseTaken, removeCourseTaken } = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;
 export const selectAllCourseCodes = state => state.appData.allCourseCodes;
 export const selectCoursesTaken = state => state.appData.coursesTaken;
+export const selectRecommendedCourses = state => state.appData.recommendedCourses;
 // export const selectConcentrations = state => {
 //   let concentrations = Object.entries(state.appData.pathwayData).map(([concentrationName, values]) => {
 //     return baseCourse;

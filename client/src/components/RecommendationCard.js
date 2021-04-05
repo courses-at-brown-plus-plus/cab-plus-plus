@@ -15,7 +15,6 @@ const styles = {
   boxContainer: {
     textAlign: "left", 
     lineHeight: "2em", 
-    width: "28vw", 
     marginBottom: "1rem"
   }
 }

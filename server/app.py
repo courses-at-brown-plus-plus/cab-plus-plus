@@ -11,12 +11,18 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 cabData = {}
 
-@app.route("/getPathwayData", methods=["GET"])
+@app.route("/allPathwayData", methods=["GET"])
 @cross_origin()
-def getPathwayData(): 
+def allPathwayData(): 
     # Reformat cab data for frontend
     pathwayData = cabData
     return jsonify({"pathwayData": pathwayData}), 200
+
+@app.route("/allCourseCodes", methods=["GET"])
+@cross_origin()
+def allCourseCodes(): 
+    courseCodes = cabData.keys()
+    return jsonify({"courseCodes": courseCodes}), 200
 
 @app.route("/generateRecommendations", methods=["POST"])
 @cross_origin()

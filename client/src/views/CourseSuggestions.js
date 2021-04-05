@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { GetRecommendations } from '../api/Network';
+
+import { selectRecommendedCourses } from '../store/slices/appDataSlice';
+
+
 import PastCourses from '../components/PastCourses';
 import RecommendationCard from '../components/RecommendationCard';
 import { Box, Button, Select } from "@chakra-ui/react"
-import { COURSE_DESCRIPTIONS } from '../constants';
 
 export default function CourseSuggestions() {
 
@@ -13,20 +19,29 @@ export default function CourseSuggestions() {
   //   "Priority4": -1
   // });
 
+
+  const recommendedCourses = useSelector(selectRecommendedCourses);
+
   const priorities = ["Time Commitment", "Difficulty", "Priority3", "Priority4"];
 
-  const [selectorContents, setSelectorContents] = useState({
+  const [priorityContents, setPriorityContents] = useState({
     "1": "", 
     "2": "", 
     "3": "", 
     "4": ""
   });
 
+  const dispatch = useDispatch();
+
+  function submitPriorityForm() {
+    dispatch(GetRecommendations(priorityContents));
+  }
+
   function handleSelectionChange(e, key) {
-    let newSelectorContents = {...selectorContents};
-    newSelectorContents[key] = e.target.value;
-    console.log(JSON.stringify(newSelectorContents));
-    setSelectorContents(newSelectorContents);
+    let newPriorityContents = {...priorityContents};
+    newPriorityContents[key] = e.target.value;
+    console.log(JSON.stringify(newPriorityContents));
+    setPriorityContents(newPriorityContents);
   }
 
   function renderDropdownOptions(availablePriorities) {
@@ -67,7 +82,7 @@ export default function CourseSuggestions() {
 
   function renderPriorityDropdowns() {
     // return Object.entries(priorities).map(([key, value]) => (
-    const takenPriorities = Object.values(selectorContents);
+    const takenPriorities = Object.values(priorityContents);
 
     // const availablePriorities = priorities.filter((aPriority) => !takenPriorities.includes(aPriority));
 
@@ -80,7 +95,7 @@ export default function CourseSuggestions() {
     // console.log("availablePriorities: ");
     // console.log(JSON.stringify(availablePriorities));
 
-    return Object.entries(selectorContents).map(([priorityNumber, selectedValue]) => (
+    return Object.entries(priorityContents).map(([priorityNumber, selectedValue]) => (
       <Select 
         placeholder="No Option Chosen" 
         key={priorityNumber}
@@ -111,12 +126,12 @@ export default function CourseSuggestions() {
           { renderPriorityDropdowns() }
 
         </Box>
-        <Button mt="5" colorScheme="red" bg="red.700" width="160px"> Submit </Button>
+        <Button onClick={() => submitPriorityForm()} mt="5" colorScheme="red" bg="red.700" width="160px"> Submit </Button>
         <br/>
       </Box>
 
-      <Box style={{marginLeft: "3rem"}}>
-        { COURSE_DESCRIPTIONS.map((aCourseInfo) => 
+      <Box style={{marginLeft: "3rem", width: "28vw"}}>
+        { recommendedCourses.map((aCourseInfo) => 
         <RecommendationCard 
           title={aCourseInfo.title} 
           description={aCourseInfo.description} 

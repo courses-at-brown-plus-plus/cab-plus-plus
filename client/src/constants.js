@@ -1,13 +1,13 @@
 
-export const COURSE_CODES = [
-  "CS19", 
-  "CS30", 
-  "CS32", 
-  "MATH0520", 
-  "MATH0540"
-]
+export const URL = "";
+export const AXIOS_CONFIG = {
+  headers: {
+    "Content-Type": "application/json",
+    'Access-Control-Allow-Origin': '*'
+  }
+};
 
-export const COURSE_DESCRIPTIONS = [
+export const RECOMMENDED_COURSES = [
   {
     title: "VISA 0160 Foundation Painting", 
     description: "[Course description from C@B]", 
@@ -23,6 +23,14 @@ export const COURSE_DESCRIPTIONS = [
     description: "[Course description from C@B]", 
     link: "#"
   }
+];
+
+export const COURSE_CODES = [
+  "CS19", 
+  "CS30", 
+  "CS32", 
+  "MATH0520", 
+  "MATH0540"
 ]
 
 export const PATHWAY_DATA = {
@@ -43,23 +51,6 @@ export const PATHWAY_DATA = {
     'CS1951A': []
   },
   "Visual Art": {
-    // 'VISA 0100': ['VISA 1110', 'VISA 1160', 'VISA 1310'], 
-    // 'VISA 0120': ['VISA 1310'], 
-    // 'VISA 0160': ['VISA 1310'], 
-    'VISA 0130': [], 
-    'VISA 0140': [], 
-    'VISA 0150': [], 
-    'VISA 1110': [], 
-    'VISA 1160': [], 
-    'VISA 1310': ['VISA 1320'], 
-    'VISA 1320': [],
-
-    'CS32': ['CS1951A'], 
-    'CS22': ['CS1010'], 
-    'CS1010': [], 
-    'CS1951A': []
-  },
-  "Visual Art (complete)": {
     'VISA 0100': ['VISA 1110', 'VISA 1160', 'VISA 1310'], 
     'VISA 0120': ['VISA 1310'], 
     'VISA 0130': [], 
