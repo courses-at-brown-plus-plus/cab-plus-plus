@@ -59,3 +59,12 @@ _On your first meeting with your mentor TA, you should plan dates for at least t
 
 ## How to Build and Run
 _A necessary part of any README!_
+
+
+## Resources & REST API table
+| URL/ENDPOINT             | VERB | DESCRIPTION                                             |
+|--------------------------|------|---------------------------------------------------------|
+| /allPathwayData/         | GET  | Retrieves pathway data scraped                          |
+| /allCourseCodes/         | GET  | Returns all available course codes                      |
+| /generateRecommendations | POST | Generates recommendations { courses_taken, priorities } |
+

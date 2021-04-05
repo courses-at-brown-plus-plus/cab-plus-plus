@@ -39,7 +39,7 @@ def appSetup():
         reader = csv.DictReader(csvFile)
         for row in reader: 
             cabData[row['courseCode']] = row
-    print(cabData)
+    #  print(cabData)
 
 
 appSetup()
