@@ -11,7 +11,7 @@ from selenium.common.exceptions import ElementClickInterceptedException
 
 
 class CABScraper:
-    def __init__(self, headless=True, timeout=10):
+    def __init__(self, timeout=10):
         self.driver = webdriver.Chrome()
         self.driver.get("https://cab.brown.edu/")
 
@@ -46,7 +46,7 @@ class CABScraper:
                     section = self.driver.find_element_by_class_name("course-section")
                     section.click()
                 except:
-                    print("sad! section not clicked")
+                    print("section was not clicked")
             course_info = self.scrape_course(self.driver.page_source)
             if course_info is None:
                 continue
@@ -76,11 +76,9 @@ class CABScraper:
         if reg_restrictions is not None:
             if "Prerequisites:" in reg_restrictions:
                 if "minimum score of WAIVE" in reg_restrictions:
-                    prereqs = reg_restrictions[reg_restrictions.index(": ") + 2
-                                           :reg_restrictions.index(" or minimum score of WAIVE")]
+                    prereqs = reg_restrictions[reg_restrictions.index(": ") + 2:reg_restrictions.index(" or minimum score of WAIVE")]
                 else:
-                    prereqs = reg_restrictions[reg_restrictions.index(": ") + 2
-                                               :reg_restrictions.index(".")]
+                    prereqs = reg_restrictions[reg_restrictions.index(": ") + 2:reg_restrictions.index(".")]
             # else:
             #     if "Prerequisite" in course_desc_value:
             #         starting_index = course_desc_value.index(": ")
@@ -161,10 +159,11 @@ class CABScraper:
 
         return add_departments
 
-    def save_to_csv(self):
-        csv_columns = ["courseCode", "courseName", "courseDesc", "preReqs", "FYS", "SOPH", "DIAP", "WRIT", "CBLR", "COEX"]
+    def save_to_csv(self, filename):
+        csv_columns = ["courseCode", "courseName", "courseDesc", "preReqs",
+                       "FYS", "SOPH", "DIAP", "WRIT", "CBLR", "COEX"]
         try:
-            with open("../data/CAB_v1.csv", "w") as csvfile:
+            with open("../server/data/" + filename, "w") as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
                 writer.writeheader()
                 for course in self.courses:
@@ -173,10 +172,11 @@ class CABScraper:
             print("I/O error")
 
 
+filename = input("What file should data be saved to (ex: CAB_data.csv)?\t")
 scraper = CABScraper()
 scraper.scrape_semester("Fall 2020")
 time.sleep(0.5)
 scraper.scrape_semester("Spring 2021")
 time.sleep(0.5)
 scraper.scrape_semester("Summer 2021")
-scraper.save_to_csv()
+scraper.save_to_csv(filename)
