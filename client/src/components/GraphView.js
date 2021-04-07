@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
-import { CourseNode, Edge } from './Graph'
-import prepareGraph from './LayerGraph'
+import { CourseNode, Edge } from './Graph';
+import prepareGraph from './LayerGraph';
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -152,10 +152,12 @@ function GraphView(props) {
             activeEdges.push(edge)
             continue;
           }
+          let xOffset = edge.port * 10
+
           let start = nodeCoords.current.get(edge.start);
           ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
           let end = nodeCoords.current.get(edge.end);
-          ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+          ctx.lineTo(end[0] + xOffset, end[1] - NODE_HEIGHT / 2);
           ctx.strokeStyle = '#ccc';
           ctx.stroke();
         }
@@ -163,10 +165,11 @@ function GraphView(props) {
       ctx.closePath();
     }
     for (let edge of activeEdges) {
+      let xOffset = edge.port * 10
       let start = nodeCoords.current.get(edge.start);
       ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
       let end = nodeCoords.current.get(edge.end);
-      ctx.lineTo(end[0], end[1] - NODE_HEIGHT / 2);
+      ctx.lineTo(end[0] + xOffset, end[1] - NODE_HEIGHT / 2);
       ctx.strokeStyle = '#666';
       ctx.stroke();
     }

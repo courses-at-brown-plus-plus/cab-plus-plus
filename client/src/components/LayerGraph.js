@@ -108,8 +108,8 @@ function addDummyVertices(nodeGraph, layeredGraph) {
         let dNode = new CourseNode('' + i + ',' + j + ',' + k, [], [], true)
         layeredGraph[j + 1].push(dNode)
         nodeGraph.set('' + i + ',' + j + ',' + k, dNode)
-        node.edges[i] = new Edge(edge.start, dNode.id, 0);
-        dNode.edges.push(new Edge(dNode.id, edge.end));
+        node.edges[i] = new Edge(edge.start, dNode.id, edge.port);
+        dNode.edges.push(new Edge(dNode.id, edge.end, edge.port));
       }
     }
   }
@@ -221,7 +221,7 @@ function removeDummyVertices(layeredGraph, nodeGraph) {
         for (let node of layeredGraph[i - 1]) {
           for (let k = 0; k < node.edges.length; k++) {
             if (node.edges[k].end === dNode.id) {
-              node.edges[k] = new Edge(node.id, edge2.end);
+              node.edges[k] = new Edge(node.id, edge2.end, edge2.port);
               nodeGraph.delete(dNode.id);
               layeredGraph[i].splice(j, 1);
             }
