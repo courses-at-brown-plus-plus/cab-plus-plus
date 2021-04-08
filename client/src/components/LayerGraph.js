@@ -235,6 +235,14 @@ function removeDummyVertices(layeredGraph, nodeGraph) {
       }
     }
   }
+  for (let i = 1; i < layeredGraph.length; i++) {
+    for (let j = layeredGraph[i].length - 1; j >= 0; j--) {
+      if (layeredGraph[i][j].isDummy) {
+        nodeGraph.delete(layeredGraph[i][j].id);
+        layeredGraph[i].splice(j, 1);
+      }
+    }
+  }
 }
 
 // Add invisible nodes to space and position nodes below their parents
