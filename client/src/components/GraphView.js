@@ -1,7 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
 import { CourseNode, Edge } from './Graph';
 import prepareGraph from './LayerGraph';
-import axios from 'axios'
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -25,28 +24,30 @@ function GraphView(props) {
 
   const [focus, setFocus] = useState(false);
 
+
+  // Current mouse coordinates
+  let [mouseX, setMouseX] = useState(0);
+  let [mouseY, setMouseY] = useState(0);
+
+  // Whether mouse is held down
+  let [mouseDown, setMouseDown] = useState(false);
+
+  // Coordinates of location of last mouse down
+  let [mouseDownX, setMouseDownX] = useState(0);
+  let [mouseDownY, setMouseDownY] = useState(0);
+
+  // Canvas zoom level
+  let [scaleFactor, setScaleFactor] = useState(1);
+
+  // ??? dont delete tho u will break everything
+  let [origYOffset, setOrigYOffset] = useState(100.5);
+  let [origXOffset, setOrigXOffset] = useState(0.5);
+
+
+
   useEffect(() => {
     layersRef.current = prepareGraph(nodeGraph)
     layers = layersRef.current;
-
-    let config = {
-        headers: {
-          "Content-Type": "application/json",
-          'Access-Control-Allow-Origin': '*',
-          }
-        }
-    axios.get(
-      'http://localhost:5000/allPathwayData',
-      config
-    )
-      .then(response => {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-
-
   }, [])
 
   useEffect(() => {
@@ -85,8 +86,14 @@ function GraphView(props) {
 
   function handleMouseMove(event) {
     let canvas = canvasRef.current;
-    let mouseX = event.pageX - canvas.offsetLeft;
-    let mouseY = event.pageY - canvas.offsetTop;
+    setMouseX(event.pageX - canvas.offsetLeft);
+    setMouseY(event.pageY - canvas.offsetTop);
+
+
+    if (mouseDown) {
+      setXOffset(origXOffset + (event.clientX - mouseDownX) / scaleFactor);
+      setYOffset(origYOffset + (event.clientY - mouseDownY) / scaleFactor);
+    }
 
 
     for (let [node, coords] of nodeCoords.current) {
@@ -111,8 +118,9 @@ function GraphView(props) {
 
   function handleMouseUp(event) {
     let canvas = canvasRef.current;
-    let mouseX = event.pageX - canvas.offsetLeft;
-    let mouseY = event.pageY - canvas.offsetTop;
+    setMouseDown(false);
+    setMouseX(event.pageX - canvas.offsetLeft);
+    setMouseY(event.pageY - canvas.offsetTop);
     for (let [node, coords] of nodeCoords.current) {
       if (nodeGraph.has(node)
         && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 
@@ -126,6 +134,14 @@ function GraphView(props) {
       }
     }
     setFocus(false);
+  }
+
+  function handleMouseDown(e) {
+    setMouseDown(true);
+    setMouseDownX(e.clientX);
+    setMouseDownY(e.clientY);
+    setOrigXOffset(xOffset);
+    setOrigYOffset(yOffset);
   }
 
   useEffect(() => {
@@ -175,8 +191,11 @@ function GraphView(props) {
           let xOffset = edge.port * 10
 
           let start = nodeCoords.current.get(edge.start);
-          ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
           let end = nodeCoords.current.get(edge.end);
+          if (start === undefined || end === undefined) {
+            continue;
+          }
+          ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
           ctx.lineTo(end[0] + xOffset, end[1] - NODE_HEIGHT / 2);
           ctx.strokeStyle = '#ccc';
           ctx.stroke();
@@ -187,8 +206,11 @@ function GraphView(props) {
     for (let edge of activeEdges) {
       let xOffset = edge.port * 10
       let start = nodeCoords.current.get(edge.start);
-      ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
       let end = nodeCoords.current.get(edge.end);
+      ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
+      if (start === undefined || end === undefined) {
+        continue;
+      }
       ctx.lineTo(end[0] + xOffset, end[1] - NODE_HEIGHT / 2);
       ctx.strokeStyle = '#666';
       ctx.stroke();
@@ -198,7 +220,7 @@ function GraphView(props) {
   return (
     <div>
       <canvas ref={canvasRef} width={props.width} height={props.height} onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}/>
+      onMouseUp={handleMouseUp} onMouseDown = {handleMouseDown}/>
     </div>
   );
 }

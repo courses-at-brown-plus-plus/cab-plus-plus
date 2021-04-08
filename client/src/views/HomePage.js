@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Select, Button, Box, Flex } from "@chakra-ui/react"
 import GraphView from '../components/GraphView';
 import { CourseNode, Edge } from '../components/Graph';
@@ -6,6 +6,8 @@ import PastCourses from '../components/PastCourses';
 
 import { useSelector } from 'react-redux';
 import { selectPathwayData } from '../store/slices/appDataSlice';
+
+import axios from 'axios';
 
 export default function HomePage() {
 
@@ -75,6 +77,47 @@ export default function HomePage() {
     }
   }
 
+  async function getWebScrapedGraph() {
+    let config = {
+      headers: {
+        "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*'
+        }
+    }
+    axios.get(
+      'http://localhost:5000/allPathwayData',
+      config
+    )
+      .then(response => {
+        let json = response.data.pathwayData;
+        let graph = new Map();
+        for (let course in json) {
+          if (!course.startsWith('CSCI')) {
+            continue;
+          }
+          let node = new CourseNode(json[course]['courseCode'], [], [])
+          for (let edge of json[course]['preReqs']) {
+            node.edges.push(new Edge(json[course]['courseCode'], edge[0], edge[1]))
+          }
+          graph.set(course, node);
+        }
+
+        setWebScrapedGraph(graph);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const [webScrapedGraph, setWebScrapedGraph] = useState(null);
+
+  useEffect(() => {
+    async function f() {
+      await getWebScrapedGraph();
+    }
+    f();
+  }, webScrapedGraph);
+
   return (
     <React.Fragment>
       <PastCourses />
@@ -86,6 +129,11 @@ export default function HomePage() {
 
         { renderGraph() }
         data from redux
+
+        { webScrapedGraph !== null && webScrapedGraph !== undefined &&
+            <GraphView width={800} height={600} graph={webScrapedGraph}/>
+        }
+        webscraped data
 
         <Flex 
           width={800} 

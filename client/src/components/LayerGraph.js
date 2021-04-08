@@ -29,6 +29,7 @@ function topoSort(nodeGraph) {
   let temp = [];
   let result = [];
 
+
   function visit(node) {
     if (perm.includes(node)) {
       return true;
@@ -39,7 +40,10 @@ function topoSort(nodeGraph) {
     temp.push(node);
 
     for (let edge of node.edges) {
-      visit(nodeGraph.get(edge.end));
+      let n = nodeGraph.get(edge.end);
+      if (n !== undefined) {
+        visit(nodeGraph.get(edge.end));
+      }
     }
 
     temp = temp.filter(x => x.id !== node.id);
@@ -57,6 +61,7 @@ function topoSort(nodeGraph) {
     }
     visit(n);
   }
+
   return result;
 }
 
