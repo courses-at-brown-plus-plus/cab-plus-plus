@@ -4,6 +4,8 @@ import prepareGraph from './LayerGraph';
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 4;
 
 function GraphView(props) {
   const canvasRef = useRef(null);
@@ -55,34 +57,6 @@ function GraphView(props) {
     layers = layersRef.current;
   }, [props.graph])
 
-  function drawNode(ctx, node, x, y) {
-    if (focus && !activeNodes.includes(node.id)) {
-      ctx.globalAlpha = 0.5;
-    }
-    ctx.fillStyle = 'white';
-    ctx.fillRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
-    if (activeNodes.includes(node.id)) {
-      ctx.strokeStyle = 'black';
-    } else {
-      ctx.strokeStyle = '#ccc';
-    }
-    ctx.strokeRect(x - NODE_WIDTH / 2, y - NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT);
-    ctx.fillStyle = 'black';
-    ctx.font = "14px Helvetica";
-    ctx.textAlign = "center";
-    ctx.fillText(node.id, x - NODE_WIDTH / 2 + NODE_WIDTH / 2, y - NODE_HEIGHT / 2 + 20);
-    ctx.globalAlpha = 1;
-  }
-
-  function makeActive(node, activeList) {
-    if (!nodeGraph.has(node)) {
-      return;
-    }
-    activeList.push(node);
-    for (let edge of nodeGraph.get(node).edges) {
-      makeActive(edge.end, activeList);
-    }
-  }
 
   function handleMouseMove(event) {
     let canvas = canvasRef.current;
@@ -144,6 +118,56 @@ function GraphView(props) {
     setOrigYOffset(yOffset);
   }
 
+  function handleScroll(e) {
+    let newScaleFactor = scaleFactor - e.deltaY * scaleFactor * 0.005;
+    if (newScaleFactor > MAX_ZOOM) {
+      setScaleFactor(MAX_ZOOM);
+    } else if (newScaleFactor < MIN_ZOOM) {
+      setScaleFactor(MIN_ZOOM);
+    } else {
+      setScaleFactor(newScaleFactor);
+    }
+  }
+
+  // Stop page from scrolling when mouse is over canvas
+  // Credit to https://stackoverflow.com/questions/55508836/prevent-page-scrolling-when-mouse-is-over-one-particular-div
+  function changeScroll() { 
+    let style = document.body.style.overflow;
+    document.body.style.overflow = (style === 'hidden') ? 'auto':'hidden';
+  } 
+
+  function drawNode(ctx, node, x, y) {
+    if (focus && !activeNodes.includes(node.id)) {
+      ctx.globalAlpha = 0.5;
+    }
+    ctx.fillStyle = 'white';
+    ctx.fillRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
+    if (activeNodes.includes(node.id)) {
+      ctx.strokeStyle = 'black';
+    } else {
+      ctx.strokeStyle = '#ccc';
+    }
+    ctx.strokeRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
+    ctx.save()
+    ctx.scale(scaleFactor, scaleFactor);
+    ctx.fillStyle = 'black';
+    ctx.font = "14px Helvetica";
+    ctx.textAlign = "center";
+    ctx.fillText(node.id, x / scaleFactor, (y - NODE_HEIGHT / 2 + 20) / scaleFactor);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function makeActive(node, activeList) {
+    if (!nodeGraph.has(node)) {
+      return;
+    }
+    activeList.push(node);
+    for (let edge of nodeGraph.get(node).edges) {
+      makeActive(edge.end, activeList);
+    }
+  }
+
   useEffect(() => {
     let canvas = canvasRef.current;
     let ctx = canvas.getContext('2d');
@@ -170,7 +194,7 @@ function GraphView(props) {
       for (let j = 0; j < layers[i].length; j++) {
         // center nodes horizontally
         let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
-        nodeCoords.current.set(layers[i][j].id, [x + xOffset, y + yOffset]);
+        nodeCoords.current.set(layers[i][j].id, [scaleFactor * (x + xOffset), scaleFactor * (y + yOffset)]);
         x += 100;
       }
       y += 100;
@@ -188,15 +212,15 @@ function GraphView(props) {
             activeEdges.push(edge)
             continue;
           }
-          let xOffset = edge.port * 10
+          let xOffset1 = edge.port * 10
 
           let start = nodeCoords.current.get(edge.start);
           let end = nodeCoords.current.get(edge.end);
           if (start === undefined || end === undefined) {
             continue;
           }
-          ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
-          ctx.lineTo(end[0] + xOffset, end[1] - NODE_HEIGHT / 2);
+          ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
+          ctx.lineTo(end[0] + xOffset1, end[1] - scaleFactor * NODE_HEIGHT / 2);
           ctx.strokeStyle = '#ccc';
           ctx.stroke();
         }
@@ -204,14 +228,14 @@ function GraphView(props) {
       ctx.closePath();
     }
     for (let edge of activeEdges) {
-      let xOffset = edge.port * 10
+      let xOffset1 = edge.port * 10
       let start = nodeCoords.current.get(edge.start);
       let end = nodeCoords.current.get(edge.end);
-      ctx.moveTo(start[0], start[1] + NODE_HEIGHT / 2);
+      ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
       if (start === undefined || end === undefined) {
         continue;
       }
-      ctx.lineTo(end[0] + xOffset, end[1] - NODE_HEIGHT / 2);
+      ctx.lineTo(end[0] + xOffset1, end[1] - scaleFactor * NODE_HEIGHT / 2);
       ctx.strokeStyle = '#666';
       ctx.stroke();
     }
@@ -220,7 +244,8 @@ function GraphView(props) {
   return (
     <div>
       <canvas ref={canvasRef} width={props.width} height={props.height} onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp} onMouseDown = {handleMouseDown}/>
+      onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
+       onMouseLeave={changeScroll}/>
     </div>
   );
 }
