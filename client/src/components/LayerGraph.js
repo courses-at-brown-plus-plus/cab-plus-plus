@@ -29,6 +29,7 @@ function topoSort(nodeGraph) {
   let temp = [];
   let result = [];
 
+
   function visit(node) {
     if (perm.includes(node)) {
       return true;
@@ -39,7 +40,10 @@ function topoSort(nodeGraph) {
     temp.push(node);
 
     for (let edge of node.edges) {
-      visit(nodeGraph.get(edge.end));
+      let n = nodeGraph.get(edge.end);
+      if (n !== undefined) {
+        visit(nodeGraph.get(edge.end));
+      }
     }
 
     temp = temp.filter(x => x.id !== node.id);
@@ -57,6 +61,7 @@ function topoSort(nodeGraph) {
     }
     visit(n);
   }
+
   return result;
 }
 
@@ -108,8 +113,8 @@ function addDummyVertices(nodeGraph, layeredGraph) {
         let dNode = new CourseNode('' + i + ',' + j + ',' + k, [], [], true)
         layeredGraph[j + 1].push(dNode)
         nodeGraph.set('' + i + ',' + j + ',' + k, dNode)
-        node.edges[i] = new Edge(edge.start, dNode.id, 0);
-        dNode.edges.push(new Edge(dNode.id, edge.end));
+        node.edges[i] = new Edge(edge.start, dNode.id, edge.port);
+        dNode.edges.push(new Edge(dNode.id, edge.end, edge.port));
       }
     }
   }
@@ -221,12 +226,20 @@ function removeDummyVertices(layeredGraph, nodeGraph) {
         for (let node of layeredGraph[i - 1]) {
           for (let k = 0; k < node.edges.length; k++) {
             if (node.edges[k].end === dNode.id) {
-              node.edges[k] = new Edge(node.id, edge2.end);
+              node.edges[k] = new Edge(node.id, edge2.end, edge2.port);
               nodeGraph.delete(dNode.id);
               layeredGraph[i].splice(j, 1);
             }
           }
         }
+      }
+    }
+  }
+  for (let i = 1; i < layeredGraph.length; i++) {
+    for (let j = layeredGraph[i].length - 1; j >= 0; j--) {
+      if (layeredGraph[i][j].isDummy) {
+        nodeGraph.delete(layeredGraph[i][j].id);
+        layeredGraph[i].splice(j, 1);
       }
     }
   }
