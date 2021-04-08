@@ -2,11 +2,12 @@ import csv
 
 cab_data = {}
 
-output_text = 'courseCode,courseName,courseDesc,preReqs,FYS,SOPH,DIAP,WRIT,CBLR,COEX\n'
+rows = []
 
 with open('../server/data/CAB_v1.csv') as csvFile: 
     reader = csv.DictReader(csvFile)
     for row in reader: 
+        rows.append(row)
         course_code = row['courseCode']
         cab_data[course_code] = []
 
@@ -30,18 +31,16 @@ with open('../server/data/CAB_v1.csv') as csvFile:
                         cab_data[subreq] = []
                     cab_data[subreq].append((course_code, port))
 
+for row in rows:
+    row['preReqs'] = cab_data[row['courseCode']]
 
-    csvFile.seek(0)
-    reader = csv.DictReader(csvFile)
-    for row in reader:
-        course_code = row['courseCode']
-
-        row['preReqs'] = str(cab_data[course_code])
-
-        output_text += ','.join(row.values()) + '\n'
-
-print(output_text)
-
-
-with open('../server/data/CAB_v1_formatted.csv', 'w') as csvFile: 
-    csvFile.write(output_text)
+try:
+    with open("../server/data/CAB_v1_formatted.csv", "w") as csvFile:
+        csv_columns = ["courseCode", "courseName", "courseDesc", "preReqs",
+                       "FYS", "SOPH", "DIAP", "WRIT", "CBLR", "COEX"]
+        writer = csv.DictWriter(csvFile, fieldnames=csv_columns)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+except IOError:
+    print("I/O error")

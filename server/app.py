@@ -16,6 +16,7 @@ cabData = {}
 def allPathwayData(): 
     # Reformat cab data for frontend
     pathwayData = cabData
+    print(cabData)
     return jsonify({"pathwayData": pathwayData}), 200
 
 @app.route("/allCourseCodes", methods=["GET"])
@@ -35,12 +36,11 @@ def generateRecommendations():
     return jsonify({"recommendedCourses": recommendedCourses}), 200
 
 def appSetup(): 
-    with open('data/CAB_v1.csv') as csvFile: 
+    with open('data/CAB_v1_formatted.csv') as csvFile: 
         reader = csv.DictReader(csvFile)
         for row in reader: 
             cabData[row['courseCode']] = row
     #  print(cabData)
-
 
 appSetup()
 

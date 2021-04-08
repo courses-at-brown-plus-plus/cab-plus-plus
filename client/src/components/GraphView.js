@@ -1,6 +1,7 @@
 import React, {useRef, useEffect, useState} from 'react';
 import { CourseNode, Edge } from './Graph';
 import prepareGraph from './LayerGraph';
+import axios from 'axios'
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -27,6 +28,25 @@ function GraphView(props) {
   useEffect(() => {
     layersRef.current = prepareGraph(nodeGraph)
     layers = layersRef.current;
+
+    let config = {
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          }
+        }
+    axios.get(
+      'http://localhost:5000/allPathwayData',
+      config
+    )
+      .then(response => {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+
   }, [])
 
   useEffect(() => {
