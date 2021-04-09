@@ -1,5 +1,5 @@
 class CourseNode {
-  constructor(id, edges, ports, isDummy = false, invisible = false, name="", desc="") {
+  constructor(id, edges, ports, isDummy = false, invisible = false, name="", desc="", categories=[]) {
     this.id = id;
     this.edges = edges;
     this.ports = ports;
@@ -8,6 +8,7 @@ class CourseNode {
     this.active = false;
     this.name = name;
     this.desc = desc;
+    this.categories = categories;
   }
 }
 

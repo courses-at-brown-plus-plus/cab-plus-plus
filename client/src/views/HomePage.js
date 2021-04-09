@@ -92,10 +92,12 @@ export default function HomePage() {
         let json = response.data.pathwayData;
         let graph = new Map();
         for (let course in json) {
-          if (!course.startsWith('CHEM')) {
+          if (!course.startsWith('CSCI')) {
             continue;
           }
-          let node = new CourseNode(json[course]['courseCode'], [], [], false, false, json[course]['courseName'], json[course]['courseDesc'])
+          let node = new CourseNode(json[course]['courseCode'], [], [], false, false, 
+            json[course]['courseName'], json[course]['courseDesc'], [json[course]['FYS'], 
+            json[course]['SOPH'],json[course]['DIAP'],json[course]['WRIT'],json[course]['CBLR'],json[course]['COEX']])
           for (let edge of json[course]['preReqs']) {
             node.edges.push(new Edge(json[course]['courseCode'], edge[0], edge[1]))
           }
@@ -123,12 +125,12 @@ export default function HomePage() {
       <PastCourses />
 
       <center>
-        <GraphView width={800} height={600} graph={csGraph}/>
+        {/*<GraphView width={800} height={600} graph={csGraph}/>
         data from dummy csGraph variable
-        <hr/> <br/> <br/>
+        <hr/> <br/> <br/>*/}
 
-        { renderGraph() }
-        data from redux
+        {/* renderGraph() */}
+        {/*data from redux*/}
 
         { webScrapedGraph !== null && webScrapedGraph !== undefined &&
             <GraphView width={800} height={600} graph={webScrapedGraph}/>
