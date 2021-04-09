@@ -4,9 +4,11 @@ from flask_cors import CORS, cross_origin
 
 import csv
 
-PORT = "5000"
+PORT = 5000
 app = Flask(__name__)
-cors = CORS(app)
+#  cors = CORS(app)
+cors = CORS(app, resources={r"/*":{"origins": "*", "supports_credentials": True}})
+
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 cabData = {}
@@ -16,13 +18,14 @@ cabData = {}
 def allPathwayData(): 
     # Reformat cab data for frontend
     pathwayData = cabData
-
+    print("request received all pathwayData ")
     return jsonify({"pathwayData": pathwayData}), 200
 
 @app.route("/allCourseCodes", methods=["GET"])
 @cross_origin()
 def allCourseCodes(): 
-    courseCodes = cabData.keys()
+    courseCodes = list(cabData.keys())
+    print("request received all course codes")
     return jsonify({"courseCodes": courseCodes}), 200
 
 @app.route("/generateRecommendations", methods=["POST"])
@@ -33,6 +36,7 @@ def generateRecommendations():
 
     # Run algorithm here
     recommendedCourses = []
+    print("request received generate recs")
     return jsonify({"recommendedCourses": recommendedCourses}), 200
 
 def appSetup(): 
