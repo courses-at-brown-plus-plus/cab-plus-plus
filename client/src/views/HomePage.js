@@ -111,10 +111,12 @@ export default function HomePage() {
         let json = response.data.pathwayData;
         let graph = new Map();
         for (let course in json) {
-          if (!course.startsWith('CHEM')) {
+          if (!course.startsWith('CSCI')) {
             continue;
           }
-          let node = new CourseNode(json[course]['courseCode'], [], [], false, false, json[course]['courseName'], json[course]['courseDesc'])
+          let node = new CourseNode(json[course]['courseCode'], [], [], false, false, 
+            json[course]['courseName'], json[course]['courseDesc'], [json[course]['FYS'], 
+            json[course]['SOPH'],json[course]['DIAP'],json[course]['WRIT'],json[course]['CBLR'],json[course]['COEX']])
           for (let edge of json[course]['preReqs']) {
             node.edges.push(new Edge(json[course]['courseCode'], edge[0], edge[1]))
           }

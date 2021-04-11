@@ -35,7 +35,6 @@ function GraphView(props) {
 
   const [focus, setFocus] = useState(false);
 
-
   const [showCourseView, setShowCourseView] = useState(false);
   const [courseView, setCourseView] = useState(null);
 
@@ -129,6 +128,7 @@ function GraphView(props) {
   }
 
   function handleScroll(e) {
+    handleMouseMove(e)
     let newScaleFactor = scaleFactor - e.deltaY * scaleFactor * 0.005;
     if (newScaleFactor > MAX_ZOOM) {
       setScaleFactor(MAX_ZOOM);
@@ -158,9 +158,8 @@ function GraphView(props) {
   function changeScroll() { 
     let style = document.body.style.overflow;
     document.body.style.overflow = (style === 'hidden') ? 'auto':'hidden';
+    setActiveNodes([])
   } 
-
-
 
   function drawNode(ctx, node, x, y) {
     if (focus && !activeNodes.includes(node.id)) {
@@ -223,7 +222,7 @@ function GraphView(props) {
       for (let j = 0; j < layers[i].length; j++) {
         // center nodes horizontally
         let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
-        nodeCoords.current.set(layers[i][j].id, [scaleFactor * (x + xOffset), scaleFactor * (y + yOffset)]);
+        nodeCoords.current.set(layers[i][j].id, [scaleFactor * (x + xOffset) + props.width / 2, scaleFactor * (y + yOffset) + props.height / 2]);
         x += 100;
       }
       y += 100;

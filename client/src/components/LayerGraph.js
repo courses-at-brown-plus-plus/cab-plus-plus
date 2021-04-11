@@ -251,6 +251,26 @@ function addInvisibleNodes(layeredGraph) {
     let numInvis = layeredGraph[i - 1].length - layeredGraph[i].length;
     let medians = medianHeuristic(layeredGraph[i - 1], layeredGraph[i]);
     let currLayer = [...layeredGraph[i]];
+
+    for (let j = 1; j < medians.length; j++) {
+      for (let k = 1; k < medians.length; k++) {
+
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     let newLayer = [];
 
     for (let j = 0; j < layeredGraph[i - 1].length; j++) {
