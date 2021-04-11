@@ -1,5 +1,5 @@
 
-export const URL = "";
+export const URL = "http://localhost:5000/";
 export const AXIOS_CONFIG = {
   headers: {
     "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export const COURSE_CODES = [
 ]
 
 export const PATHWAY_DATA = {
-  "Computer Science": {
+  "CSCI": {
     'CS15': ['CS16'], 
     'CS16': ['CS32', 'CS30', 'CS22', 'CS171', 'CS1420'], 
     'CS17': ['CS18'], 
@@ -50,7 +50,7 @@ export const PATHWAY_DATA = {
     'CS1420': [],
     'CS1951A': []
   },
-  "Visual Art": {
+  "VISA": {
     'VISA 0100': ['VISA 1110', 'VISA 1160', 'VISA 1310'], 
     'VISA 0120': ['VISA 1310'], 
     'VISA 0130': [], 

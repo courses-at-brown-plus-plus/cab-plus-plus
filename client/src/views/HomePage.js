@@ -14,8 +14,23 @@ export default function HomePage() {
   const pathwayData = useSelector(selectPathwayData);
   const [selectedConcentration, setSelectedConcentration] = useState("");
 
+  const [currentGraph, setCurrentGraph] = useState(null);
   function handleConcentrationChange(e) {
-    setSelectedConcentration(e.target.value);
+    let newConcentrationName = e.target.value;
+
+    setSelectedConcentration(newConcentrationName);
+    let aGraph = new Map();
+    for (let course in pathwayData) {
+      if (!course.startsWith(newConcentrationName)) {
+        continue;
+      }
+      let node = new CourseNode(pathwayData[course]['courseCode'], [], [])
+      for (let edge of pathwayData[course]['preReqs']) {
+        node.edges.push(new Edge(pathwayData[course]['courseCode'], edge[0], edge[1]))
+      }
+      aGraph.set(course, node);
+    }
+    setCurrentGraph(aGraph);
   }
 
   let csGraph = new Map();
@@ -48,23 +63,27 @@ export default function HomePage() {
 
   //csGraph = Object.fromEntries(csGraph);
 
-  function infoToGraph(concentrationInfo) {
-    let aGraph = new Map();
-    for (const [baseCourse, unlockedCourses] of Object.entries(concentrationInfo)) {
-      let courseEdges = unlockedCourses.map((nextCourse) => {
-        return new Edge(baseCourse, nextCourse, 0);
-      });
-      aGraph.set(baseCourse, new CourseNode(baseCourse, courseEdges, []));
-    }
-    return aGraph;
-  }
+  // function infoToGraph(concentrationInfo) {
+  //   let aGraph = new Map();
+  //   for (const [baseCourse, unlockedCourses] of Object.entries(concentrationInfo)) {
+  //     let courseEdges = unlockedCourses.map((nextCourse) => {
+  //       return new Edge(baseCourse, nextCourse, 0);
+  //     });
+  //     aGraph.set(baseCourse, new CourseNode(baseCourse, courseEdges, []));
+  //   }
+  //   return aGraph;
+  // }
 
   function renderGraph() {
     console.log("rendering new graph for concentrationName: " + selectedConcentration);
     let aGraph;
-    if (pathwayData && pathwayData[selectedConcentration]) {
-      aGraph = infoToGraph(pathwayData[selectedConcentration]);
-      return <GraphView width={800} height={600} graph={aGraph}/>;
+    // if (pathwayData && pathwayData[selectedConcentration]) {
+      // aGraph = infoToGraph(pathwayData[selectedConcentration]);
+      // return <GraphView width={800} height={600} graph={aGraph}/>;
+
+
+    if (pathwayData && selectedConcentration && currentGraph) {
+      return <GraphView width={800} height={600} graph={currentGraph}/>;
     }
     else {
       // empty graph; no concentration selected
@@ -125,17 +144,19 @@ export default function HomePage() {
       <PastCourses />
 
       <center>
-        {/*<GraphView width={800} height={600} graph={csGraph}/>
-        data from dummy csGraph variable
-        <hr/> <br/> <br/>*/}
-
-        {/* renderGraph() */}
-        {/*data from redux*/}
+        <GraphView width={800} height={600} graph={csGraph}/>
+        ^data from dummy csGraph variable
+        <br/> { "-".repeat(100) }
 
         { webScrapedGraph !== null && webScrapedGraph !== undefined &&
             <GraphView width={800} height={600} graph={webScrapedGraph}/>
         }
-        webscraped data
+        ^webscraped data (gareth's code)
+        <br/> { "-".repeat(100) }
+
+        { renderGraph() }
+        ^data from redux  (kevin and gareth's combined)
+        <br/> { "-".repeat(100) }
 
         <Flex 
           width={800} 
@@ -174,9 +195,12 @@ export default function HomePage() {
   );
 
   function renderDropdownItems() {
-    return Object.keys(pathwayData).map((concentrationName) => (
+    return ["CSCI", "VISA"].map((concentrationName) => (
       <option key={concentrationName} value={concentrationName}>{concentrationName}</option>
     ));
+    // return Object.keys(pathwayData).map((concentrationName) => (
+    //   <option key={concentrationName} value={concentrationName}>{concentrationName}</option>
+    // ));
   }
 }
 
