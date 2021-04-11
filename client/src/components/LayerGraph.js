@@ -174,6 +174,31 @@ function medianHeuristic(layer1, layer2) {
   return medians;
 }
 
+function medianHeuristic1(nodeGraph, layers, layer2) {
+  let medians = new Map();
+  for (let node2 of layer2) {
+    let l = [];
+    for (let k = 0; k < layers.length; k++) {
+      let layer1 = layers[k];
+      for (let i = 0; i < layer1.length; i++) {
+        let node1 = nodeGraph.get(layer1[i].id);
+        for (let edge of node1.edges) {
+          if (edge.end === node2.id) {
+            l.push(layer1[i].coord)
+          }
+        }
+      }
+      l.sort(function(a, b) {return a.coord - b.coord;});
+      if (l.length % 2 === 0) {
+        medians.set(node2.id, (l[l.length / 2 - 1] + l[l.length / 2]) / 2)
+      } else {
+        medians.set(node2.id, l[(l.length - 1) / 2])
+      }
+    }
+  }
+  return medians;
+}
+
 // Position each node between its neighbors
 function sortByMedian(layer1, layer2) {
   let medians = medianHeuristic(layer1, layer2)
@@ -192,8 +217,6 @@ function permuteGraph(layerGraph, nodeGraph) {
 
 
   let minCross = countCrossingsGraph(layerGraph, nodeGraph);
-
-
 
   for (let i = 0; i < 100; i++) {
     let depth = Math.floor(Math.random() * (layerGraph.length - 1))
@@ -293,14 +316,106 @@ function addInvisibleNodes(layeredGraph) {
   }
 }
 
+function orderedMapFromCoords(coordMap) {
+  let result = [];
+  for (let [item, coord] of coordMap.entries()) {
+    result.push({id: item, coord: coord});
+  }
+  result.sort(function(a, b) {return a.coord - b.coord});
+  return result;
+}
+
+function tempAssignCoords(nodeGraph, layeredGraph) {
+  let result = [[]]
+  for (let i = 1; i < layeredGraph[0].length; i++) {
+    result[0].push({id: layeredGraph[0][i].id, coord: i});
+  }
+
+  for (let i = 1; i < layeredGraph.length; i++) {
+    let medians = medianHeuristic1(nodeGraph, result.slice(0, i), layeredGraph[i]);
+    result.push(orderedMapFromCoords(medians))
+  }
+  return result;
+}
+
+function space(layer) {
+  let groups = findGroups([...layer]);
+  let result = [...layer];
+  let counter = 0;
+  while (groups.length > 0 && counter < 200) {
+    counter += 1;
+    let toAdd = []
+    for (let i = 0; i < groups.length - 1; i++) {
+      expandGroup(groups[i]);
+      toAdd = toAdd.concat(groups[i]);
+    }
+
+    let newLayer = [];
+    let layerCopy = [...layer]
+
+    while (layerCopy.length > 0 || toAdd.length > 0) {
+      if (toAdd.length !== 0 && layerCopy[0].id === toAdd[0].id) {
+        newLayer.push(toAdd.shift());
+        layerCopy.shift();
+      } else {
+        newLayer.push(layerCopy.shift());
+      }
+    }
+    groups = findGroups([...newLayer]);
+    result = [...newLayer];
+  }
+  return result;
+}
+
+function findGroups(layer) {
+  let groups = [];
+  let currentGroup = [];
+  for (let i = 0; i < layer.length - 1; i++) {
+    if (layer[i + 1].coord - layer[i].coord < 1) {
+      if (currentGroup.length === 0) {
+        currentGroup.push(layer[i])
+      }
+      currentGroup.push(layer[i + 1])
+    } else {
+      if (currentGroup.length > 0) {
+        groups.push(currentGroup);
+        currentGroup = [];
+      }
+    }
+  }
+  if (currentGroup.length > 0) {
+    groups.push(currentGroup);
+  }
+  return groups;
+}
+
+function expandGroup(group) {
+  let avg = 0;
+  for (let i = 0; i < group.length - 1; i++) {
+    avg += group[i].coord;
+  }
+  avg /= group.length;
+
+  for (let i = 0; i < group.length - 1; i++) {
+    group[i].coord += (group.length / 2 - i) * 0.01;
+  }
+}
+
+
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
   addDummyVertices(nodeGraph, result);
   result = permuteGraph(result, nodeGraph);
   removeDummyVertices(result, nodeGraph);
-  addInvisibleNodes(result);
-  return result;
+  //addInvisibleNodes(result);
+  let temp = tempAssignCoords(nodeGraph, result);
+  for (let i = 0; i < temp.length - 1; i++) {
+    temp[i] = space(temp[i]);
+  }
+  console.log(temp)
+
+  return temp;
 }
 
 export default prepareGraph;

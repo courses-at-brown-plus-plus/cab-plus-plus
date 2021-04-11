@@ -55,6 +55,8 @@ function GraphView(props) {
   let [origYOffset, setOrigYOffset] = useState(100.5);
   let [origXOffset, setOrigXOffset] = useState(0.5);
 
+  const [annotations, setAnnotations] = useState([]);
+
   useEffect(() => {
     layersRef.current = prepareGraph(nodeGraph)
     layers = layersRef.current;
@@ -127,6 +129,19 @@ function GraphView(props) {
     setOrigYOffset(yOffset);
   }
 
+  function handleDoubleClick(e) {
+    for (let [node, coords] of nodeCoords.current) {
+      if (nodeGraph.has(node)
+        && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 * scaleFactor
+        && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2 * scaleFactor) {
+        if (!annotations.includes(node)) {
+          setAnnotations(annotations.concat([node]))
+        }
+      }
+    }
+    console.log(annotations);
+  }
+
   function handleScroll(e) {
     handleMouseMove(e)
     let newScaleFactor = scaleFactor - e.deltaY * scaleFactor * 0.005;
@@ -169,9 +184,13 @@ function GraphView(props) {
     ctx.fillRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
     if (activeNodes.includes(node.id)) {
       ctx.strokeStyle = 'black';
+    } else if (annotations.includes(node.id)) {
+      ctx.strokeStyle = '#8f8';
     } else {
       ctx.strokeStyle = '#ccc';
     }
+
+
     ctx.strokeRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
     ctx.save()
     ctx.scale(scaleFactor, scaleFactor);
@@ -221,12 +240,16 @@ function GraphView(props) {
     for (let i = 0; i < layers.length; i++) {
       for (let j = 0; j < layers[i].length; j++) {
         // center nodes horizontally
-        let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100
+        let x = props.width / 2 + (layers[i][j].coord) * 100;
+        //console.log(x)
+
+        //let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100;
         nodeCoords.current.set(layers[i][j].id, [scaleFactor * (x + xOffset) + props.width / 2, scaleFactor * (y + yOffset) + props.height / 2]);
         x += 100;
       }
       y += 100;
     }
+    
 
     let activeEdges = [];
     for (let [node, coords] of nodeCoords.current.entries()) {
@@ -276,7 +299,7 @@ function GraphView(props) {
       }
       <canvas ref={canvasRef} onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
-       onMouseLeave={changeScroll} className = "graphView"/>
+       onMouseLeave={changeScroll} className = "graphView" onDoubleClick={handleDoubleClick}/>
     </div>
   );
 }
