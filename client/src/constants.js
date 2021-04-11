@@ -25,13 +25,21 @@ export const RECOMMENDED_COURSES = [
   }
 ];
 
+export const PRIORITY_OPTIONS = [
+  "Time Commitment", 
+  "Difficulty",
+  "Enjoyment", 
+  "Suitability for none-concentrators", 
+  "High S/NC ratio"
+];
+
 export const COURSE_CODES = [
   "CS19", 
   "CS30", 
   "CS32", 
   "MATH0520", 
   "MATH0540"
-]
+];
 
 export const PATHWAY_DATA = {
   "CSCI": {
@@ -62,6 +70,5 @@ export const PATHWAY_DATA = {
     'VISA 1310': ['VISA 1320'], 
     'VISA 1320': []
   }
-
 }
 

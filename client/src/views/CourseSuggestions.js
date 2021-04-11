@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Box, Button, Select } from "@chakra-ui/react"
 
 import { GetRecommendations } from '../api/Network';
-
 import { selectRecommendedCourses } from '../store/slices/appDataSlice';
-
 
 import PastCourses from '../components/PastCourses';
 import RecommendationCard from '../components/RecommendationCard';
-import { Box, Button, Select } from "@chakra-ui/react"
+
+import { PRIORITY_OPTIONS } from '../constants';
 
 export default function CourseSuggestions() {
 
@@ -21,8 +21,6 @@ export default function CourseSuggestions() {
 
 
   const recommendedCourses = useSelector(selectRecommendedCourses);
-
-  const priorities = ["Time Commitment", "Difficulty", "Priority3", "Priority4"];
 
   const [priorityContents, setPriorityContents] = useState({
     "1": "", 
@@ -62,7 +60,7 @@ export default function CourseSuggestions() {
 
     return (
       <React.Fragment>
-        {priorities.map((priorityTitle) => {
+        {PRIORITY_OPTIONS.map((priorityTitle) => {
             return (
               <option value={priorityTitle}> {priorityTitle}</option>
             )
@@ -103,7 +101,7 @@ export default function CourseSuggestions() {
         onChange={(e) => handleSelectionChange(e, priorityNumber)}
       >
         {
-          priorities.map((priorityTitle) => (
+          PRIORITY_OPTIONS.map((priorityTitle) => (
             <option value={priorityTitle}> {priorityTitle}</option>
           ))
         }
