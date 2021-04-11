@@ -252,8 +252,6 @@ function addInvisibleNodes(layeredGraph) {
     let medians = medianHeuristic(layeredGraph[i - 1], layeredGraph[i]);
     let currLayer = [...layeredGraph[i]];
 
-    
-
     for (let j = 1; j < medians.length; j++) {
       for (let k = 1; k < medians.length; k++) {
 
