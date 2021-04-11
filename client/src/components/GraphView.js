@@ -3,6 +3,9 @@ import { CourseNode, Edge } from './Graph';
 import prepareGraph from './LayerGraph';
 import CourseView from './CourseView';
 
+import { useSelector } from 'react-redux';
+import { selectCoursesTaken } from '../store/slices/appDataSlice';
+
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
 const MIN_ZOOM = 0.1;
@@ -10,6 +13,11 @@ const MAX_ZOOM = 4;
 
 function GraphView(props) {
   const canvasRef = useRef(null);
+
+  // access redux var for courses taken input on the sidebar
+  const coursesTaken = useSelector(selectCoursesTaken);
+  // dummy data equivalent
+  // const coursesTaken = ["CSCI 0190"];
   
   // let nodeGraphRef = useRef(props.graph);
   // let nodeGraph = nodeGraphRef.current;

@@ -193,7 +193,7 @@ export default function HomePage() {
   );
 
   function renderDropdownItems() {
-    return ["CSCI", "VISA"].map((concentrationName) => (
+    return ["CSCI", "VISA", "MATH"].map((concentrationName) => (
       <option key={concentrationName} value={concentrationName}>{concentrationName}</option>
     ));
     // return Object.keys(pathwayData).map((concentrationName) => (
