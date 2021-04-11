@@ -47,6 +47,11 @@ class TextComparison(object):
             self.model = hub.load(model_loc)
 
         self.data = None
+        self.dept_data = None
+
+        # Hyperparams
+        self.TEXT_WEIGHT = 0.8
+        self.DEPT_WEIGHT = 0.2
     
     def __str__(self):
         """Defines a string representation of the TextComparison object."""
@@ -64,6 +69,18 @@ class TextComparison(object):
     def get_cross_product_similarity(self, docs: list, names: list):
         """Gets the USE similarity of a list of documents compared to a list of
         documents, saving the resultant in the self.data variable."""
+
+        temp = list(zip(names, docs))
+        unique_indices = []
+        items = []
+        for i in range(len(temp)):
+            if temp[i][0] not in items:
+                unique_indices.append(i)
+                items.append(temp[i][0])
+        res = [temp[i] for i in unique_indices]
+        names = [i[0] for i in res]
+        docs = [i[1] for i in res]
+
         doc_sims = []
         for doc in docs:
             doc_sims.append(self.use_similarity(doc, docs))
@@ -72,7 +89,14 @@ class TextComparison(object):
     def import_saved_similarity(self, filename: str):
         """Imports an existing similarity csv."""
         self.data = pd.read_csv(filename, index_col=0)
+        fixed_courses = [x.replace("\xa0", " ").split(".")[0] for x in self.data.columns.tolist()]
+        self.data.columns = fixed_courses
+        self.data.index = fixed_courses
     
+    def import_department_similarity(self, filename: str):
+        """Imports an existing department similarity csv."""
+        self.dept_data = pd.read_csv(filename, index_col=0)
+
     def save_scores(self, filename: str):
         """Saves data if it exists."""
         if self.data is not None:
@@ -80,7 +104,7 @@ class TextComparison(object):
             return True
         else:
             return False
-    
+
     def get_data(self):
         """Grabs the data."""
         return self.data
@@ -88,12 +112,18 @@ class TextComparison(object):
     def clear_data(self):
         """Clears the data."""
         self.data = None
-    
+
     def get_most_similar(self, column: str, num: int = 1):
         """Grabs the course most similar to the given course. If a num is specified,
-        it will get that number of similar courses."""
+        it will get that number of similar courses. If num = None, grabs all of the values."""
         if self.data is not None:
-            return sorted(list(zip(self.data.columns.tolist(), self.data[column])), key=lambda a: a[1], reverse=True)[1: num + 1]
+            similarities = [a for a in sorted(list(zip(self.data.columns.tolist(), self.data[column])), key=lambda a: a[1], reverse=True) if a[0] != column]
+            if self.dept_data is not None:
+                similarities_with_dept = sorted([(a[0], a[1]*self.TEXT_WEIGHT + self.dept_data[a[0].split(" ")[0]][column.split(" ")[0]]*self.DEPT_WEIGHT) for a in similarities],
+                            key=lambda a: a[1], reverse=True)
+                return similarities_with_dept[0: num]
+            else:
+                return similarities[0: num]
         else:
             return None
 
@@ -103,9 +133,17 @@ class MetadataComparison(object):
         self.metadata_loc = metadata_loc
         self.data = CsvLoader(metadata_loc)
 
+        # Hyperparams
+        
+
     def __str__(self):
         """Defines a string representation of the MetadataComparison object."""
         return self.metadata_loc
+    
+    def get_most_similar(self, column: str, num: int = 1):
+        """Grabs the course most similar to the given course. If a num is specified,
+        it will get that number of similar courses. If num = None, grabs all of the values."""
+        a = 1
 
 class Algorithm(object):
     def __init__(self, text_compare: TextComparison, metadata_compare: MetadataComparison):
@@ -114,11 +152,15 @@ class Algorithm(object):
         self.text_compare = text_compare
         self.metadata_compare = metadata_compare
 
+        # Hyperparams
+        self.text_weight = 0.5
+        self.metadata_weight = 0.5
+
 if __name__ == "__main__":
     default_formatting_error = "Arguments not formatted properly. Run `python3 algorithm.py -h` to see the allowed argument formats."
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hs:d:m:c:n:")
+        opts, args = getopt.getopt(sys.argv[1:], "hs:d:m:c:n:t:")
     except getopt.GetoptError:
         print(default_formatting_error)
         sys.exit()
@@ -127,7 +169,7 @@ if __name__ == "__main__":
 
     if '-h' in flags:
         print("Usage: python3 algorithm.py -m <model_location> -t <textdata_location> -s <save_location> \n OR \n" + 
-            "python3 algorithm.py -c <course_name> -d <similaritydata_location> [-n <num_recommendations>]")
+            "python3 algorithm.py -c <course_name> -s <similaritydata_location> -m <metadata_location> [-n <num_recommendations>] [-d <departmentsimilarity_location>]")
         sys.exit()
     elif '-m' in flags and '-s' in flags and '-t' in flags:
         model_loc = [x[1] for x in opts if x[0]=="-m"][0]
@@ -141,17 +183,22 @@ if __name__ == "__main__":
         algorithm.save_scores(save_loc)
 
         sys.exit()
-    elif '-c' in flags and '-d' in flags:
+    elif '-c' in flags and '-s' in flags and '-m' in flags:
         course = [x[1] for x in opts if x[0]=="-c"][0]
-        similarity_data_loc = [x[1] for x in opts if x[0]=="-d"][0]
+        similarity_data_loc = [x[1] for x in opts if x[0]=="-s"][0]
+        metadata_loc = [x[1] for x in opts if x[0]=="-m"][0]
 
-        algorithm = TextComparison()
-        algorithm.import_saved_similarity(similarity_data_loc)
+        text_compare = TextComparison()
+        metadata_compare = MetadataComparison(metadata_loc)
+        text_compare.import_saved_similarity(similarity_data_loc)
+        if '-d' in flags:
+            department_similarity_loc = [x[1] for x in opts if x[0]=="-d"][0]
+            text_compare.import_department_similarity(department_similarity_loc)
 
         if '-n' in flags:
-            print(algorithm.get_most_similar(course, int([x[1] for x in opts if x[0]=="-n"][0])))
+            print(text_compare.get_most_similar(course, int([x[1] for x in opts if x[0]=="-n"][0])))
         else:
-            print(algorithm.get_most_similar(course))
+            print(text_compare.get_most_similar(course))
         sys.exit()
     else:
         print(default_formatting_error)
