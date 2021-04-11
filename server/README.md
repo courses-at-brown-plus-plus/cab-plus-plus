@@ -10,4 +10,4 @@ All of the following commands should be run in the command line:
 
 `python3 algorithm.py -m <model_location> -t <textdata_location> -s <save_location>` - Saves a csv file of comparisons at the given save location, given the location of texts and the location of the model.
 
-`python3 algorithm.py -c <course_name> -d <similaritydata_location> [-n <num_recommendations>]` - Gives recommendations for the given course, given the location of the similarity data, and optionally given the number of recommendations (default: 1).
+`python3 algorithm.py -c <course_name> -s <similaritydata_location> -m <metadata_location> [-n <num_recommendations>] [-d <departmentsimilarity_location>]` - Gives recommendations for the given course, given the location of the similarity data, the location of the metadata (Critical Review data), and optionally given the number of recommendations (default: 1) as well as optionally given the overall department similarities.
