@@ -84,6 +84,9 @@ export const slice = createSlice({
         state.issueReportState = -1;
       }
     }, 
+    resetIssueReportState: (state, action) => {
+      state.issueReportState = 0;
+    }
     // addGraphAnnotations: (state, action) => {
     //   state.graphAnnotations[action.payload.concentration] = action.payload.annotation;
     // }
@@ -93,7 +96,7 @@ export const slice = createSlice({
 export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, 
   addCourseTaken, removeCourseTaken, 
   addPrereq, removePrereq, 
-  addAnnotation, removeAnnotation} = slice.actions;
+  addAnnotation, removeAnnotation, resetIssueReportState } = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;
 export const selectAllCourseCodes = state => state.appData.allCourseCodes;
