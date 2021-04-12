@@ -72,18 +72,13 @@ function GraphView(props) {
 
     alone.current = p[0];
 
+    setXOffset(layers[0].length / 2 * 100)
+    setOrigXOffset(layers[0].length / 2 * 100)
+    setScaleFactor(0.4)
+
   }, [props.graph]);
 
   useEffect(() => {
-
-/*    for (let i = 0; i < coursesTaken.length; i++) {
-      if (!nodeGraph.has(coursesTaken[i])) {
-        continue;
-      }
-      for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
-        nextCourses.push(nodeGraph.get(coursesTaken[i]).edges[j].end);
-        setNextCourses(nextCourses);
-=======*/
     if (props.displayedAnnotation) {
       setAnnotations([...props.displayedAnnotation]);
     }
@@ -98,7 +93,6 @@ function GraphView(props) {
             setNextCourses(nextCourses);
           }
         }
-//>>>>>>> 7defa6be480ad400ebedd83f5d4933f349d27bc7
       }
     }
   });
@@ -246,7 +240,7 @@ function GraphView(props) {
     ctx.fillStyle = 'black';
     ctx.font = "14px Helvetica";
     ctx.textAlign = "center";
-    ctx.fillText(node.id, x / scaleFactor, (y - NODE_HEIGHT / 2 + 20) / scaleFactor);
+    ctx.fillText(node.id, (x - scaleFactor * NODE_WIDTH / 2 + NODE_WIDTH / 2 * scaleFactor) / scaleFactor, ( y - scaleFactor * NODE_HEIGHT / 2 + 20 * scaleFactor) / scaleFactor);
     ctx.restore();
     ctx.globalAlpha = 1;
   }
