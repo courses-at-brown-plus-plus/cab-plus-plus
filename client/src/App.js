@@ -4,8 +4,8 @@ import './App.css';
 import { Route, Switch } from 'react-router-dom';
 import HomePage from './views/HomePage';
 import CourseSuggestions from './views/CourseSuggestions';
-import AppHeader from './components/AppHeader';
-import AppFooter from './components/AppFooter';
+import AppHeader from './views/AppHeader';
+import AppFooter from './views/AppFooter';
 import { Flex } from "@chakra-ui/react"
 
 import { useDispatch } from 'react-redux';

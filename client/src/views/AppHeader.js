@@ -2,7 +2,7 @@ import React from 'react';
 import { Flex, Button, Box } from "@chakra-ui/react"
 import { NavLink } from 'react-router-dom';
 
-import AboutPopup from './AboutPopup';
+import AboutPopup from '../components/AboutPopup';
 
 export default function AppHeader() {
 

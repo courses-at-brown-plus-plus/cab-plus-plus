@@ -30,7 +30,8 @@ export const PRIORITY_OPTIONS = [
   "Difficulty",
   "Enjoyment", 
   "Suitability for none-concentrators", 
-  "High S/NC ratio"
+  "Small class size",
+  "Fair grading"
 ];
 
 export const COURSE_CODES = [
