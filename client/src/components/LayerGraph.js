@@ -462,6 +462,7 @@ function expandGroup(group, layer) {
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
+  console.log(result)
   let alone = separateGraph(result[0]);
   //addDummyVertices(nodeGraph, result);
   //result = permuteGraph(result, nodeGraph);

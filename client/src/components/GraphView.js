@@ -85,9 +85,6 @@ function GraphView(props) {
           layers[i].splice(j, 1)
         }
       }
-      console.log(layers[i])
-
-
     }
     minX.current = min;
 
@@ -309,7 +306,7 @@ function GraphView(props) {
       //console.log(id)
       //drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
       nodeCoords.current.set(id, 
-        [scaleFactor * (coords[0] * 100 - 720 + xOffset) + props.width / 2,
+        [scaleFactor * (coords[0] * 100 + 1600 + xOffset) + props.width / 2,
          scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
@@ -363,7 +360,7 @@ function GraphView(props) {
     }
 
     for (let edge of activeEdges) {
-      let xOffset1 = edge.port * 10
+      let xOffset1 = 0;//edge.port * 10
       let start = nodeCoords.current.get(edge.start);
       let end = nodeCoords.current.get(edge.end);
       ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
