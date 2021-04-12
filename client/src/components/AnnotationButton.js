@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Select, Box, ButtonGroup, Button, IconButton } from "@chakra-ui/react"
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { Box, ButtonGroup, Button, IconButton } from "@chakra-ui/react"
 import { CloseIcon } from '@chakra-ui/icons';
 import { removeAnnotation } from '../store/slices/appDataSlice';
 

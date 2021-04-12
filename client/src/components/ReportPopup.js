@@ -41,16 +41,6 @@ export default function ReportPopup() {
     });
   }, [issueReportState]);
 
-  function displayToast() {
-    toast({
-      title: "Graph Updated",
-      description: "We'll review your changes as soon as possible!",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-
   function handleAddPrereq() {
     let prereqValid = allCourseCodes.includes(addPrereqInputVal);
     let unlockedValid = allCourseCodes.includes(addUnlockedInputVal);
@@ -64,7 +54,6 @@ export default function ReportPopup() {
       }));
       setAddPrereqInputVal("");
       setAddUnlockedInputVal("");
-      // displayToast();
     }
   }
 
@@ -81,7 +70,6 @@ export default function ReportPopup() {
       }));
       setRemovePrereqInputVal("");
       setRemoveUnlockedInputVal("");
-      // displayToast();
     }
   }
 

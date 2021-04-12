@@ -3,10 +3,8 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAnnotations, addAnnotation } from '../store/slices/appDataSlice';
 
-import { Button, Box, Flex, useDisclosure,
-  AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, 
-  AlertDialogCloseButton, AlertDialogBody, AlertDialogFooter, Input, Text, FormHelperText, 
-} from "@chakra-ui/react";
+import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, 
+  AlertDialogCloseButton, AlertDialogBody, AlertDialogFooter, Input, Text, Button } from "@chakra-ui/react";
 
 export default function AnnotationSave(props) {
   const dispatch = useDispatch();

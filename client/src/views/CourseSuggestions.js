@@ -42,7 +42,7 @@ export default function CourseSuggestions() {
     setPriorityContents(newPriorityContents);
   }
 
-  function renderDropdownOptions(availablePriorities) {
+  // function renderDropdownOptions(availablePriorities) {
 
     // <option key={priorityTitle} value={priorityTitle}>{priorityTitle}</option>
     // return availablePriorities.map((priorityTitle) => (
@@ -58,16 +58,16 @@ export default function CourseSuggestions() {
         //   )
         // }
 
-    return (
-      <React.Fragment>
-        {PRIORITY_OPTIONS.map((priorityTitle) => {
-            return (
-              <option value={priorityTitle}> {priorityTitle}</option>
-            )
-          })
-        }
-      </React.Fragment>
-    );
+    // return (
+    //   <React.Fragment>
+    //     {PRIORITY_OPTIONS.map((priorityTitle) => {
+    //         return (
+    //           <option value={priorityTitle}> {priorityTitle}</option>
+    //         )
+    //       })
+    //     }
+    //   </React.Fragment>
+    // );
 
     // return (
     //   <React.Fragment>
@@ -76,11 +76,11 @@ export default function CourseSuggestions() {
     //     <option value="option3">Option 3</option>
     //   </React.Fragment>
     // );
-  }
+  // }
 
   function renderPriorityDropdowns() {
     // return Object.entries(priorities).map(([key, value]) => (
-    const takenPriorities = Object.values(priorityContents);
+    // const takenPriorities = Object.values(priorityContents);
 
     // const availablePriorities = priorities.filter((aPriority) => !takenPriorities.includes(aPriority));
 

@@ -1,5 +1,7 @@
 
-export const URL = "http://localhost:5000/";
+// export const URL = "http://localhost:5000/";
+export const URL = "https://courses-at-brown-plus-plus.herokuapp.com/";
+
 export const AXIOS_CONFIG = {
   headers: {
     "Content-Type": "application/json",
