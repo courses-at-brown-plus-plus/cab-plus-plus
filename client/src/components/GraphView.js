@@ -60,13 +60,22 @@ function GraphView(props) {
 
   const [annotations, setAnnotations] = useState([]);
 
+  let alone = useRef(new Map());
+
   useEffect(() => {
-    layersRef.current = prepareGraph(nodeGraph)
+    let p = prepareGraph(nodeGraph);
+    layersRef.current = p[1];
     layers = layersRef.current;
+
+    alone.current = p[0];
+
   }, [props.graph]);
 
   useEffect(() => {
     for (let i = 0; i < coursesTaken.length; i++) {
+      if (!nodeGraph.has(coursesTaken[i])) {
+        continue;
+      }
       for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
         nextCourses.push(nodeGraph.get(coursesTaken[i]).edges[j].end);
         setNextCourses(nextCourses);
@@ -189,6 +198,7 @@ function GraphView(props) {
   } 
 
   function drawNode(ctx, node, x, y) {
+
     if (focus && !activeNodes.includes(node.id)) {
       ctx.globalAlpha = 0.5;
     }
@@ -243,6 +253,7 @@ function GraphView(props) {
     let ctx = canvas.getContext('2d');
 
 
+
     // Fix canvas blur
     // https://dev.to/pahund/how-to-fix-blurry-text-on-html-canvases-on-mobile-phones-3iep
     const ratio = Math.ceil(window.devicePixelRatio);
@@ -258,6 +269,11 @@ function GraphView(props) {
     ctx.clearRect(0, 0, props.width, props.height);
     ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, props.width, props.height);
+
+    for (let [id, coords] of alone.current) {
+      console.log(id)
+      drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
+    }
 
     let y = 40;
     for (let i = 0; i < layers.length; i++) {

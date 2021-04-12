@@ -97,6 +97,29 @@ function layerGraph(nodeGraph) {
   return result;
 }
 
+function separateGraph(topLayer) {
+  let alone = new Map();
+  for (let i = topLayer.length - 1; i >= 0; i--) {
+    if (topLayer[i].edges.length === 0) {
+      alone.set(topLayer[i].id, topLayer[i]);
+      topLayer.splice(i, 1)
+    }
+  }
+  return alone;
+}
+
+function box(nodeMap) {
+  let width = Math.floor(Math.sqrt(nodeMap.size));
+  let i = 0;
+  let result = new Map();
+
+  for (let [id, node] of nodeMap) {
+    result.set(id, [i % width, Math.floor(i / width)])
+    i++;
+  }
+  return result;
+}
+
 //Replace edges that span multiple lines with smaller edges that meet at dummy vertices
 function addDummyVertices(nodeGraph, layeredGraph) {
   let depths = longestPath(nodeGraph);
@@ -439,6 +462,7 @@ function expandGroup(group, layer) {
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
+  let alone = separateGraph(result[0]);
   //addDummyVertices(nodeGraph, result);
   //result = permuteGraph(result, nodeGraph);
   //removeDummyVertices(result, nodeGraph);
@@ -448,7 +472,7 @@ function prepareGraph(nodeGraph) {
     temp[i] = arrangeNodes(temp[i]);
   }
 
-  return temp;
+  return [box(alone), temp];
 }
 
 export default prepareGraph;
