@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 
 import csv
+import pandas as pd
+from algorithm import TextComparison, MetadataComparison, Algorithm
 
 PORT = 5000
 app = Flask(__name__)
@@ -31,13 +33,17 @@ def allCourseCodes():
 @app.route("/generateRecommendations", methods=["POST"])
 @cross_origin()
 def generateRecommendations(): 
-    coursesTaken = request.json["courses_taken"]
+    courses_taken = request.json["courses_taken"]
     priorities = request.json["priorities"]
 
     # Run algorithm here
-    recommendedCourses = []
+    text_compare = TextComparison()
+    metadata_compare = MetadataComparison("./data/CritReview_data.csv")
+    text_compare.import_saved_similarity("./data/similarities.csv")
+    algorithm = Algorithm(text_compare, metadata_compare)
+    recommended_courses = algorithm.get_recs(courses_taken, priorities, 5)
     print("request received generate recs")
-    return jsonify({"recommendedCourses": recommendedCourses}), 200
+    return jsonify({"recommendedCourses": recommended_courses}), 200
 
 def appSetup(): 
     with open('data/CAB_v1_formatted.csv') as csvFile: 

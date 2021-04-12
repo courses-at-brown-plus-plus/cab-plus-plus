@@ -3,3 +3,6 @@ models/universal-sentence-encoder_4/
 
 # Large data files
 data/similarities.csv
+
+# Test files
+test.py
