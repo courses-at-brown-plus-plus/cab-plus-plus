@@ -101,7 +101,7 @@ export default function HomePage() {
       headers: {
         "Content-Type": "application/json",
         'Access-Control-Allow-Origin': '*'
-        }
+      }
     }
     axios.get(
       'http://localhost:5000/allPathwayData',
@@ -144,7 +144,7 @@ export default function HomePage() {
       <PastCourses />
 
       <center>
-        <GraphView width={800} height={600} graph={csGraph}/>
+        {/*<GraphView width={800} height={600} graph={csGraph}/>
         ^data from dummy csGraph variable
         <br/> { "-".repeat(100) }
 
@@ -153,7 +153,7 @@ export default function HomePage() {
         }
         ^webscraped data (gareth's code)
         <br/> { "-".repeat(100) }
-
+         */}
         { renderGraph() }
         ^data from redux  (kevin and gareth's combined)
         <br/> { "-".repeat(100) }

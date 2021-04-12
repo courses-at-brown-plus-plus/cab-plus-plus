@@ -348,30 +348,21 @@ function arrangeNodes(layer) {
   
 
     let counter = 0;
-    while (counter < 1000) {
+    while (counter < 1000000) {
         counter++;
         for (let i = 0; i < layer.length - 1; i++) {
             let dx = 0;
-            dx = -0.02 / (1 + Math.exp(medians.get(layer[i].id) - layer[i].coord)) - 0.01;
+            dx = 0.005 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
 
 
             if (i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) {
-                dx -= 0.01;
+                dx -= 0.02;
             }
 
             if (i > 0 && layer[i].coord - layer[i - 1].coord < 1) {
-                dx += 0.01;
+                dx += 0.02;
             }
 
-            /*let friction = 0.03 * Math.sign(force);
-            if (Math.abs(friction) < Math.abs(force)) {
-                force -= friction;
-            } else {
-                force = 0;
-            }*/
-
-
-            console.log(dx)
             layer[i].coord += dx;
         }
     }
@@ -448,12 +439,11 @@ function expandGroup(group, layer) {
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
-  addDummyVertices(nodeGraph, result);
-  result = permuteGraph(result, nodeGraph);
-  removeDummyVertices(result, nodeGraph);
+  //addDummyVertices(nodeGraph, result);
+  //result = permuteGraph(result, nodeGraph);
+  //removeDummyVertices(result, nodeGraph);
   //addInvisibleNodes(result);
   let temp = tempAssignCoords(nodeGraph, result);
-  //console.log(temp)
   for (let i = 0; i < temp.length - 1; i++) {
     temp[i] = arrangeNodes(temp[i]);
   }

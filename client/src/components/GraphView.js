@@ -16,6 +16,9 @@ function GraphView(props) {
 
   // access redux var for courses taken input on the sidebar
   const coursesTaken = useSelector(selectCoursesTaken);
+
+  const [nextCourses, setNextCourses] = useState([]);
+
   // dummy data equivalent
   // const coursesTaken = ["CSCI 0190"];
   
@@ -60,7 +63,16 @@ function GraphView(props) {
   useEffect(() => {
     layersRef.current = prepareGraph(nodeGraph)
     layers = layersRef.current;
-  }, [props.graph])
+  }, [props.graph]);
+
+  useEffect(() => {
+    for (let i = 0; i < coursesTaken.length; i++) {
+      for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
+        nextCourses.push(nodeGraph.get(coursesTaken[i]).edges[j].end);
+        setNextCourses(nextCourses);
+      }
+    }
+  });
 
 
   function handleMouseMove(event) {
@@ -181,6 +193,13 @@ function GraphView(props) {
       ctx.globalAlpha = 0.5;
     }
     ctx.fillStyle = 'white';
+    if (coursesTaken.includes(node.id)) {
+      ctx.fillStyle = '#6c6';
+    } else if (nextCourses.includes(node.id)) {
+      ctx.fillStyle = '#cfc';
+    }
+
+
     ctx.fillRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
     if (activeNodes.includes(node.id)) {
       ctx.strokeStyle = 'black';
@@ -251,16 +270,20 @@ function GraphView(props) {
     }
     
 
+    ctx.lineWidth = scaleFactor;
+
     let activeEdges = [];
     for (let [node, coords] of nodeCoords.current.entries()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
-        drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
+        if (!node.active) {
+          drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
+        }
 
         for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
           let edge = nodeGraph.get(node).edges[i];
           if (activeNodes.includes(edge.start)) {
-            activeEdges.push(edge)
+            activeEdges.push(edge);
             continue;
           }
           let xOffset1 = edge.port * 10
@@ -278,6 +301,7 @@ function GraphView(props) {
       }
       ctx.closePath();
     }
+
     for (let edge of activeEdges) {
       let xOffset1 = edge.port * 10
       let start = nodeCoords.current.get(edge.start);
@@ -287,7 +311,7 @@ function GraphView(props) {
         continue;
       }
       ctx.lineTo(end[0] + xOffset1, end[1] - scaleFactor * NODE_HEIGHT / 2);
-      ctx.strokeStyle = '#666';
+      ctx.strokeStyle = '#999';
       ctx.stroke();
     }
   });

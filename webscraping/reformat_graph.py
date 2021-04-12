@@ -9,7 +9,8 @@ with open('../server/data/CAB_v2.csv') as csvFile:
     for row in reader: 
         rows.append(row)
         course_code = row['courseCode']
-        cab_data[course_code] = []
+        if course_code not in cab_data:
+            cab_data[course_code] = []
 
         # Convert string to nested list
         prereqs = eval(row['preReqs'])
@@ -30,6 +31,8 @@ with open('../server/data/CAB_v2.csv') as csvFile:
                     if subreq not in cab_data:
                         cab_data[subreq] = []
                     cab_data[subreq].append((course_code, port))
+
+print(cab_data['CSCI 0160'])
 
 for row in rows:
     row['preReqs'] = cab_data[row['courseCode']]
