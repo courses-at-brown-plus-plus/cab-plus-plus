@@ -1,11 +1,17 @@
 
-export const URL = "http://localhost:5000/";
+// export const URL = "http://localhost:5000/";
+export const URL = "https://courses-at-brown-plus-plus.herokuapp.com/";
+
 export const AXIOS_CONFIG = {
   headers: {
     "Content-Type": "application/json",
     'Access-Control-Allow-Origin': '*'
   }
 };
+
+export const AVAILABLE_CONCENTRATIONS = [ 
+"CSCI", "VISA", "MATH" 
+];
 
 export const RECOMMENDED_COURSES = [
   {

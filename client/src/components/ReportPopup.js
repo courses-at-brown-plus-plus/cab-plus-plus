@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { selectAllCourseCodes } from '../store/slices/appDataSlice';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, addPrereq, removePrereq } from '../store/slices/appDataSlice';
 
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, 
   ModalCloseButton, ModalFooter, ModalBody, useDisclosure, 
-  Box, Input, Flex, Text, InputGroup, useToast } from "@chakra-ui/react";
-
+  Box, Input, Flex, Text, useToast } from "@chakra-ui/react";
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 
 
 export default function ReportPopup() {
-  const toast = useToast()
+  const toast = useToast();
+  const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const allCourseCodes = useSelector(selectAllCourseCodes);
+  const errorMessage = useSelector(selectErrorMessage);
+  const issueReportState = useSelector(selectIssueReportState);
 
   const [addPrereqInputVal, setAddPrereqInputVal] = useState("");
   const [addPrereqCourseExists, setAddPrereqCourseExists] = useState(true);
@@ -26,15 +28,18 @@ export default function ReportPopup() {
   const [removeUnlockedInputVal, setRemoveUnlockedInputVal] = useState("");
   const [removeUnlockedCourseExists, setRemoveUnlockedCourseExists] = useState(true);
 
-  function displayToast() {
+  useEffect(() => {
+    if (errorMessage === "" || issueReportState === 0) {
+      return;
+    }
     toast({
-      title: "Graph Updated",
-      description: "We'll review your changes as soon as possible!",
-      status: "success",
+      title: "Issue Report",
+      description: errorMessage, 
+      status: (issueReportState > 0) ? "success" : "error",
       duration: 5000,
       isClosable: true,
     });
-  }
+  }, [issueReportState]);
 
   function handleAddPrereq() {
     let prereqValid = allCourseCodes.includes(addPrereqInputVal);
@@ -43,11 +48,12 @@ export default function ReportPopup() {
     setAddUnlockedCourseExists(unlockedValid);
 
     if (prereqValid && unlockedValid) {
-      alert("sent");
-      // connect nodes (addPrereqInputVal, addUnlockedInputVal)
+      dispatch(addPrereq({ 
+        prereqCourse: addPrereqInputVal, 
+        unlockedCourse: addUnlockedInputVal
+      }));
       setAddPrereqInputVal("");
       setAddUnlockedInputVal("");
-      displayToast();
     }
   }
 
@@ -58,11 +64,12 @@ export default function ReportPopup() {
     setRemoveUnlockedCourseExists(unlockedValid);
 
     if (prereqValid && unlockedValid) {
-      alert("sent");
-      // connect nodes (removePrereqInputVal, removeUnlockedInputVal)
+      dispatch(removePrereq({ 
+        prereqCourse: removePrereqInputVal, 
+        unlockedCourse: removeUnlockedInputVal
+      }));
       setRemovePrereqInputVal("");
       setRemoveUnlockedInputVal("");
-      displayToast();
     }
   }
 
