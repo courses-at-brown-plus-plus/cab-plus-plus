@@ -3,12 +3,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectAllCourseCodes, selectCoursesTaken, 
   addCourseTaken, removeCourseTaken} from '../store/slices/appDataSlice';
 
-import { InputGroup, Input, 
+import { InputGroup, Input, useToast, 
   Button, Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
 
 
 export default function PastCourses(props) {
 
+  const toast = useToast()
   const dispatch = useDispatch();
   const allCourseCodes = useSelector(selectAllCourseCodes);
   const coursesTaken = useSelector(selectCoursesTaken);
@@ -26,6 +27,12 @@ export default function PastCourses(props) {
     }
     else {
       setCourseExists(false);
+      toast({
+        title: "Invalid course code",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
     }
   }
 
