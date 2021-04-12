@@ -338,6 +338,49 @@ function tempAssignCoords(nodeGraph, layeredGraph) {
   return result;
 }
 
+
+function arrangeNodes(layer) {
+    let medians = new Map();
+
+    for (let i = 0; i < layer.length; i++) {
+      medians.set(layer[i].id, layer[i].coord);
+    }
+  
+
+    let counter = 0;
+    while (counter < 1000) {
+        counter++;
+        for (let i = 0; i < layer.length - 1; i++) {
+            let dx = 0;
+            dx = -0.02 / (1 + Math.exp(medians.get(layer[i].id) - layer[i].coord)) - 0.01;
+
+
+            if (i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) {
+                dx -= 0.01;
+            }
+
+            if (i > 0 && layer[i].coord - layer[i - 1].coord < 1) {
+                dx += 0.01;
+            }
+
+            /*let friction = 0.03 * Math.sign(force);
+            if (Math.abs(friction) < Math.abs(force)) {
+                force -= friction;
+            } else {
+                force = 0;
+            }*/
+
+
+            console.log(dx)
+            layer[i].coord += dx;
+        }
+    }
+    return layer;
+}
+
+
+
+/*
 function space(layer) {
   let groups = findGroups([...layer]);
   let result = [...layer];
@@ -346,7 +389,7 @@ function space(layer) {
     counter += 1;
     let toAdd = []
     for (let i = 0; i < groups.length - 1; i++) {
-      expandGroup(groups[i]);
+      expandGroup(groups[i], layer);
       toAdd = toAdd.concat(groups[i]);
     }
 
@@ -389,7 +432,7 @@ function findGroups(layer) {
   return groups;
 }
 
-function expandGroup(group) {
+function expandGroup(group, layer) {
   let avg = 0;
   for (let i = 0; i < group.length - 1; i++) {
     avg += group[i].coord;
@@ -400,7 +443,7 @@ function expandGroup(group) {
     group[i].coord += (group.length / 2 - i) * 0.01;
   }
 }
-
+*/
 
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
@@ -410,10 +453,10 @@ function prepareGraph(nodeGraph) {
   removeDummyVertices(result, nodeGraph);
   //addInvisibleNodes(result);
   let temp = tempAssignCoords(nodeGraph, result);
+  //console.log(temp)
   for (let i = 0; i < temp.length - 1; i++) {
-    temp[i] = space(temp[i]);
+    temp[i] = arrangeNodes(temp[i]);
   }
-  console.log(temp)
 
   return temp;
 }

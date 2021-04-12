@@ -4,7 +4,7 @@ cab_data = {}
 
 rows = []
 
-with open('../server/data/CAB_v1.csv') as csvFile: 
+with open('../server/data/CAB_v2.csv') as csvFile: 
     reader = csv.DictReader(csvFile)
     for row in reader: 
         rows.append(row)
