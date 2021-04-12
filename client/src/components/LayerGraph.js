@@ -212,11 +212,14 @@ function medianHeuristic1(nodeGraph, layers, layer2) {
         }
       }
       l.sort(function(a, b) {return a.coord - b.coord;});
-      if (l.length % 2 === 0) {
+      if (l.length > 0) {
+        medians.set(node2.id, Math.round(l.reduce((a, b) => a + b) / l.length * 2) / 2);
+      }
+      /*if (l.length % 2 === 0) {
         medians.set(node2.id, (l[l.length / 2 - 1] + l[l.length / 2]) / 2)
       } else {
         medians.set(node2.id, l[(l.length - 1) / 2])
-      }
+      }*/
     }
   }
   return medians;

@@ -97,7 +97,7 @@ function GraphView(props) {
       setXOffset(-layers[0].reduce((a, b) => a + b.coord, 0) / layers[0].length * 100);
       setOrigXOffset(-layers[0].reduce((a, b) => a + b.coord, 0) / layers[0].length * 100);
     }
-    //console.log(layers[0])
+
     setScaleFactor(0.4)
 
   }, [props.graph]);
@@ -307,7 +307,7 @@ function GraphView(props) {
     ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, props.width, props.height);
 
-    nodeCoords.current.set(new Map());
+    nodeCoords.current = new Map();
 
     for (let [id, coords] of alone.current) {
       //console.log(id)
@@ -322,6 +322,11 @@ function GraphView(props) {
     let y = 40;
     for (let i = 0; i < layers.length; i++) {
       for (let j = 0; j < layers[i].length; j++) {
+
+        if (layers[i][j].id === 'MATH 1620') {
+          console.log(layers[i][j])
+        }
+
         // center nodes horizontally
         let x = props.width / 2 + (layers[i][j].coord) * 100;
         //console.log(x)
