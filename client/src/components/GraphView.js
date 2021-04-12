@@ -192,6 +192,12 @@ function GraphView(props) {
     setAnnotations(annotations.concat([id]))
   }
 
+  function removeAnnotation(id) {
+    console.log(id)
+    annotations.splice(annotations.indexOf(id), 1);
+    setAnnotations(annotations);
+  }
+
   function handleScroll(e) {
     handleMouseMove(e)
     let newScaleFactor = scaleFactor - e.deltaY * scaleFactor * 0.005;
@@ -323,10 +329,6 @@ function GraphView(props) {
     for (let i = 0; i < layers.length; i++) {
       for (let j = 0; j < layers[i].length; j++) {
 
-        if (layers[i][j].id === 'MATH 1620') {
-          console.log(layers[i][j])
-        }
-
         // center nodes horizontally
         let x = props.width / 2 + (layers[i][j].coord) * 100;
         //console.log(x)
@@ -403,7 +405,7 @@ function GraphView(props) {
         { showCourseView && 
           <CourseView node={courseView} 
           annotation={nextCourses.includes(courseView.id) && !annotations.includes(courseView.id)} 
-          add={addAnnotation}/>
+          add={addAnnotation} rann={annotations.includes(courseView.id)} remove={removeAnnotation}/>
         }
         <canvas ref={canvasRef} onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
