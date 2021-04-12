@@ -6,6 +6,7 @@ import PastCourses from '../components/PastCourses';
 
 import { useSelector } from 'react-redux';
 import { selectPathwayData } from '../store/slices/appDataSlice';
+import { AVAILABLE_CONCENTRATIONS } from '../constants';
 
 import axios from 'axios';
 
@@ -24,7 +25,10 @@ export default function HomePage() {
       if (!course.startsWith(newConcentrationName)) {
         continue;
       }
-      let node = new CourseNode(pathwayData[course]['courseCode'], [], [])
+      let node = new CourseNode(pathwayData[course]['courseCode'], [], [], false, false, 
+        pathwayData[course]['courseName'], pathwayData[course]['courseDesc'], [pathwayData[course]['FYS'], 
+          pathwayData[course]['SOPH'], pathwayData[course]['DIAP'], pathwayData[course]['WRIT'],
+          pathwayData[course]['CBLR'], pathwayData[course]['COEX']])
       for (let edge of pathwayData[course]['preReqs']) {
         node.edges.push(new Edge(pathwayData[course]['courseCode'], edge[0], edge[1]))
       }
@@ -88,10 +92,11 @@ export default function HomePage() {
     else {
       // empty graph; no concentration selected
       let emptyGraph = new Map();
-      emptyGraph.set('MATH0520', new CourseNode('MATH0520', [new Edge('MATH0520', 'CS1420', 0)], []));
-      emptyGraph.set('CS1420', new CourseNode('CS1420', [], []));
-      emptyGraph.set('CS22', new CourseNode('CS22', [new Edge('CS22', 'CS1010', 0)], []));
-      emptyGraph.set('CS1010', new CourseNode('CS1010', [], []));
+      emptyGraph.set('No graph selected', new CourseNode('No graph selected', [], []));
+      // emptyGraph.set('MATH0520', new CourseNode('MATH0520', [new Edge('MATH0520', 'CS1420', 0)], []));
+      // emptyGraph.set('CS1420', new CourseNode('CS1420', [], []));
+      // emptyGraph.set('CS22', new CourseNode('CS22', [new Edge('CS22', 'CS1010', 0)], []));
+      // emptyGraph.set('CS1010', new CourseNode('CS1010', [], []));
       return <GraphView width={800} height={600} graph={emptyGraph}/>;
     }
   }
@@ -148,15 +153,16 @@ export default function HomePage() {
         ^data from dummy csGraph variable
         <br/> { "-".repeat(100) }
 
-        { webScrapedGraph !== null && webScrapedGraph !== undefined &&
-            <GraphView width={800} height={600} graph={webScrapedGraph}/>
+         */
+          // webScrapedGraph !== null && webScrapedGraph !== undefined &&
+          //   <GraphView width={800} height={600} graph={webScrapedGraph}/>
+        // ^webscraped data (gareth's code)
         }
-        ^webscraped data (gareth's code)
-        <br/> { "-".repeat(100) }
-         */}
         { renderGraph() }
-        ^data from redux  (kevin and gareth's combined)
-        <br/> { "-".repeat(100) }
+        { 
+          // ^data from redux  (kevin and gareth's combined)
+          // <br/> { "-".repeat(100) }
+        }
 
         <Flex 
           width={800} 
@@ -181,7 +187,9 @@ export default function HomePage() {
           </Box>
 
         </Flex>
-        Selected Concentration: { selectedConcentration }
+        {
+          // Selected Concentration: { selectedConcentration }
+        }
 
       </center>
 
@@ -195,7 +203,7 @@ export default function HomePage() {
   );
 
   function renderDropdownItems() {
-    return ["CSCI", "VISA", "MATH"].map((concentrationName) => (
+    return AVAILABLE_CONCENTRATIONS.map((concentrationName) => (
       <option key={concentrationName} value={concentrationName}>{concentrationName}</option>
     ));
     // return Object.keys(pathwayData).map((concentrationName) => (

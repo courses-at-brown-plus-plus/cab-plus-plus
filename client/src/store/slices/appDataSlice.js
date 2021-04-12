@@ -6,7 +6,9 @@ export const slice = createSlice({
     pathwayData: {"placeholderConcentration": "aGraph"},
     allCourseCodes: [],
     coursesTaken: [], 
-    recommendedCourses: []
+    recommendedCourses: [], 
+    errorMessage: "",
+    issueReportState: 0
     // graph annotations
     // undo tree for "courses taken" input?
     // undo tree for graph annotations?
@@ -30,18 +32,64 @@ export const slice = createSlice({
         state.coursesTaken.splice(targetIndex, 1);
       }
     },
+    addPrereq: (state, action) => {
+      let unlockedCourse = action.payload.unlockedCourse;
+      let prereqCourse = action.payload.prereqCourse;
+
+      let targetIndex = -1;
+      state.pathwayData[unlockedCourse].preReqs.forEach((aPrereq, index) => {
+        if (aPrereq[0] === prereqCourse) {
+          targetIndex = index;
+        }
+      })
+
+      if (targetIndex === -1) {
+        state.pathwayData[unlockedCourse].preReqs.push([prereqCourse, 1]);
+        state.errorMessage = "We'll review your changes as soon as possible!";
+        state.issueReportState = 1;
+      }
+      else {
+        state.errorMessage = "This prerequisite already exists";
+        state.issueReportState = -1;
+      }
+    }, 
+    removePrereq: (state, action) => {
+      let unlockedCourse = action.payload.unlockedCourse;
+      let prereqCourse = action.payload.prereqCourse;
+
+      let targetIndex = -1;
+      state.pathwayData[unlockedCourse].preReqs.forEach((aPrereq, index) => {
+        if (aPrereq[0] === prereqCourse) {
+          targetIndex = index;
+        }
+      })
+
+      if (targetIndex !== -1) {
+        state.pathwayData[unlockedCourse].preReqs.splice(targetIndex, 1);
+        state.errorMessage = "We'll review your changes as soon as possible!";
+        state.issueReportState = 1;
+      }
+      else {
+        state.errorMessage = "This prerequisite does not exist";
+        state.issueReportState = -1;
+      }
+    }, 
     // addGraphAnnotations: (state, action) => {
     //   state.graphAnnotations[action.payload.concentration] = action.payload.annotation;
     // }
   }
 })
 
-export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, addCourseTaken, removeCourseTaken } = slice.actions;
+export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, 
+  addCourseTaken, removeCourseTaken, 
+  addPrereq, removePrereq } = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;
 export const selectAllCourseCodes = state => state.appData.allCourseCodes;
 export const selectCoursesTaken = state => state.appData.coursesTaken;
 export const selectRecommendedCourses = state => state.appData.recommendedCourses;
+export const selectErrorMessage = state => state.appData.errorMessage;
+export const selectIssueReportState = state => state.appData.issueReportState;
 // export const selectConcentrations = state => {
 //   let concentrations = Object.entries(state.appData.pathwayData).map(([concentrationName, values]) => {
 //     return baseCourse;

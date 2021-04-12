@@ -7,6 +7,10 @@ export const AXIOS_CONFIG = {
   }
 };
 
+export const AVAILABLE_CONCENTRATIONS = [ 
+"CSCI", "VISA", "MATH" 
+];
+
 export const RECOMMENDED_COURSES = [
   {
     title: "VISA 0160 Foundation Painting", 

@@ -66,10 +66,14 @@ function GraphView(props) {
   }, [props.graph]);
 
   useEffect(() => {
-    for (let i = 0; i < coursesTaken.length; i++) {
-      for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
-        nextCourses.push(nodeGraph.get(coursesTaken[i]).edges[j].end);
-        setNextCourses(nextCourses);
+    if (props.graph && nodeGraph) {
+      for (let i = 0; i < coursesTaken.length; i++) {
+        if (nodeGraph.has(coursesTaken[i])) {
+          for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
+            nextCourses.push(nodeGraph.get(coursesTaken[i]).edges[j].end);
+            setNextCourses(nextCourses);
+          }
+        }
       }
     }
   });
