@@ -49,7 +49,7 @@ export default function HomePage() {
       aGraph.set(course, node);
     }
     setCurrentGraph(aGraph);
-  }, [selectedConcentration]);
+  }, [selectedConcentration, pathwayData]);
 
   // no concentration selected
   let emptyGraph = new Map();

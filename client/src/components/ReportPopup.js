@@ -51,9 +51,12 @@ export default function ReportPopup() {
       dispatch(addPrereq({ 
         prereqCourse: addPrereqInputVal, 
         unlockedCourse: addUnlockedInputVal
+        // prereqCourse: addUnlockedInputVal, 
+        // unlockedCourse: addPrereqInputVal
       }));
       setAddPrereqInputVal("");
       setAddUnlockedInputVal("");
+      onClose();
     }
   }
 
@@ -67,9 +70,12 @@ export default function ReportPopup() {
       dispatch(removePrereq({ 
         prereqCourse: removePrereqInputVal, 
         unlockedCourse: removeUnlockedInputVal
+        // prereqCourse: removeUnlockedInputVal, 
+        // unlockedCourse: removePrereqInputVal
       }));
       setRemovePrereqInputVal("");
       setRemoveUnlockedInputVal("");
+      onClose();
     }
   }
 

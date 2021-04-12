@@ -47,14 +47,14 @@ export const slice = createSlice({
       let prereqCourse = action.payload.prereqCourse;
 
       let targetIndex = -1;
-      state.pathwayData[unlockedCourse].preReqs.forEach((aPrereq, index) => {
-        if (aPrereq[0] === prereqCourse) {
+      state.pathwayData[prereqCourse].preReqs.forEach((aPrereq, index) => {
+        if (aPrereq[0] === unlockedCourse) {
           targetIndex = index;
         }
       })
 
       if (targetIndex === -1) {
-        state.pathwayData[unlockedCourse].preReqs.push([prereqCourse, 1]);
+        state.pathwayData[prereqCourse].preReqs.push([unlockedCourse, 1]);
         state.errorMessage = "We'll review your changes as soon as possible!";
         state.issueReportState = 1;
       }
@@ -68,14 +68,14 @@ export const slice = createSlice({
       let prereqCourse = action.payload.prereqCourse;
 
       let targetIndex = -1;
-      state.pathwayData[unlockedCourse].preReqs.forEach((aPrereq, index) => {
-        if (aPrereq[0] === prereqCourse) {
+      state.pathwayData[prereqCourse].preReqs.forEach((aPrereq, index) => {
+        if (aPrereq[0] === unlockedCourse) {
           targetIndex = index;
         }
       })
 
       if (targetIndex !== -1) {
-        state.pathwayData[unlockedCourse].preReqs.splice(targetIndex, 1);
+        state.pathwayData[prereqCourse].preReqs.splice(targetIndex, 1);
         state.errorMessage = "We'll review your changes as soon as possible!";
         state.issueReportState = 1;
       }
