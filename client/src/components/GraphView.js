@@ -183,17 +183,8 @@ function GraphView(props) {
     setOrigYOffset(yOffset);
   }
 
-  function handleDoubleClick(e) {
-    for (let [node, coords] of nodeCoords.current) {
-      if (nodeGraph.has(node)
-        && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 * scaleFactor
-        && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2 * scaleFactor) {
-        if (!annotations.includes(node)) {
-          setAnnotations(annotations.concat([node]))
-        }
-      }
-    }
-    console.log(annotations);
+  function addAnnotation(id) {
+    setAnnotations(annotations.concat([id]))
   }
 
   function handleScroll(e) {
@@ -247,13 +238,15 @@ function GraphView(props) {
     if (activeNodes.includes(node.id)) {
       ctx.strokeStyle = 'black';
     } else if (annotations.includes(node.id)) {
-      ctx.strokeStyle = '#8f8';
+      ctx.lineWidth = 3 * scaleFactor;
+      ctx.strokeStyle = '#6c6';
     } else {
       ctx.strokeStyle = '#ccc';
     }
 
 
     ctx.strokeRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
+    ctx.lineWidth = 1 * scaleFactor;
     ctx.save()
     ctx.scale(scaleFactor, scaleFactor);
     ctx.fillStyle = 'black';
@@ -396,11 +389,13 @@ function GraphView(props) {
     <React.Fragment>
       <div style={{position: "relative", width: props.width, height: props.height}} className="canvasContainer">
         { showCourseView && 
-          <CourseView node={courseView}/>
+          <CourseView node={courseView} 
+          annotation={nextCourses.includes(courseView.id) && !annotations.includes(courseView.id)} 
+          add={addAnnotation}/>
         }
         <canvas ref={canvasRef} onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
-          onMouseLeave={changeScroll} className = "graphView" onDoubleClick={handleDoubleClick}/>
+          onMouseLeave={changeScroll} className = "graphView"/>
       </div>
 
       <Flex width={800} justify="space-between" padding={3}>

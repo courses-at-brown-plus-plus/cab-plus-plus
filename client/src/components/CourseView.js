@@ -9,7 +9,8 @@ import {
   Th,
   Td,
   TableCaption,
-  Divider
+  Divider,
+  Button
 } from "@chakra-ui/react"
 
 function CourseView(props) {
@@ -41,6 +42,11 @@ function CourseView(props) {
                 </Tr>
                 </Tbody>
             </Table>
+            <br/>
+            {props.annotation &&
+              <Button colorScheme="green" style={{display: 'block', margin: 'auto', }}
+              onClick={(e) => props.add(props.node.id)}>Add annotation</Button>
+            }
         </div>);
 }
 
