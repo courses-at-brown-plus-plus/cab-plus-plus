@@ -47,6 +47,10 @@ function CourseView(props) {
               <Button colorScheme="green" style={{display: 'block', margin: 'auto', }}
               onClick={(e) => props.add(props.node.id)}>Add annotation</Button>
             }
+            {props.rann &&
+              <Button colorScheme="red" style={{display: 'block', margin: 'auto', }}
+              onClick={(e) => props.remove(props.node.id)}>Remove annotation</Button>
+            }
         </div>);
 }
 

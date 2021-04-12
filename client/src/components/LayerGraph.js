@@ -364,6 +364,16 @@ function tempAssignCoords(nodeGraph, layeredGraph) {
   return result;
 }
 
+function arrangeTopLayer(nodeGraph, topLayer, nextLayer) {
+  let targets = new Map();
+  for (let i = 0; i < topLayer.length; i++) {
+    for (let j = 0; j <  nodeGraph.get(topLayer[i]).edges.length; j++) {
+      let n = nodeGraph.get(topLayer[i]).edges[j];
+
+    }
+  }
+}
+
 
 function arrangeNodes(layer) {
     let medians = new Map();
@@ -467,9 +477,9 @@ function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
   console.log(result)
   let alone = separateGraph(result[0]);
-  //addDummyVertices(nodeGraph, result);
-  //result = permuteGraph(result, nodeGraph);
-  //removeDummyVertices(result, nodeGraph);
+  //addDummyVertices(nodeGraph, result[1]);
+  //result = permuteGraph(result[1], nodeGraph);
+  //removeDummyVertices(result[1], nodeGraph);
   //addInvisibleNodes(result);
   let temp = tempAssignCoords(nodeGraph, result);
   for (let i = 0; i < temp.length - 1; i++) {
