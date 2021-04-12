@@ -65,10 +65,31 @@ function GraphView(props) {
 
   let alone = useRef(new Map());
 
+  let minX = useRef(null);
+
   useEffect(() => {
     let p = prepareGraph(nodeGraph);
     layersRef.current = p[1];
     layers = layersRef.current;
+
+    let min = Infinity;
+    for (let i = 0; i < layers.length; i++) {
+      if (Math.min(layers[i].map((x) => {return x.coord;})) < min) {
+        min = Math.min(layers[i].map((x) => {return x.coord;}));
+      }
+
+      //TODO: Fix bug
+
+      for (let j = layers[i].length - 1; j >= 0; j--) {
+        if (isNaN(layers[i][j].coord)) {
+          layers[i].splice(j, 1)
+        }
+      }
+      console.log(layers[i])
+
+
+    }
+    minX.current = min;
 
     alone.current = p[0];
 
@@ -287,7 +308,9 @@ function GraphView(props) {
     for (let [id, coords] of alone.current) {
       //console.log(id)
       //drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
-      nodeCoords.current.set(id, [scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
+      nodeCoords.current.set(id, 
+        [scaleFactor * (coords[0] * 100 - 720 + xOffset) + props.width / 2,
+         scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
     let y = 40;
@@ -298,7 +321,9 @@ function GraphView(props) {
         //console.log(x)
 
         //let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100;
-        nodeCoords.current.set(layers[i][j].id, [scaleFactor * (x + xOffset) + props.width / 2, scaleFactor * (y + yOffset) + props.height / 2]);
+        nodeCoords.current.set(layers[i][j].id, 
+          [scaleFactor * (x + xOffset) + props.width / 2, 
+          scaleFactor * (y + yOffset) + props.height / 2]);
         x += 100;
       }
       y += 100;

@@ -10,7 +10,7 @@ export const AXIOS_CONFIG = {
 };
 
 export const AVAILABLE_CONCENTRATIONS = [ 
-"CSCI", "VISA", "MATH" 
+"CSCI", "VISA", "MATH", "ECON", "BIOL", "ENGL", "PHYS", "ENGN"
 ];
 
 export const RECOMMENDED_COURSES = [
