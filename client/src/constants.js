@@ -1,11 +1,17 @@
 
-export const URL = "http://localhost:5000/";
+// export const URL = "http://localhost:5000/";
+export const URL = "https://courses-at-brown-plus-plus.herokuapp.com/";
+
 export const AXIOS_CONFIG = {
   headers: {
     "Content-Type": "application/json",
     'Access-Control-Allow-Origin': '*'
   }
 };
+
+export const AVAILABLE_CONCENTRATIONS = [ 
+"CSCI", "VISA", "MATH", "ECON", "BIOL", "ENGL", "PHYS", "ENGN"
+];
 
 export const RECOMMENDED_COURSES = [
   {
@@ -25,13 +31,22 @@ export const RECOMMENDED_COURSES = [
   }
 ];
 
+export const PRIORITY_OPTIONS = [
+  "Time Commitment", 
+  "Difficulty",
+  "Enjoyment", 
+  "Suitability for none-concentrators", 
+  "Small class size",
+  "Fair grading"
+];
+
 export const COURSE_CODES = [
   "CS19", 
   "CS30", 
   "CS32", 
   "MATH0520", 
   "MATH0540"
-]
+];
 
 export const PATHWAY_DATA = {
   "CSCI": {
@@ -62,6 +77,5 @@ export const PATHWAY_DATA = {
     'VISA 1310': ['VISA 1320'], 
     'VISA 1320': []
   }
-
 }
 

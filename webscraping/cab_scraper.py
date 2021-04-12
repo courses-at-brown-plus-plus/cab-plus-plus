@@ -17,6 +17,7 @@ class CABScraper:
 
         self.timeout = timeout
         self.courses = []
+        self.course_codes = []
 
     def scrape_semester(self, semester):
         select_semester = Select(self.driver.find_element_by_id("crit-srcdb"))
@@ -41,10 +42,13 @@ class CABScraper:
             time.sleep(0.25)
             try:
                 section = self.driver.find_element_by_class_name("course-section--viewing")
+                print("section was already clicked")
             except:
                 try:
-                    section = self.driver.find_element_by_class_name("course-section")
+                    section = self.driver.find_element_by_class_name("course-section-section")
                     section.click()
+                    time.sleep(0.25)
+                    print("section was clicked")
                 except:
                     print("section was not clicked")
             course_info = self.scrape_course(self.driver.page_source)
@@ -53,9 +57,10 @@ class CABScraper:
             else:
                 course_code = self.driver.find_element_by_class_name("dtl-course-code").text
                 print(course_code)
-                if course_code not in self.courses:
+                if course_code not in self.course_codes:
                     course_info["courseCode"] = course_code
                     self.courses.append(course_info)
+                    self.course_codes.append(course_code)
 
     def scrape_course(self, page_source):
         course_info = {}
@@ -117,10 +122,12 @@ class CABScraper:
 
         if "(" not in prereqs and "and" in prereqs:
             without_departments = prereqs.replace(" and", ",").split(", ")
+        elif "(" not in prereqs and "or" in prereqs:
+            without_departments = [prereqs.replace(" or", ",").split(", ")]
         elif "(" not in prereqs:
             without_departments = [prereqs.split(", ")]
         else:
-            parse_and = re.split(r" (?<!\()\band\b(?![\w\s]*[\)]) ", prereqs)
+            parse_and = re.split(r" (?<!\()\band\b(?![\w\s']*[\)]) ", prereqs)
 
             parse_or = []
             for course_group in parse_and:
@@ -144,6 +151,8 @@ class CABScraper:
                     if re.search(class_name_regex, item):
                         department = item[:item.index(" ")]
                         new_course_group.append(item)
+                    elif "minimum score" in item:
+                        new_course_group.append(item)
                     else:
                         new_course_group.append(department + " " + item)
                 add_departments.append(new_course_group)
@@ -151,13 +160,19 @@ class CABScraper:
                 if re.search(class_name_regex, course_group):
                     department = course_group[:course_group.index(" ")]
                     add_departments.append(course_group)
+                elif "minimum score" in course_group:
+                    add_departments.append(course_group)
                 else:
                     add_departments.append(department + " " + course_group)
 
-        if len(add_departments) == 1 and type(add_departments[0]) is list:
-            return add_departments[0]
+        cleaned_with_departments = []
+        for course_group in add_departments:
+            if type(course_group) is list and len(course_group) == 1:
+                cleaned_with_departments.append(course_group[0])
+            else:
+                cleaned_with_departments.append(course_group)
 
-        return add_departments
+        return cleaned_with_departments
 
     def save_to_csv(self, filename):
         csv_columns = ["courseCode", "courseName", "courseDesc", "preReqs",

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Box, Button, Select } from "@chakra-ui/react"
 
 import { GetRecommendations } from '../api/Network';
-
 import { selectRecommendedCourses } from '../store/slices/appDataSlice';
-
 
 import PastCourses from '../components/PastCourses';
 import RecommendationCard from '../components/RecommendationCard';
-import { Box, Button, Select } from "@chakra-ui/react"
+
+import { PRIORITY_OPTIONS } from '../constants';
 
 export default function CourseSuggestions() {
 
@@ -21,8 +21,6 @@ export default function CourseSuggestions() {
 
 
   const recommendedCourses = useSelector(selectRecommendedCourses);
-
-  const priorities = ["Time Commitment", "Difficulty", "Priority3", "Priority4"];
 
   const [priorityContents, setPriorityContents] = useState({
     "1": "", 
@@ -44,7 +42,7 @@ export default function CourseSuggestions() {
     setPriorityContents(newPriorityContents);
   }
 
-  function renderDropdownOptions(availablePriorities) {
+  // function renderDropdownOptions(availablePriorities) {
 
     // <option key={priorityTitle} value={priorityTitle}>{priorityTitle}</option>
     // return availablePriorities.map((priorityTitle) => (
@@ -60,16 +58,16 @@ export default function CourseSuggestions() {
         //   )
         // }
 
-    return (
-      <React.Fragment>
-        {priorities.map((priorityTitle) => {
-            return (
-              <option value={priorityTitle}> {priorityTitle}</option>
-            )
-          })
-        }
-      </React.Fragment>
-    );
+    // return (
+    //   <React.Fragment>
+    //     {PRIORITY_OPTIONS.map((priorityTitle) => {
+    //         return (
+    //           <option value={priorityTitle}> {priorityTitle}</option>
+    //         )
+    //       })
+    //     }
+    //   </React.Fragment>
+    // );
 
     // return (
     //   <React.Fragment>
@@ -78,11 +76,11 @@ export default function CourseSuggestions() {
     //     <option value="option3">Option 3</option>
     //   </React.Fragment>
     // );
-  }
+  // }
 
   function renderPriorityDropdowns() {
     // return Object.entries(priorities).map(([key, value]) => (
-    const takenPriorities = Object.values(priorityContents);
+    // const takenPriorities = Object.values(priorityContents);
 
     // const availablePriorities = priorities.filter((aPriority) => !takenPriorities.includes(aPriority));
 
@@ -103,7 +101,7 @@ export default function CourseSuggestions() {
         onChange={(e) => handleSelectionChange(e, priorityNumber)}
       >
         {
-          priorities.map((priorityTitle) => (
+          PRIORITY_OPTIONS.map((priorityTitle) => (
             <option value={priorityTitle}> {priorityTitle}</option>
           ))
         }
