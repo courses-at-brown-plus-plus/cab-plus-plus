@@ -52,6 +52,7 @@ def appSetup():
             row['preReqs'] = eval(row['preReqs'])
             cabData[row['courseCode']] = row
 
+    print("app setup done")
     #  print(cabData)
 
 appSetup()
