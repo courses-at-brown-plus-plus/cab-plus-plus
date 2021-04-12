@@ -26,7 +26,17 @@ export default function HomePage() {
     }
     let aGraph = new Map();
     for (let course in pathwayData) {
-      if (!course.startsWith(selectedConcentration)) {
+      let include = false;
+      for (let edge of pathwayData[course]['preReqs']) {
+        if (edge[0].startsWith(selectedConcentration)) {
+          include = true;
+          break;
+        }
+      }
+      if (!include && !course.startsWith(selectedConcentration)) {
+        continue;
+      }
+      if (aGraph.has(course)) {
         continue;
       }
       let node = new CourseNode(pathwayData[course]['courseCode'], [], [], false, false, 

@@ -103,6 +103,7 @@ function GraphView(props) {
   }, [props.displayedAnnotation]);
 
   useEffect(() => {
+    setNextCourses([])
     if (nodeGraph) {
       for (let i = 0; i < coursesTaken.length; i++) {
         if (nodeGraph.has(coursesTaken[i])) {
@@ -113,7 +114,7 @@ function GraphView(props) {
         }
       }
     }
-  });
+  }, [mouseX]);
 
 
   function handleMouseMove(event) {
@@ -270,6 +271,10 @@ function GraphView(props) {
     activeList.push(node);
     for (let edge of props.graph.get(node).edges) {
 
+      if (!props.graph.has(edge.end)) {
+        continue;
+      }
+
       //Avoid crashing on a cyclic graph
       if (!activeList.includes(edge.end)) {
         makeActive(edge.end, activeList);
@@ -278,6 +283,8 @@ function GraphView(props) {
   }
 
   useEffect(() => {
+
+
     if (showCourseView) {
       return;
     }
@@ -302,11 +309,13 @@ function GraphView(props) {
     ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, props.width, props.height);
 
+    nodeCoords.current.set(new Map());
+
     for (let [id, coords] of alone.current) {
       //console.log(id)
       //drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
       nodeCoords.current.set(id, 
-        [scaleFactor * (coords[0] * 100 + 1600 + xOffset) + props.width / 2,
+        [scaleFactor * (coords[0] * 100 + 2600 + xOffset) + props.width / 2,
          scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
@@ -333,21 +342,21 @@ function GraphView(props) {
     for (let [node, coords] of nodeCoords.current.entries()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
-        if (!node.active) {
+        /*if (!node.active) {
           drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
-        }
+        }*/
 
         for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
-          let edge = nodeGraph.get(node).edges[i];
+          let edge = props.graph.get(node).edges[i];
           if (activeNodes.includes(edge.start)) {
             activeEdges.push(edge);
             continue;
           }
-          let xOffset1 = edge.port * 10
+          let xOffset1 = 0;//edge.port * 10
 
           let start = nodeCoords.current.get(edge.start);
           let end = nodeCoords.current.get(edge.end);
-          if (start === undefined || end === undefined) {
+          if (start === undefined || end === undefined || !props.graph.has(edge.end)) {
             continue;
           }
           ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
@@ -363,14 +372,24 @@ function GraphView(props) {
       let xOffset1 = 0;//edge.port * 10
       let start = nodeCoords.current.get(edge.start);
       let end = nodeCoords.current.get(edge.end);
-      ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
-      if (start === undefined || end === undefined) {
+      if (start === undefined || end === undefined || !props.graph.has(edge.end)) {
         continue;
       }
+      ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
       ctx.lineTo(end[0] + xOffset1, end[1] - scaleFactor * NODE_HEIGHT / 2);
       ctx.strokeStyle = '#999';
       ctx.stroke();
     }
+
+    for (let [node, coords] of nodeCoords.current.entries()) {
+      ctx.beginPath();
+      if (nodeGraph.has(node)) {
+        if (!node.active) {
+          drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
+        }
+      }
+    }
+
   });
 
   return (
