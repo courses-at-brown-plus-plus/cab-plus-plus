@@ -3,7 +3,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 
 import csv
-import pandas as pd
 from algorithm import TextComparison, MetadataComparison, Algorithm
 
 PORT = 5000

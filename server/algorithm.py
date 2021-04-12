@@ -159,9 +159,12 @@ class MetadataComparison(object):
         """Defines a string representation of the MetadataComparison object."""
         return self.metadata_loc
 
-    def data_is_valid(self, val: str):
+    def data_is_valid(self, val):
         """Helper to check if a value of data is valid."""
-        return not (math.isnan(val) or (val == "n/a"))
+        if type(val) == int or type(val) == float:
+            return not (math.isnan(val))
+        else:
+            return not (val == "n/a")
 
     def get_category_vals(self, course: str):
         """Grabs the value of the course, before weighted by priorities."""
@@ -189,7 +192,7 @@ class MetadataComparison(object):
             elif self.data_is_valid(self.data.get_data("enjoyedCourse")[course]):
                 enjoyment = float(self.data.get_data("enjoyedCourse")[course].strip("()").split(", ")[0]) / 5.0
             elif self.data_is_valid(self.data.get_data("courseRating")[course]):
-                enjoyment = float(self.data.get_data("courseRating")[course].strip("()").split(", ")[0]) / 5.0
+                enjoyment = float(self.data.get_data("courseRating")[course]) / 5.0
             else:
                 enjoyment = None
             
@@ -197,9 +200,12 @@ class MetadataComparison(object):
                         (float(self.data.get_data("concentratorYes")[course]) + float(self.data.get_data("concentratorNo")[course])
                         + float(self.data.get_data("concentratorMaybe")[course])))
             
-            class_size = min(1, 10.0 / (float(self.data.get_data("freshmen")[course]) + float(self.data.get_data("sophomores")[course])
-                        + float(self.data.get_data("juniors")[course]) + float(self.data.get_data("seniors")[course]) 
-                        + float(self.data.get_data("gradStudents")[course])))
+            try:
+                class_size = min(1, 10.0 / (float(self.data.get_data("freshmen")[course]) + float(self.data.get_data("sophomores")[course])
+                            + float(self.data.get_data("juniors")[course]) + float(self.data.get_data("seniors")[course]) 
+                            + float(self.data.get_data("gradStudents")[course])))
+            except:
+                class_size = None
 
             if self.data_is_valid(self.data.get_data("fairGrading")[course]):
                 grading = ((float(self.data.get_data("fairGrading")[course].strip("()").split(", ")[0])) / 5.0)
@@ -220,14 +226,19 @@ class MetadataComparison(object):
             priority = self.priority_weight[:len(priorities)]
             non_priority = self.total - sum(self.priority_weight[:len(priorities)])
             fit = 0
+            total = 0
             for i in range(len(priorities)):
-                fit += priority_vals[priorities[i]] * priority[i]
+                if (priority_vals[priorities[i]] is not None):
+                    fit += priority_vals[priorities[i]] * priority[i]
+                    total += priority[i]
             
             non_priority_vals = [a for a in priority_vals.keys() if a not in priorities]
-            for i in range(len(non_priority)):
-                fit += priority_vals[non_priority_vals[i]] * non_priority
+            for i in range(len(non_priority_vals)):
+                if (priority_vals[non_priority_vals[i]] is not None):
+                    fit += priority_vals[non_priority_vals[i]] * non_priority
+                    total += non_priority
 
-            return fit
+            return fit / total
 
 class Algorithm(object):
     def __init__(self, text_compare: TextComparison, metadata_compare: MetadataComparison):
@@ -237,16 +248,17 @@ class Algorithm(object):
         self.metadata_compare = metadata_compare
 
         # Hyperparams
-        self.text_weight = 0.5
-        self.metadata_weight = 0.5
+        self.text_weight = 0.8
+        self.metadata_weight = 0.2
     
     def get_recs(self, course_list: list, priorities: list, num: int = 1):
         """Gets course recommendations based on the course list and priorities. If a num is specified,
         it will get that number of similar courses. If num = None, grabs all of the values. Default num: 1"""
         text_vals = self.text_compare.get_most_similar_multiple(course_list, num=None)
         priority_vals = [self.metadata_compare.get_fit_value(a[0], priorities) for a in text_vals]
-        final = [(a[0][0], a[0][1]*self.text_weight + a[1]*self.metadata_weight) for a in zip(text_vals, priority_vals)]
-        return final[:num]
+        final = [(a[0][0], a[0][1]*self.text_weight + a[1]*self.metadata_weight) if a[1] is not None else a[0] for a in zip(text_vals, priority_vals)]
+        final_sorted = sorted(final, key=lambda a: a[1], reverse=True)
+        return final_sorted[:num]
 
 if __name__ == "__main__":
     default_formatting_error = "Arguments not formatted properly. Run `python3 algorithm.py -h` to see the allowed argument formats."
