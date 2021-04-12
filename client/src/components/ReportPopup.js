@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, addPrereq, removePrereq } from '../store/slices/appDataSlice';
+import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, addPrereq, removePrereq, resetIssueReportState } from '../store/slices/appDataSlice';
 
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, 
   ModalCloseButton, ModalFooter, ModalBody, useDisclosure, 
@@ -39,6 +39,10 @@ export default function ReportPopup() {
       duration: 5000,
       isClosable: true,
     });
+    dispatch(resetIssueReportState());
+    if (issueReportState < 0) {
+      onOpen();
+    }
   }, [issueReportState]);
 
   function handleAddPrereq() {
@@ -54,6 +58,7 @@ export default function ReportPopup() {
       }));
       setAddPrereqInputVal("");
       setAddUnlockedInputVal("");
+      onClose();
     }
   }
 
@@ -70,6 +75,7 @@ export default function ReportPopup() {
       }));
       setRemovePrereqInputVal("");
       setRemoveUnlockedInputVal("");
+      onClose();
     }
   }
 
