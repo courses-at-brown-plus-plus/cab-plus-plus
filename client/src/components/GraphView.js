@@ -72,10 +72,13 @@ function GraphView(props) {
     layersRef.current = p[1];
     layers = layersRef.current;
 
-    let min = Infinity;
+    let max = 0;
     for (let i = 0; i < layers.length; i++) {
-      if (Math.min(layers[i].map((x) => {return x.coord;})) < min) {
-        min = Math.min(layers[i].map((x) => {return x.coord;}));
+      if (layers[i].length === 0) {
+        continue;
+      }
+      if (layers[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b)) > max) {
+        max = layers[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b));
       }
 
       //TODO: Fix bug
@@ -86,12 +89,15 @@ function GraphView(props) {
         }
       }
     }
-    minX.current = min;
+    minX.current = max;
 
     alone.current = p[0];
 
-    setXOffset(layers[0].length / 2 * 100)
-    setOrigXOffset(layers[0].length / 2 * 100)
+    if (layers[0].length > 0) {
+      setXOffset(-layers[0].reduce((a, b) => a + b.coord, 0) / layers[0].length * 100);
+      setOrigXOffset(-layers[0].reduce((a, b) => a + b.coord, 0) / layers[0].length * 100);
+    }
+    //console.log(layers[0])
     setScaleFactor(0.4)
 
   }, [props.graph]);
@@ -159,7 +165,6 @@ function GraphView(props) {
         && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2 * scaleFactor) {
 
         if (focus && activeNodes.includes(node)) {
-          console.log(node)
           setShowCourseView(true);
           setCourseView(props.graph.get(node));
         }
@@ -307,8 +312,10 @@ function GraphView(props) {
     for (let [id, coords] of alone.current) {
       //console.log(id)
       //drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
+      let x = minX.current * 100 + (coords[0] + 5) * 100;
+
       nodeCoords.current.set(id, 
-        [scaleFactor * (coords[0] * 100 + 2600 + xOffset) + props.width / 2,
+        [scaleFactor * (x + xOffset) + props.width / 2,
          scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
