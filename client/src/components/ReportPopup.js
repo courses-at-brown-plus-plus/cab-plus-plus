@@ -4,7 +4,7 @@ import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, addPr
 
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, 
   ModalCloseButton, ModalFooter, ModalBody, useDisclosure, 
-  Box, Input, Flex, Text, InputGroup, useToast } from "@chakra-ui/react";
+  Box, Input, Flex, Text, useToast } from "@chakra-ui/react";
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 
 

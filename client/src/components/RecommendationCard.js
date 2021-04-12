@@ -1,4 +1,4 @@
-import { Box, Button, Select } from "@chakra-ui/react"
+import { Box, Button } from "@chakra-ui/react"
 
 export default function RecommendationCard(props) {
   return (

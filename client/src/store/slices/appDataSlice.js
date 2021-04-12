@@ -8,7 +8,8 @@ export const slice = createSlice({
     coursesTaken: [], 
     recommendedCourses: [], 
     errorMessage: "",
-    issueReportState: 0
+    issueReportState: 0, 
+    annotations: {},
     // graph annotations
     // undo tree for "courses taken" input?
     // undo tree for graph annotations?
@@ -32,6 +33,15 @@ export const slice = createSlice({
         state.coursesTaken.splice(targetIndex, 1);
       }
     },
+    addAnnotation: (state, action) => {
+      state.annotations[action.payload.name] = { 
+        content: [...action.payload.annotation], 
+        concentration: action.payload.concentration
+      };
+    }, 
+    removeAnnotation: (state, action) => {
+      delete state.annotations[action.payload.name];
+    }, 
     addPrereq: (state, action) => {
       let unlockedCourse = action.payload.unlockedCourse;
       let prereqCourse = action.payload.prereqCourse;
@@ -82,7 +92,8 @@ export const slice = createSlice({
 
 export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, 
   addCourseTaken, removeCourseTaken, 
-  addPrereq, removePrereq } = slice.actions;
+  addPrereq, removePrereq, 
+  addAnnotation, removeAnnotation} = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;
 export const selectAllCourseCodes = state => state.appData.allCourseCodes;
@@ -90,6 +101,7 @@ export const selectCoursesTaken = state => state.appData.coursesTaken;
 export const selectRecommendedCourses = state => state.appData.recommendedCourses;
 export const selectErrorMessage = state => state.appData.errorMessage;
 export const selectIssueReportState = state => state.appData.issueReportState;
+export const selectAnnotations = state => state.appData.annotations;
 // export const selectConcentrations = state => {
 //   let concentrations = Object.entries(state.appData.pathwayData).map(([concentrationName, values]) => {
 //     return baseCourse;

@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Select, Button, Box, Flex } from "@chakra-ui/react"
+import React, { useState, useEffect } from 'react';
+import { Select, Box, ButtonGroup, Button, IconButton } from "@chakra-ui/react"
 import GraphView from '../components/GraphView';
 import { CourseNode, Edge } from '../components/Graph';
 import PastCourses from '../components/PastCourses';
+import AnnotationButton from '../components/AnnotationButton';
 
 import { useSelector } from 'react-redux';
-import { selectPathwayData } from '../store/slices/appDataSlice';
+import { selectPathwayData, selectAnnotations } from '../store/slices/appDataSlice';
 import { AVAILABLE_CONCENTRATIONS } from '../constants';
 
 import axios from 'axios';
@@ -13,16 +14,19 @@ import axios from 'axios';
 export default function HomePage() {
 
   const pathwayData = useSelector(selectPathwayData);
+  const savedAnnotations = useSelector(selectAnnotations);
+  const [displayedAnnotation, setDisplayedAnnotation] = useState(null);
   const [selectedConcentration, setSelectedConcentration] = useState("");
 
   const [currentGraph, setCurrentGraph] = useState(null);
-  function handleConcentrationChange(e) {
-    let newConcentrationName = e.target.value;
 
-    setSelectedConcentration(newConcentrationName);
+  useEffect(() => {
+    if (!selectedConcentration) {
+      return;
+    }
     let aGraph = new Map();
     for (let course in pathwayData) {
-      if (!course.startsWith(newConcentrationName)) {
+      if (!course.startsWith(selectedConcentration)) {
         continue;
       }
       let node = new CourseNode(pathwayData[course]['courseCode'], [], [], false, false, 
@@ -35,7 +39,11 @@ export default function HomePage() {
       aGraph.set(course, node);
     }
     setCurrentGraph(aGraph);
-  }
+  }, [selectedConcentration]);
+
+  // no concentration selected
+  let emptyGraph = new Map();
+  emptyGraph.set('No graph selected', new CourseNode('No graph selected', [], []));
 
   let csGraph = new Map();
   csGraph.set('CS111', new CourseNode('CS111', [new Edge('CS111', 'CS112', 0)], []));
@@ -78,28 +86,20 @@ export default function HomePage() {
   //   return aGraph;
   // }
 
-  function renderGraph() {
-    console.log("rendering new graph for concentrationName: " + selectedConcentration);
-    let aGraph;
+  // function renderGraph() {
+  //   console.log("rendering new graph for concentrationName: " + selectedConcentration);
+    // let aGraph;
     // if (pathwayData && pathwayData[selectedConcentration]) {
       // aGraph = infoToGraph(pathwayData[selectedConcentration]);
       // return <GraphView width={800} height={600} graph={aGraph}/>;
 
-
-    if (pathwayData && selectedConcentration && currentGraph) {
-      return <GraphView width={800} height={600} graph={currentGraph}/>;
-    }
-    else {
-      // empty graph; no concentration selected
-      let emptyGraph = new Map();
-      emptyGraph.set('No graph selected', new CourseNode('No graph selected', [], []));
-      // emptyGraph.set('MATH0520', new CourseNode('MATH0520', [new Edge('MATH0520', 'CS1420', 0)], []));
-      // emptyGraph.set('CS1420', new CourseNode('CS1420', [], []));
-      // emptyGraph.set('CS22', new CourseNode('CS22', [new Edge('CS22', 'CS1010', 0)], []));
-      // emptyGraph.set('CS1010', new CourseNode('CS1010', [], []));
-      return <GraphView width={800} height={600} graph={emptyGraph}/>;
-    }
-  }
+  //   if (pathwayData && selectedConcentration && currentGraph) {
+  //     return <GraphView width={800} height={600} graph={currentGraph}/>;
+  //   }
+  //   else {
+  //     return <GraphView width={800} height={600} graph={emptyGraph}/>;
+  //   }
+  // }
 
   async function getWebScrapedGraph() {
     let config = {
@@ -158,35 +158,31 @@ export default function HomePage() {
           //   <GraphView width={800} height={600} graph={webScrapedGraph}/>
         // ^webscraped data (gareth's code)
         }
-        { renderGraph() }
+
+        <GraphView 
+          width={800} 
+          height={600} 
+          concentration={selectedConcentration}
+          displayedAnnotation={displayedAnnotation}
+          graph={(pathwayData && selectedConcentration && currentGraph) ? currentGraph : emptyGraph}
+        >
+
+          <Select 
+            bg="gray.600" 
+            color="white"
+            placeholder="Select concentration" 
+            value={selectedConcentration}
+            onChange={(e) => setSelectedConcentration(e.target.value)}
+          >
+            { renderDropdownItems() }
+          </Select>
+
+        </GraphView>
+
         { 
           // ^data from redux  (kevin and gareth's combined)
           // <br/> { "-".repeat(100) }
         }
-
-        <Flex 
-          width={800} 
-          justify="space-between"
-          padding={3}
-        >
-
-          <Box>
-            <Button colorScheme="cyan"> Save Loadout </Button>
-          </Box>
-
-          <Box>
-            <Select 
-              bg="gray.600" 
-              color="white"
-              placeholder="Select concentration" 
-              value={selectedConcentration}
-              onChange={handleConcentrationChange}
-            >
-              { renderDropdownItems() }
-            </Select>
-          </Box>
-
-        </Flex>
         {
           // Selected Concentration: { selectedConcentration }
         }
@@ -194,9 +190,21 @@ export default function HomePage() {
       </center>
 
       <Box>
-        <Box p="5" style={styles.boxContainer}>
+        <Box p={5} style={styles.boxContainer}>
           <h1><b>Saved Loadouts</b></h1>
+          { 
+            Object.keys(savedAnnotations).map((key) => 
+              <AnnotationButton 
+                name={key} 
+                content={savedAnnotations[key]}
+                setSelectedConcentration={setSelectedConcentration}
+                setDisplayedAnnotation={setDisplayedAnnotation}
+              />)
+          }
         </Box>
+        { 
+          // JSON.stringify(savedAnnotations) 
+        }
       </Box>
 
     </React.Fragment>
@@ -216,9 +224,10 @@ const styles = {
   boxContainer: {
     width: "14vw", 
     marginLeft: "3rem",
-    minHeight: "30vh",
+    height: "40vh",
     border: "2px solid black",
-    borderRadius: "1.6rem"
+    borderRadius: "0.3rem",
+    overflowY: "scroll"
   }
 }
 

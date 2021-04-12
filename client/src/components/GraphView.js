@@ -3,8 +3,10 @@ import { CourseNode, Edge } from './Graph';
 import prepareGraph from './LayerGraph';
 import CourseView from './CourseView';
 
+import { Button, Box, Flex, useDisclosure } from "@chakra-ui/react"
 import { useSelector } from 'react-redux';
 import { selectCoursesTaken } from '../store/slices/appDataSlice';
+import AnnotationSave from './AnnotationSave';
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -16,6 +18,7 @@ function GraphView(props) {
 
   // access redux var for courses taken input on the sidebar
   const coursesTaken = useSelector(selectCoursesTaken);
+  const popup = useDisclosure();
 
   const [nextCourses, setNextCourses] = useState([]);
 
@@ -66,7 +69,13 @@ function GraphView(props) {
   }, [props.graph]);
 
   useEffect(() => {
-    if (props.graph && nodeGraph) {
+    if (props.displayedAnnotation) {
+      setAnnotations([...props.displayedAnnotation]);
+    }
+  }, [props.displayedAnnotation]);
+
+  useEffect(() => {
+    if (nodeGraph) {
       for (let i = 0; i < coursesTaken.length; i++) {
         if (nodeGraph.has(coursesTaken[i])) {
           for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
@@ -325,14 +334,27 @@ function GraphView(props) {
   });
 
   return (
-    <div style={{position: "relative", width: props.width, height: props.height}} className="canvasContainer">
-      {showCourseView && 
-        <CourseView node={courseView}/>
-      }
-      <canvas ref={canvasRef} onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
-       onMouseLeave={changeScroll} className = "graphView" onDoubleClick={handleDoubleClick}/>
-    </div>
+    <React.Fragment>
+      <div style={{position: "relative", width: props.width, height: props.height}} className="canvasContainer">
+        { showCourseView && 
+          <CourseView node={courseView}/>
+        }
+        <canvas ref={canvasRef} onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
+          onMouseLeave={changeScroll} className = "graphView" onDoubleClick={handleDoubleClick}/>
+      </div>
+
+      <Flex width={800} justify="space-between" padding={3}>
+        <Box> 
+          <AnnotationSave 
+            concentration={props.concentration} 
+            popup={popup}
+            annotations={annotations}
+          />
+        </Box>
+        <Box> { props.children } </Box>
+      </Flex>
+    </React.Fragment>
   );
 }
 
