@@ -109,11 +109,11 @@ function GraphView(props) {
     }
 
     for (let [node, coords] of nodeCoords.current) {
-      if (nodeGraph.has(node)
+      if (props.graph.has(node)
         && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 * scaleFactor
         && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2 * scaleFactor) {
         if (!focus) {
-          nodeGraph.get(node).active = true;
+          props.graph.get(node).active = true;
           let l = [];
           makeActive(node, l);
           setActiveNodes(l);
@@ -135,18 +135,18 @@ function GraphView(props) {
     setMouseX(event.clientX - event.target.getBoundingClientRect().left);
     setMouseY(event.clientY - event.target.getBoundingClientRect().top);
     for (let [node, coords] of nodeCoords.current) {
-      if (nodeGraph.has(node)
+      if (props.graph.has(node)
         && Math.abs(mouseX - coords[0]) < NODE_WIDTH / 2 * scaleFactor
         && Math.abs(mouseY - coords[1]) < NODE_HEIGHT / 2 * scaleFactor) {
 
         if (focus && activeNodes.includes(node)) {
           console.log(node)
           setShowCourseView(true);
-          setCourseView(nodeGraph.get(node));
+          setCourseView(props.graph.get(node));
         }
 
         setFocus(true);
-        nodeGraph.get(node).active = true;
+        props.graph.get(node).active = true;
         let l = [];
         makeActive(node, l);
         setActiveNodes(l);
@@ -246,11 +246,11 @@ function GraphView(props) {
   }
 
   function makeActive(node, activeList) {
-    if (!nodeGraph.has(node)) {
+    if (!props.graph.has(node)) {
       return;
     }
     activeList.push(node);
-    for (let edge of nodeGraph.get(node).edges) {
+    for (let edge of props.graph.get(node).edges) {
 
       //Avoid crashing on a cyclic graph
       if (!activeList.includes(edge.end)) {
@@ -285,8 +285,9 @@ function GraphView(props) {
     ctx.fillRect(0, 0, props.width, props.height);
 
     for (let [id, coords] of alone.current) {
-      console.log(id)
-      drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
+      //console.log(id)
+      //drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
+      nodeCoords.current.set(id, [scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
     let y = 40;
