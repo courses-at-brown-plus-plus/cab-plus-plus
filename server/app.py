@@ -12,6 +12,11 @@ cors = CORS(app, resources={r"/*":{"origins": "*", "supports_credentials": True}
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+text_compare = TextComparison()
+metadata_compare = MetadataComparison("./data/CritReview_data.csv")
+text_compare.import_saved_similarity("./data/similarities.csv")
+algorithm = Algorithm(text_compare, metadata_compare)
+
 cabData = {}
 
 @app.route("/allPathwayData", methods=["GET"])
@@ -36,10 +41,6 @@ def generateRecommendations():
     priorities = request.json["priorities"]
 
     # Run algorithm here
-    text_compare = TextComparison()
-    metadata_compare = MetadataComparison("./data/CritReview_data.csv")
-    text_compare.import_saved_similarity("./data/similarities.csv")
-    algorithm = Algorithm(text_compare, metadata_compare)
     recommended_courses = algorithm.get_recs(courses_taken, priorities, 5)
     print("request received generate recs")
     return jsonify({"recommendedCourses": recommended_courses}), 200
