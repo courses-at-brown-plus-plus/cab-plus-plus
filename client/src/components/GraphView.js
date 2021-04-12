@@ -227,7 +227,11 @@ function GraphView(props) {
     }
     activeList.push(node);
     for (let edge of nodeGraph.get(node).edges) {
-      makeActive(edge.end, activeList);
+
+      //Avoid crashing on a cyclic graph
+      if (!activeList.includes(edge.end)) {
+        makeActive(edge.end, activeList);
+      }
     }
   }
 
