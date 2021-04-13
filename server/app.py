@@ -13,8 +13,9 @@ cors = CORS(app, resources={r"/*":{"origins": "*", "supports_credentials": True}
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 text_compare = TextComparison()
-metadata_compare = MetadataComparison("./data/CritReview_data.csv")
-text_compare.import_saved_similarity("./data/similarities.csv")
+metadata_compare = MetadataComparison("./data/CritReview_data_v2.csv")
+text_compare.import_saved_similarity("./data/similarities_v2.csv")
+text_compare.import_department_similarity("./data/dept_similarities_v2.csv")
 algorithm = Algorithm(text_compare, metadata_compare)
 
 cabData = {}
