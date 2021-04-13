@@ -153,7 +153,7 @@ class CritReviewScraper:
             print("I/O error")
 
 
-courses = compile_courses("../server/data/CAB_v1_no_duplicates.csv")
+courses = compile_courses("../server/data/CAB_v2.csv")
 filename = input("What file should data be saved to (ex: CritReview_data.csv)?\t")
 scraper = CritReviewScraper(filename)
 for course in courses:
