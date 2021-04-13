@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Box, Button, Select } from "@chakra-ui/react"
 
 import { GetRecommendations } from '../api/Network';
-import { selectRecommendedCourses } from '../store/slices/appDataSlice';
+import { selectRecommendedCourses, selectCoursesTaken } from '../store/slices/appDataSlice';
 
 import PastCourses from '../components/PastCourses';
 import RecommendationCard from '../components/RecommendationCard';
@@ -19,7 +19,7 @@ export default function CourseSuggestions() {
   //   "Priority4": -1
   // });
 
-
+  const coursesTaken = useSelector(selectCoursesTaken);
   const recommendedCourses = useSelector(selectRecommendedCourses);
 
   const [priorityContents, setPriorityContents] = useState({
@@ -33,9 +33,16 @@ export default function CourseSuggestions() {
 
   function submitPriorityForm() {
     // dispatch(GetRecommendations(priorityContents));
+
+    let priorities = [];
+    Object.keys(priorities).forEach((keyName) => {
+      let value = priorities[keyName];
+      if (value != "")
+        priorities.push(value);
+    });
     dispatch(GetRecommendations({ 
-      priorities: [priorityContents["1"], priorityContents["2"], priorityContents["3"], priorityContents["4"]], 
-      courses_taken: []
+      priorities: priorities,
+      courses_taken: coursesTaken
     }));
   }
 
@@ -132,7 +139,6 @@ export default function CourseSuggestions() {
         <br/>
       </Box>
 
-        Recs
       { 
         // JSON.stringify(recommendedCourses) 
       }
