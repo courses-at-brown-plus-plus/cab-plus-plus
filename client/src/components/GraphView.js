@@ -25,8 +25,6 @@ function GraphView(props) {
   // dummy data equivalent
   // const coursesTaken = ["CSCI 0190"];
   
-  // let nodeGraphRef = useRef(props.graph);
-  // let nodeGraph = nodeGraphRef.current;
   let nodeGraph = props.graph;
   let layersRef = useRef(null);
   let layers = layersRef.current;
@@ -188,16 +186,6 @@ function GraphView(props) {
     setOrigYOffset(yOffset);
   }
 
-  function addAnnotation(id) {
-    setAnnotations(annotations.concat([id]))
-  }
-
-  function removeAnnotation(id) {
-    console.log(id)
-    annotations.splice(annotations.indexOf(id), 1);
-    setAnnotations(annotations);
-  }
-
   function handleScroll(e) {
     handleMouseMove(e)
     let newScaleFactor = scaleFactor - e.deltaY * scaleFactor * 0.005;
@@ -206,21 +194,7 @@ function GraphView(props) {
     } else if (newScaleFactor < MIN_ZOOM) {
       setScaleFactor(MIN_ZOOM);
     } else {
-      //let old = scaleFactor;
       setScaleFactor(newScaleFactor);
-      //handleMouseMove(e);
-
-
-      /*let new_map_width = (props.width) * newScaleFactor
-      let new_map_height = (props.height) * newScaleFactor
-      setXOffset(xOffset - (mouseX / props.width * (new_map_width - (props.width * old))))
-      setYOffset(yOffset - (mouseY / props.height * (new_map_height - (props.height * old))))*/
-
-      //setXOffset(-(xOffset + mouseX) * newScaleFactor + (xOffset + mouseX));
-      //setYOffset(-(yOffset + mouseY) * newScaleFactor + (yOffset + mouseY));
-
-      //setXOffset(yOffset + (mouseY) * (1 - (newScaleFactor - scaleFactor)) - mouseY);
-      //dy = (currentMouseY - image.getTop()) * (factor - 1);
     }
   }
 
@@ -231,6 +205,16 @@ function GraphView(props) {
     document.body.style.overflow = (style === 'hidden') ? 'auto':'hidden';
     setActiveNodes([])
   } 
+
+  function addAnnotation(id) {
+    setAnnotations(annotations.concat([id]))
+  }
+
+  function removeAnnotation(id) {
+    console.log(id)
+    annotations.splice(annotations.indexOf(id), 1);
+    setAnnotations(annotations);
+  }
 
   function drawNode(ctx, node, x, y) {
 
@@ -316,8 +300,7 @@ function GraphView(props) {
     nodeCoords.current = new Map();
 
     for (let [id, coords] of alone.current) {
-      //console.log(id)
-      //drawNode(ctx, props.graph.get(id), scaleFactor * (coords[0] * 100 + xOffset) + props.width / 2 - 720 * scaleFactor, scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2)
+      
       let x = minX.current * 100 + (coords[0] + 5) * 100;
 
       nodeCoords.current.set(id, 
@@ -329,11 +312,8 @@ function GraphView(props) {
     for (let i = 0; i < layers.length; i++) {
       for (let j = 0; j < layers[i].length; j++) {
 
-        // center nodes horizontally
         let x = props.width / 2 + (layers[i][j].coord) * 100;
-        //console.log(x)
 
-        //let x = props.width / 2 + ((layers[i].length - 1) / 2 - j) * 100;
         nodeCoords.current.set(layers[i][j].id, 
           [scaleFactor * (x + xOffset) + props.width / 2, 
           scaleFactor * (y + yOffset) + props.height / 2]);
@@ -349,9 +329,6 @@ function GraphView(props) {
     for (let [node, coords] of nodeCoords.current.entries()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
-        /*if (!node.active) {
-          drawNode(ctx, nodeGraph.get(node), coords[0], coords[1]);
-        }*/
 
         for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
           let edge = props.graph.get(node).edges[i];

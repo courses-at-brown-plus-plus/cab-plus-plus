@@ -382,33 +382,38 @@ function arrangeNodes(layer) {
       medians.set(layer[i].id, layer[i].coord);
     }
   
-    /*let dxMap = new Map();
+    let dxMap = new Map();
     for (let i = 0; i < layer.length; i++) {
       dxMap.set(layer[i].id, 0);
-    }*/
+    }
 
     let counter = 0;
     while (counter < 1000000) {
         counter++;
+        for (let id of dxMap.keys()) {
+          dxMap.set(id, 0);
+        }
         for (let i = 0; i < layer.length - 1; i++) {
             let dx = 0;
-            dx = 0.005 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
+            dx = 0.01 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
 
 
             if (i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) {
-                dx -= 0.02;
+                dx -= 0.03;
+                dxMap.set(layer[i + 1].id, dxMap.get(layer[i + 1].id) + 0.03)
             }
 
             if (i > 0 && layer[i].coord - layer[i - 1].coord < 1) {
-                dx += 0.02;
+                dx += 0.03;
+                dxMap.set(layer[i - 1].id, dxMap.get(layer[i - 1].id) - 0.03)
             }
 
-            layer[i].coord += dx;
-            //dxMap.set(layer[i].id, dx)
+            //layer[i].coord += dx;
+            dxMap.set(layer[i].id, dxMap.get(layer[i].id) + dx)
         }
-        /*for (let i = 0; i < layer.length - 1; i++) {
+        for (let i = 0; i < layer.length - 1; i++) {
           layer[i].coord += 10 * dxMap.get(layer[i].id);
-        }*/
+        }
     }
 
     return layer;
