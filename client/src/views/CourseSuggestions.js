@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Box, Button, Select } from "@chakra-ui/react"
+import { Box, Button, Select, useToast } from "@chakra-ui/react"
 
 import { GetRecommendations } from '../api/Network';
 import { selectRecommendedCourses, selectCoursesTaken } from '../store/slices/appDataSlice';
@@ -21,6 +21,8 @@ export default function CourseSuggestions() {
 
   const coursesTaken = useSelector(selectCoursesTaken);
   const recommendedCourses = useSelector(selectRecommendedCourses);
+  const toast = useToast();
+
 
   const [priorityContents, setPriorityContents] = useState({
     "1": "", 
@@ -33,6 +35,17 @@ export default function CourseSuggestions() {
 
   function submitPriorityForm() {
     // dispatch(GetRecommendations(priorityContents));
+
+    if (coursesTaken.length == 0) {
+      toast({
+        title: "Recommendation generation",
+        description: "No past course history", 
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
 
     let priorities = [];
     Object.keys(priorities).forEach((keyName) => {
