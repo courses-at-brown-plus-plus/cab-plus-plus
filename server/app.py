@@ -13,8 +13,9 @@ cors = CORS(app, resources={r"/*":{"origins": "*", "supports_credentials": True}
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 text_compare = TextComparison()
-metadata_compare = MetadataComparison("./data/CritReview_data.csv")
-text_compare.import_saved_similarity("./data/similarities.csv")
+metadata_compare = MetadataComparison("./data/CritReview_data_v2.csv")
+text_compare.import_saved_similarity("./data/similarities_v2.csv")
+text_compare.import_department_similarity("./data/dept_similarities_v2.csv")
 algorithm = Algorithm(text_compare, metadata_compare)
 
 cabData = {}
@@ -37,13 +38,23 @@ def allCourseCodes():
 @app.route("/generateRecommendations", methods=["POST"])
 @cross_origin()
 def generateRecommendations(): 
+    print("request received, generating recommendations")
     courses_taken = request.json["courses_taken"]
     priorities = request.json["priorities"]
+    #  print("courses taken: " + courses_taken)
+    #  print("priorities" + priorities)
 
     # Run algorithm here
     recommended_courses = algorithm.get_recs(courses_taken, priorities, 5)
     print("request received generate recs")
-    return jsonify({"recommendedCourses": recommended_courses}), 200
+    print("recommended_courses: ")
+    print(recommended_courses)
+    print(type(recommended_courses))
+
+    ret = []
+    for item in recommended_courses: 
+        ret.append(item[0])
+    return jsonify({"recommendedCourses": ret}), 200
 
 def appSetup(): 
     with open('data/CAB_v1_formatted.csv') as csvFile: 
@@ -53,6 +64,7 @@ def appSetup():
             row['preReqs'] = eval(row['preReqs'])
             cabData[row['courseCode']] = row
 
+    print("app setup done")
     #  print(cabData)
 
 appSetup()

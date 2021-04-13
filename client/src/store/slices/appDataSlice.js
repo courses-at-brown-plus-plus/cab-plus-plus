@@ -22,7 +22,24 @@ export const slice = createSlice({
       state.allCourseCodes = action.payload;
     },
     setRecommendedCourses: (state, action) => {
-      state.recommendedCourses = action.payload;
+      // alert("set recommende couress called");
+
+      let recommendedCourseCodes = action.payload;
+      let newRecommendedCourseData = []
+      recommendedCourseCodes.forEach((aCode) => {
+        const ret = {
+          title: `${aCode} ${state.pathwayData[aCode]["courseName"]}`,
+          description: state.pathwayData[aCode]["courseDesc"], 
+          // link: "#"
+          link: `https://thecriticalreview.org/search/${aCode.substring(0, 4)}/${aCode.substring(5, aCode.length)}`
+          // https://thecriticalreview.org/search/CSCI/0320
+        };
+        newRecommendedCourseData.push(ret);
+      });
+
+      // alert(JSON.stringify(newRecommendedCourseData, null, 2));
+
+      state.recommendedCourses = { ...newRecommendedCourseData };
     },
     addCourseTaken: (state, action) => {
       state.coursesTaken.push(action.payload);

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Box, Button, Select } from "@chakra-ui/react"
+import { Box, Button, Select, useToast } from "@chakra-ui/react"
 
 import { GetRecommendations } from '../api/Network';
-import { selectRecommendedCourses } from '../store/slices/appDataSlice';
+import { selectRecommendedCourses, selectCoursesTaken } from '../store/slices/appDataSlice';
 
 import PastCourses from '../components/PastCourses';
 import RecommendationCard from '../components/RecommendationCard';
@@ -19,8 +19,10 @@ export default function CourseSuggestions() {
   //   "Priority4": -1
   // });
 
-
+  const coursesTaken = useSelector(selectCoursesTaken);
   const recommendedCourses = useSelector(selectRecommendedCourses);
+  const toast = useToast();
+
 
   const [priorityContents, setPriorityContents] = useState({
     "1": "", 
@@ -32,7 +34,29 @@ export default function CourseSuggestions() {
   const dispatch = useDispatch();
 
   function submitPriorityForm() {
-    dispatch(GetRecommendations(priorityContents));
+    // dispatch(GetRecommendations(priorityContents));
+
+    if (coursesTaken.length == 0) {
+      toast({
+        title: "Recommendation generation",
+        description: "No past course history", 
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    let priorities = [];
+    Object.keys(priorities).forEach((keyName) => {
+      let value = priorities[keyName];
+      if (value != "")
+        priorities.push(value);
+    });
+    dispatch(GetRecommendations({ 
+      priorities: priorities,
+      courses_taken: coursesTaken
+    }));
   }
 
   function handleSelectionChange(e, key) {
@@ -128,12 +152,28 @@ export default function CourseSuggestions() {
         <br/>
       </Box>
 
+      { 
+        // JSON.stringify(recommendedCourses) 
+      }
+      {
+      // <Box style={{marginLeft: "3rem", width: "28vw"}}>
+      //   { recommendedCourses && recommendedCourses.map((aCourseInfo) => 
+      //   <RecommendationCard 
+      //     title={aCourseInfo.title} 
+      //     description={aCourseInfo.description} 
+      //     link={aCourseInfo.link} 
+      //   />
+      //   )}
+      // </Box>
+      }
+
       <Box style={{marginLeft: "3rem", width: "28vw"}}>
-        { recommendedCourses.map((aCourseInfo) => 
+        { recommendedCourses && Object.keys(recommendedCourses).map((aCourseInfo) => 
         <RecommendationCard 
-          title={aCourseInfo.title} 
-          description={aCourseInfo.description} 
-          link={aCourseInfo.link} 
+          title={recommendedCourses[aCourseInfo].title} 
+          // description={recommendedCourses[aCourseInfo].description} 
+          description={recommendedCourses[aCourseInfo].description} 
+          link={recommendedCourses[aCourseInfo].link} 
         />
         )}
       </Box>
