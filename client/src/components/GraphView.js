@@ -120,7 +120,7 @@ function GraphView(props) {
         }
       }
     }
-  }, [mouseX]);
+  }, [coursesTaken]);
 
 
   function handleMouseMove(event) {

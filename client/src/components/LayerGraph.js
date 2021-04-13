@@ -353,6 +353,7 @@ function orderedMapFromCoords(coordMap) {
 
 function tempAssignCoords(nodeGraph, layeredGraph) {
   let result = [[]]
+  //layeredGraph[0].sort((a, b) => a.id > b.id ? 1 : -1)
   for (let i = 1; i < layeredGraph[0].length; i++) {
     result[0].push({id: layeredGraph[0][i].id, coord: i});
   }
@@ -374,7 +375,6 @@ function arrangeTopLayer(nodeGraph, topLayer, nextLayer) {
   }
 }
 
-
 function arrangeNodes(layer) {
     let medians = new Map();
 
@@ -382,6 +382,10 @@ function arrangeNodes(layer) {
       medians.set(layer[i].id, layer[i].coord);
     }
   
+    /*let dxMap = new Map();
+    for (let i = 0; i < layer.length; i++) {
+      dxMap.set(layer[i].id, 0);
+    }*/
 
     let counter = 0;
     while (counter < 1000000) {
@@ -400,8 +404,13 @@ function arrangeNodes(layer) {
             }
 
             layer[i].coord += dx;
+            //dxMap.set(layer[i].id, dx)
         }
+        /*for (let i = 0; i < layer.length - 1; i++) {
+          layer[i].coord += 10 * dxMap.get(layer[i].id);
+        }*/
     }
+
     return layer;
 }
 
@@ -475,7 +484,6 @@ function expandGroup(group, layer) {
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
-  console.log(result)
   let alone = separateGraph(result[0]);
   //addDummyVertices(nodeGraph, result[1]);
   //result = permuteGraph(result[1], nodeGraph);
