@@ -1,9 +1,9 @@
 import pandas as pd
 from algorithm import TextComparison
 
-courses = pd.read_csv("./server/data/similarities.csv", index_col=0).columns.tolist()
+courses = pd.read_csv("./server/data/similarities_v2.csv", index_col=0).columns.tolist()
 algorithm = TextComparison("./server/models/universal-sentence-encoder_4")
-algorithm.import_saved_similarity("./server/data/similarities.csv")
+algorithm.import_saved_similarity("./server/data/similarities_v2.csv")
 
 courses = [x.replace("\xa0", " ").split(".")[0] for x in courses]
 departments = list(set([x.split(" ")[0] for x in courses]))
@@ -33,4 +33,4 @@ for i in departments:
   dept_similarities.append(temp)
 
 final = pd.DataFrame(dept_similarities, departments, departments)
-final.to_csv("./server/data/dept_similarities.csv")
+final.to_csv("./server/data/dept_similarities_v2.csv")

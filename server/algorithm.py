@@ -15,11 +15,14 @@ import getopt
 class CsvLoader(object):
     """Class for loading in and processing CSV files."""
 
-    def __init__(self, data_loc: str):
+    def __init__(self, data_loc: str, ind_col: int = None):
         """Stores the data location and loads in the csv as a pandas dataframe,
         as well as save the headers."""
         self.data_loc = data_loc
-        self.data = pd.read_csv(data_loc, index_col=0)
+        if ind_col is not None:
+            self.data = pd.read_csv(data_loc, index_col=ind_col)
+        else:
+            self.data = pd.read_csv(data_loc)
         self.headers = self.data.columns.tolist()
     
     def __str__(self):
@@ -149,7 +152,7 @@ class MetadataComparison(object):
     def __init__(self, metadata_loc: str):
         """Initializes the metadata location and creates a CsvLoader of the metadata."""
         self.metadata_loc = metadata_loc
-        self.data = CsvLoader(metadata_loc)
+        self.data = CsvLoader(metadata_loc, ind_col=0)
 
         # Hyperparams
         self.priority_weight = [0.4, 0.25, 0.15, 0.1]
@@ -282,7 +285,7 @@ if __name__ == "__main__":
 
         data = CsvLoader(data_loc)
         algorithm = TextComparison(model_loc)
-        # print(data.get_data("courseDesc"))
+        # print(len(data.get_data("courseCode")))
         algorithm.get_cross_product_similarity(data.get_data("courseDesc"), data.get_data("courseCode"))
         algorithm.save_scores(save_loc)
 
