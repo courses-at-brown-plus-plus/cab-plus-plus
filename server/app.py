@@ -32,8 +32,11 @@ def allCourseCodes():
 @app.route("/generateRecommendations", methods=["POST"])
 @cross_origin()
 def generateRecommendations(): 
+    print("request received, generating recommendations")
     courses_taken = request.json["courses_taken"]
     priorities = request.json["priorities"]
+    #  print("courses taken: " + courses_taken)
+    #  print("priorities" + priorities)
 
     # Run algorithm here
     text_compare = TextComparison()
@@ -42,7 +45,14 @@ def generateRecommendations():
     algorithm = Algorithm(text_compare, metadata_compare)
     recommended_courses = algorithm.get_recs(courses_taken, priorities, 5)
     print("request received generate recs")
-    return jsonify({"recommendedCourses": recommended_courses}), 200
+    print("recommended_courses: ")
+    print(recommended_courses)
+    print(type(recommended_courses))
+
+    ret = []
+    for item in recommended_courses: 
+        ret.append(item[0])
+    return jsonify({"recommendedCourses": ret}), 200
 
 def appSetup(): 
     with open('data/CAB_v1_formatted.csv') as csvFile: 

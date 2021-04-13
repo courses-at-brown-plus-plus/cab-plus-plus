@@ -32,7 +32,11 @@ export default function CourseSuggestions() {
   const dispatch = useDispatch();
 
   function submitPriorityForm() {
-    dispatch(GetRecommendations(priorityContents));
+    // dispatch(GetRecommendations(priorityContents));
+    dispatch(GetRecommendations({ 
+      priorities: [priorityContents["1"], priorityContents["2"], priorityContents["3"], priorityContents["4"]], 
+      courses_taken: []
+    }));
   }
 
   function handleSelectionChange(e, key) {
@@ -128,12 +132,29 @@ export default function CourseSuggestions() {
         <br/>
       </Box>
 
+        Recs
+      { 
+        // JSON.stringify(recommendedCourses) 
+      }
+      {
+      // <Box style={{marginLeft: "3rem", width: "28vw"}}>
+      //   { recommendedCourses && recommendedCourses.map((aCourseInfo) => 
+      //   <RecommendationCard 
+      //     title={aCourseInfo.title} 
+      //     description={aCourseInfo.description} 
+      //     link={aCourseInfo.link} 
+      //   />
+      //   )}
+      // </Box>
+      }
+
       <Box style={{marginLeft: "3rem", width: "28vw"}}>
-        { recommendedCourses.map((aCourseInfo) => 
+        { recommendedCourses && Object.keys(recommendedCourses).map((aCourseInfo) => 
         <RecommendationCard 
-          title={aCourseInfo.title} 
-          description={aCourseInfo.description} 
-          link={aCourseInfo.link} 
+          title={recommendedCourses[aCourseInfo].title} 
+          // description={recommendedCourses[aCourseInfo].description} 
+          description={recommendedCourses[aCourseInfo].description} 
+          link={recommendedCourses[aCourseInfo].link} 
         />
         )}
       </Box>

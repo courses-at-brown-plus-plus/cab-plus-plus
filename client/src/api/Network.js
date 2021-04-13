@@ -16,12 +16,12 @@ export const getRequest = async (resource) => {
 }
 
 export const postRequest = async (resource, data) => {
-  // const res = await axios.post(URL + resource, data, AXIOS_CONFIG);
+  const res = await axios.post(URL + resource, data, AXIOS_CONFIG);
 
   // dummy post request to wait for 2 seconds
-  const res = await setTimeout(() => {
-    return "post request dummy data";
-  }, 2);
+  // const res = await setTimeout(() => {
+  //   return "post request dummy data";
+  // }, 2);
   return res;
 }
 
@@ -62,11 +62,19 @@ export const GetAllCourseCodes = createAsyncThunk(
 
 export const GetRecommendations = createAsyncThunk(
   'appData/getRecommendationsThunk', 
-  async (priorityData, { dispatch, rejectWithValue }) => {
+  async (data, { dispatch, rejectWithValue }) => {
 
-    postRequest("generateRecommendations", priorityData).then((res) => {
-      // const recommendedCourses = res.data.recommendedCourses;
-      const recommendedCourses = RECOMMENDED_COURSES;
+    // let data = {
+    //   priorities: priorityData, 
+    //   courses_taken: []
+    // };
+
+    postRequest("generateRecommendations", data).then((res) => {
+      console.log(res.data);
+      console.log(res.data.recommendedCourses);
+      const recommendedCourses = res.data.recommendedCourses;
+      // const recommendedCourses = RECOMMENDED_COURSES;
+      console.log(JSON.stringify(recommendedCourses));
       dispatch(setRecommendedCourses(recommendedCourses));
       return;
     }, (err) => {
