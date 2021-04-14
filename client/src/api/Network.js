@@ -1,7 +1,8 @@
 
 import axios from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { setPathwayData, setAllCourseCodes, setRecommendedCourses } from '../store/slices/appDataSlice';
+import { setPathwayData, setAllCourseCodes, setRecommendedCourses, 
+  addPrereq, removePrereq } from '../store/slices/appDataSlice';
 import { URL, AXIOS_CONFIG, PATHWAY_DATA, COURSE_CODES, RECOMMENDED_COURSES } from '../constants';
 
 export const getRequest = async (resource) => {
@@ -64,21 +65,39 @@ export const GetRecommendations = createAsyncThunk(
   'appData/getRecommendationsThunk', 
   async (data, { dispatch, rejectWithValue }) => {
 
-    // let data = {
-    //   priorities: priorityData, 
-    //   courses_taken: []
-    // };
-
     postRequest("generateRecommendations", data).then((res) => {
-      console.log(res.data);
-      console.log(res.data.recommendedCourses);
       const recommendedCourses = res.data.recommendedCourses;
       // const recommendedCourses = RECOMMENDED_COURSES;
-      console.log(JSON.stringify(recommendedCourses));
       dispatch(setRecommendedCourses(recommendedCourses));
       return;
     }, (err) => {
       console.log("error in Network.GetRecommendations: " + JSON.stringify(err));
+      // dispatch(setStatus(err.response.status));
+      return rejectWithValue(err.message);
+    });
+
+  }
+);
+
+export const ReportIssue = createAsyncThunk(
+  'appData/reportIssueThunk', 
+  async (data, { dispatch, rejectWithValue }) => {
+
+    if (data.issueType === "add") {
+      dispatch(addPrereq(data));
+    }
+    else if (data.issueType === "remove") {
+      dispatch(removePrereq(data));
+    }
+
+    postRequest("logIssue", {
+      issue_type: data.issueType, 
+      prereq_id: data.prereqCourse, 
+      unlocked_id: data.unlockedCourse
+    }).then((res) => {
+      return;
+    }, (err) => {
+      console.log("error in Network.ReportIssue: " + JSON.stringify(err));
       // dispatch(setStatus(err.response.status));
       return rejectWithValue(err.message);
     });
