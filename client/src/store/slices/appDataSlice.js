@@ -30,14 +30,11 @@ export const slice = createSlice({
         const ret = {
           title: `${aCode} ${state.pathwayData[aCode]["courseName"]}`,
           description: state.pathwayData[aCode]["courseDesc"], 
-          // link: "#"
           link: `https://thecriticalreview.org/search/${aCode.substring(0, 4)}/${aCode.substring(5, aCode.length)}`
-          // https://thecriticalreview.org/search/CSCI/0320
+          // eg: https://thecriticalreview.org/search/CSCI/0320
         };
         newRecommendedCourseData.push(ret);
       });
-
-      // alert(JSON.stringify(newRecommendedCourseData, null, 2));
 
       state.recommendedCourses = { ...newRecommendedCourseData };
     },
@@ -59,7 +56,7 @@ export const slice = createSlice({
     removeAnnotation: (state, action) => {
       delete state.annotations[action.payload.name];
     }, 
-    reportError: (state, action) => {
+    broadcastError: (state, action) => {
       state.errorMessage = action.payload.errorMessage;
       state.issueReportState = action.payload.issueReportState;
     }, 
@@ -98,7 +95,7 @@ export const slice = createSlice({
 export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, 
   addCourseTaken, removeCourseTaken, 
   addPrereq, removePrereq, 
-  addAnnotation, removeAnnotation, resetIssueReportState, reportError
+  addAnnotation, removeAnnotation, resetIssueReportState, broadcastError
 } = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;

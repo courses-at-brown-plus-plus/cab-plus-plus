@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, selectPathwayData, 
-  addPrereq, removePrereq, resetIssueReportState, reportError } from '../store/slices/appDataSlice';
+  addPrereq, removePrereq, resetIssueReportState, broadcastError } from '../store/slices/appDataSlice';
+
+import { ReportIssue } from '../api/Network';
 
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, 
   ModalCloseButton, ModalFooter, ModalBody, useDisclosure, 
@@ -67,7 +69,8 @@ export default function ReportPopup() {
 
     if (prereqValid && unlockedValid) {
       if (!prereqExists(prereqCourse, unlockedCourse))
-        dispatch(addPrereq({ 
+        dispatch(ReportIssue({
+          issueType: "add",
           prereqCourse: addPrereqInputVal, 
           unlockedCourse: addUnlockedInputVal
         }));
@@ -76,7 +79,7 @@ export default function ReportPopup() {
       onClose();
     }
     else {
-      dispatch(reportError({
+      dispatch(broadcastError({
         errorMessage: "This prerequisite already exists", 
         issueReportState: -1
       }));
@@ -93,7 +96,8 @@ export default function ReportPopup() {
 
     if (prereqValid && unlockedValid) {
       if (prereqExists(prereqCourse, unlockedCourse)) {
-        dispatch(removePrereq({ 
+        dispatch(ReportIssue({ 
+          issueType: "remove",
           prereqCourse: removePrereqInputVal, 
           unlockedCourse: removeUnlockedInputVal
         }));
@@ -102,7 +106,7 @@ export default function ReportPopup() {
         onClose();
       }
       else {
-        dispatch(reportError({
+        dispatch(broadcastError({
           errorMessage: "This prerequisite does not exists", 
           issueReportState: -1
         }));
