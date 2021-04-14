@@ -59,26 +59,17 @@ export const slice = createSlice({
     removeAnnotation: (state, action) => {
       delete state.annotations[action.payload.name];
     }, 
+    reportError: (state, action) => {
+      state.errorMessage = action.payload.errorMessage;
+      state.issueReportState = action.payload.issueReportState;
+    }, 
     addPrereq: (state, action) => {
       let unlockedCourse = action.payload.unlockedCourse;
       let prereqCourse = action.payload.prereqCourse;
 
-      let targetIndex = -1;
-      state.pathwayData[prereqCourse].preReqs.forEach((aPrereq, index) => {
-        if (aPrereq[0] === unlockedCourse) {
-          targetIndex = index;
-        }
-      })
-
-      if (targetIndex === -1) {
-        state.pathwayData[prereqCourse].preReqs.push([unlockedCourse, 1]);
-        state.errorMessage = "We'll review your changes as soon as possible!";
-        state.issueReportState = 1;
-      }
-      else {
-        state.errorMessage = "This prerequisite already exists";
-        state.issueReportState = -1;
-      }
+      state.pathwayData[prereqCourse].preReqs.push([unlockedCourse, 1]);
+      state.errorMessage = "We'll review your changes as soon as possible!";
+      state.issueReportState = 1;
     }, 
     removePrereq: (state, action) => {
       let unlockedCourse = action.payload.unlockedCourse;
@@ -91,15 +82,9 @@ export const slice = createSlice({
         }
       })
 
-      if (targetIndex !== -1) {
-        state.pathwayData[prereqCourse].preReqs.splice(targetIndex, 1);
-        state.errorMessage = "We'll review your changes as soon as possible!";
-        state.issueReportState = 1;
-      }
-      else {
-        state.errorMessage = "This prerequisite does not exist";
-        state.issueReportState = -1;
-      }
+      state.pathwayData[prereqCourse].preReqs.splice(targetIndex, 1);
+      state.errorMessage = "We'll review your changes as soon as possible!";
+      state.issueReportState = 1;
     }, 
     resetIssueReportState: (state, action) => {
       state.issueReportState = 0;
@@ -113,7 +98,8 @@ export const slice = createSlice({
 export const { setPathwayData, setAllCourseCodes, setRecommendedCourses, 
   addCourseTaken, removeCourseTaken, 
   addPrereq, removePrereq, 
-  addAnnotation, removeAnnotation, resetIssueReportState } = slice.actions;
+  addAnnotation, removeAnnotation, resetIssueReportState, reportError
+} = slice.actions;
 
 export const selectPathwayData = state => state.appData.pathwayData;
 export const selectAllCourseCodes = state => state.appData.allCourseCodes;

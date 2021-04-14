@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, addPrereq, removePrereq, resetIssueReportState } from '../store/slices/appDataSlice';
+import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, selectPathwayData, 
+  addPrereq, removePrereq, resetIssueReportState, reportError } from '../store/slices/appDataSlice';
 
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, 
   ModalCloseButton, ModalFooter, ModalBody, useDisclosure, 
@@ -15,6 +16,7 @@ export default function ReportPopup() {
   const allCourseCodes = useSelector(selectAllCourseCodes);
   const errorMessage = useSelector(selectErrorMessage);
   const issueReportState = useSelector(selectIssueReportState);
+  const pathwayData = useSelector(selectPathwayData);
 
   const [addPrereqInputVal, setAddPrereqInputVal] = useState("");
   const [addPrereqCourseExists, setAddPrereqCourseExists] = useState(true);
@@ -45,37 +47,66 @@ export default function ReportPopup() {
     }
   }, [issueReportState]);
 
+  function prereqExists(prereqCourse, unlockedCourse) {
+    let targetIndex = -1;
+    pathwayData[prereqCourse].preReqs.forEach((aPrereq, index) => {
+      if (aPrereq[0] === unlockedCourse) {
+        targetIndex = index;
+      }
+    })
+    return (targetIndex !== -1);
+  }
+
   function handleAddPrereq() {
-    let prereqValid = allCourseCodes.includes(addPrereqInputVal);
-    let unlockedValid = allCourseCodes.includes(addUnlockedInputVal);
+    let prereqCourse = addPrereqInputVal;
+    let unlockedCourse = addUnlockedInputVal;
+    let prereqValid = allCourseCodes.includes(prereqCourse);
+    let unlockedValid = allCourseCodes.includes(unlockedCourse);
     setAddPrereqCourseExists(prereqValid);
     setAddUnlockedCourseExists(unlockedValid);
 
     if (prereqValid && unlockedValid) {
-      dispatch(addPrereq({ 
-        prereqCourse: addPrereqInputVal, 
-        unlockedCourse: addUnlockedInputVal
-      }));
+      if (!prereqExists(prereqCourse, unlockedCourse))
+        dispatch(addPrereq({ 
+          prereqCourse: addPrereqInputVal, 
+          unlockedCourse: addUnlockedInputVal
+        }));
       setAddPrereqInputVal("");
       setAddUnlockedInputVal("");
       onClose();
     }
+    else {
+      dispatch(reportError({
+        errorMessage: "This prerequisite already exists", 
+        issueReportState: -1
+      }));
+    }
   }
 
   function handleRemovePrereq() {
-    let prereqValid = allCourseCodes.includes(removePrereqInputVal);
-    let unlockedValid = allCourseCodes.includes(removeUnlockedInputVal);
+    let prereqCourse = removePrereqInputVal;
+    let unlockedCourse = removeUnlockedInputVal;
+    let prereqValid = allCourseCodes.includes(prereqCourse);
+    let unlockedValid = allCourseCodes.includes(unlockedCourse);
     setRemovePrereqCourseExists(prereqValid);
     setRemoveUnlockedCourseExists(unlockedValid);
 
     if (prereqValid && unlockedValid) {
-      dispatch(removePrereq({ 
-        prereqCourse: removePrereqInputVal, 
-        unlockedCourse: removeUnlockedInputVal
-      }));
-      setRemovePrereqInputVal("");
-      setRemoveUnlockedInputVal("");
-      onClose();
+      if (prereqExists(prereqCourse, unlockedCourse)) {
+        dispatch(removePrereq({ 
+          prereqCourse: removePrereqInputVal, 
+          unlockedCourse: removeUnlockedInputVal
+        }));
+        setRemovePrereqInputVal("");
+        setRemoveUnlockedInputVal("");
+        onClose();
+      }
+      else {
+        dispatch(reportError({
+          errorMessage: "This prerequisite does not exists", 
+          issueReportState: -1
+        }));
+      }
     }
   }
 
