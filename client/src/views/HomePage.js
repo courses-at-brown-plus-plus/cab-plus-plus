@@ -53,7 +53,7 @@ export default function HomePage() {
 
   // no concentration selected
   let emptyGraph = new Map();
-  emptyGraph.set('No graph selected', new CourseNode('No graph selected', [], []));
+  // emptyGraph.set('No graph selected', new CourseNode('No graph selected', [], []));
 
   // let csGraph = new Map();
   // csGraph.set('CS111', new CourseNode('CS111', [new Edge('CS111', 'CS112', 0)], []));

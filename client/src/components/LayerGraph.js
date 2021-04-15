@@ -215,11 +215,6 @@ function medianHeuristic1(nodeGraph, layers, layer2) {
       if (l.length > 0) {
         medians.set(node2.id, Math.round(l.reduce((a, b) => a + b) / l.length * 2) / 2);
       }
-      /*if (l.length % 2 === 0) {
-        medians.set(node2.id, (l[l.length / 2 - 1] + l[l.length / 2]) / 2)
-      } else {
-        medians.set(node2.id, l[(l.length - 1) / 2])
-      }*/
     }
   }
   return medians;
@@ -353,14 +348,13 @@ function orderedMapFromCoords(coordMap) {
 
 function tempAssignCoords(nodeGraph, layeredGraph) {
   let result = [[]]
-  //layeredGraph[0].sort((a, b) => a.id > b.id ? 1 : -1)
   for (let i = 1; i < layeredGraph[0].length; i++) {
     result[0].push({id: layeredGraph[0][i].id, coord: i});
   }
 
   for (let i = 1; i < layeredGraph.length; i++) {
     let medians = medianHeuristic1(nodeGraph, result.slice(0, i), layeredGraph[i]);
-    result.push(orderedMapFromCoords(medians))
+    result.push(arrangeNodes(orderedMapFromCoords(medians)))
   }
   return result;
 }
@@ -381,7 +375,7 @@ function arrangeNodes(layer) {
     for (let i = 0; i < layer.length; i++) {
       medians.set(layer[i].id, layer[i].coord);
     }
-  
+
     let dxMap = new Map();
     for (let i = 0; i < layer.length; i++) {
       dxMap.set(layer[i].id, 0);
@@ -398,7 +392,7 @@ function arrangeNodes(layer) {
 
             if (!(i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) 
               && !(i > 0 && layer[i].coord - layer[i - 1].coord < 1)) {
-              dx = 0.01 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
+              dx += 0.01 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
             }
 
 
@@ -412,7 +406,6 @@ function arrangeNodes(layer) {
                 dxMap.set(layer[i - 1].id, dxMap.get(layer[i - 1].id) - 0.03)
             }
 
-            //layer[i].coord += dx;
             dxMap.set(layer[i].id, dxMap.get(layer[i].id) + dx)
         }
         for (let i = 0; i < layer.length - 1; i++) {
@@ -499,9 +492,9 @@ function prepareGraph(nodeGraph) {
   //removeDummyVertices(result[1], nodeGraph);
   //addInvisibleNodes(result);
   let temp = tempAssignCoords(nodeGraph, result);
-  for (let i = 0; i < temp.length - 1; i++) {
+  /*for (let i = 0; i < temp.length - 1; i++) {
     temp[i] = arrangeNodes(temp[i]);
-  }
+  }*/
 
   return [box(alone), temp];
 }

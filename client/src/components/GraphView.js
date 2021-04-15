@@ -66,6 +66,9 @@ function GraphView(props) {
   let minX = useRef(null);
 
   useEffect(() => {
+    if (props.graph.size === 0) {
+      return;
+    }
     let p = prepareGraph(nodeGraph);
     layersRef.current = p[1];
     layers = layersRef.current;
@@ -296,6 +299,14 @@ function GraphView(props) {
     ctx.clearRect(0, 0, props.width, props.height);
     ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, props.width, props.height);
+
+    if (props.graph.size === 0) {
+      ctx.fillStyle = '#bbb';
+      ctx.font = "28pt Helvetica";
+      ctx.textAlign = "center";
+      ctx.fillText('No concentration selected', props.width / 2, props.height / 2)
+      return;
+    }
 
     nodeCoords.current = new Map();
 
