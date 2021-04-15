@@ -395,7 +395,11 @@ function arrangeNodes(layer) {
         }
         for (let i = 0; i < layer.length - 1; i++) {
             let dx = 0;
-            dx = 0.01 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
+
+            if (!(i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) 
+              && !(i > 0 && layer[i].coord - layer[i - 1].coord < 1)) {
+              dx = 0.01 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
+            }
 
 
             if (i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) {
@@ -412,7 +416,7 @@ function arrangeNodes(layer) {
             dxMap.set(layer[i].id, dxMap.get(layer[i].id) + dx)
         }
         for (let i = 0; i < layer.length - 1; i++) {
-          layer[i].coord += 10 * dxMap.get(layer[i].id);
+          layer[i].coord += dxMap.get(layer[i].id);
         }
     }
 
