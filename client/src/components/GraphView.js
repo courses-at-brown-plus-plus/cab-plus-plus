@@ -190,6 +190,7 @@ function GraphView(props) {
   }
 
   function handleScroll(e) {
+    document.body.style.overflow = 'hidden';
     handleMouseMove(e)
     let newScaleFactor = scaleFactor - e.deltaY * scaleFactor * 0.005;
     if (newScaleFactor > MAX_ZOOM) {
@@ -203,9 +204,15 @@ function GraphView(props) {
 
   // Stop page from scrolling when mouse is over canvas
   // Credit to https://stackoverflow.com/questions/55508836/prevent-page-scrolling-when-mouse-is-over-one-particular-div
-  function changeScroll() { 
+  function enterScroll() { 
     let style = document.body.style.overflow;
-    document.body.style.overflow = (style === 'hidden') ? 'auto':'hidden';
+    document.body.style.overflow = 'hidden';
+    setActiveNodes([])
+  } 
+
+  function leaveScroll() { 
+    let style = document.body.style.overflow;
+    document.body.style.overflow = 'auto';
     setActiveNodes([])
   } 
 
@@ -292,9 +299,6 @@ function GraphView(props) {
     canvas.style.width = `${props.width}px`;
     canvas.style.height = `${props.height}px`;
     canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
-
-
-
 
     ctx.clearRect(0, 0, props.width, props.height);
     ctx.fillStyle = '#ddd';
@@ -396,8 +400,8 @@ function GraphView(props) {
           add={addAnnotation} rann={annotations.includes(courseView.id)} remove={removeAnnotation}/>
         }
         <canvas ref={canvasRef} onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={changeScroll}
-          onMouseLeave={changeScroll} className = "graphView"/>
+          onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={enterScroll}
+          onMouseLeave={leaveScroll} className = "graphView"/>
       </div>
 
       <Flex width={800} justify="space-between" padding={3}>
