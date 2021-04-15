@@ -200,24 +200,24 @@ export default function HomePage() {
 
       </center>
       <Stack>
-      <Box>
-        <Box p={5} style={styles.boxContainer}>
-          <h1><b>Saved Loadouts</b></h1>
+        <Box>
+          <Box p={5} style={styles.boxContainer}>
+            <h1><b>Saved Loadouts</b></h1>
+            { 
+              Object.keys(savedAnnotations).map((key) => 
+                <AnnotationButton 
+                  name={key} 
+                  content={savedAnnotations[key]}
+                  setSelectedConcentration={setSelectedConcentration}
+                  setDisplayedAnnotation={setDisplayedAnnotation}
+                />)
+            }
+          </Box>
           { 
-            Object.keys(savedAnnotations).map((key) => 
-              <AnnotationButton 
-                name={key} 
-                content={savedAnnotations[key]}
-                setSelectedConcentration={setSelectedConcentration}
-                setDisplayedAnnotation={setDisplayedAnnotation}
-              />)
+            // JSON.stringify(savedAnnotations) 
           }
         </Box>
-        { 
-          // JSON.stringify(savedAnnotations) 
-        }
-      </Box>
-      <Legend />
+        <Legend />
       </Stack>
 
     </React.Fragment>
