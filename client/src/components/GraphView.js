@@ -281,6 +281,10 @@ function GraphView(props) {
     }
   }
 
+  function clearAnnotations(e) {
+    setAnnotations([]);
+  }
+
   useEffect(() => {
 
 
@@ -412,6 +416,7 @@ function GraphView(props) {
             popup={popup}
             annotations={annotations}
           />
+          <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Annotations</Button>
         </Box>
         <Box> { props.children } </Box>
       </Flex>
