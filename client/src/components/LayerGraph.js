@@ -226,7 +226,7 @@ function sortByMedian(layer1, layer2) {
   layer2.sort((a, b) => medians.get(a.id) - medians.get(b.id));
   return layer2;
 }
-
+/*
 // Permute layer to minimize crossings
 function permuteGraph(layerGraph, nodeGraph) {
   
@@ -258,6 +258,7 @@ function permuteGraph(layerGraph, nodeGraph) {
   }
   return layerGraph
 }
+
 
 // For each dummy vertex, find both connected edges and replace with a single edge
 function removeDummyVertices(layeredGraph, nodeGraph) {
@@ -336,6 +337,7 @@ function addInvisibleNodes(layeredGraph) {
 
   }
 }
+*/
 
 function orderedMapFromCoords(coordMap) {
   let result = [];
@@ -345,6 +347,7 @@ function orderedMapFromCoords(coordMap) {
   result.sort(function(a, b) {return a.coord - b.coord});
   return result;
 }
+
 
 function tempAssignCoords(nodeGraph, layeredGraph) {
   let result = [[]]
@@ -411,6 +414,12 @@ function arrangeNodes(layer) {
         for (let i = 0; i < layer.length - 1; i++) {
           layer[i].coord += dxMap.get(layer[i].id);
         }
+    }
+
+    let minCoord = -Infinity;
+    for (let i = 0; i < layer.length - 1; i++) {
+      layer[i].coord = Math.max(minCoord, Math.round(layer[i].coord * 2) / 2);
+      minCoord = layer[i].coord + 1;
     }
 
     return layer;

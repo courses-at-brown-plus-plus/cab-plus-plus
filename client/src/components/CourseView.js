@@ -31,6 +31,7 @@ function CourseView(props) {
             <h1 className="courseTitle">{props.node.id + ": " + props.node.name}</h1>
             <Divider orientation="horizontal" />
             <p className="courseDesc">{props.node.desc}</p>
+            
             <div style={{textAlign: 'center'}}>
               {
                 getCategories().map((x, i) => {
