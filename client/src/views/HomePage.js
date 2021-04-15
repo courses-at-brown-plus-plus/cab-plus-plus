@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Box } from "@chakra-ui/react"
+import { Select, Box, Stack } from "@chakra-ui/react"
 import GraphView from '../components/GraphView';
 import { CourseNode, Edge } from '../components/Graph';
 import PastCourses from '../components/PastCourses';
@@ -8,6 +8,8 @@ import AnnotationButton from '../components/AnnotationButton';
 import { useSelector } from 'react-redux';
 import { selectPathwayData, selectAnnotations } from '../store/slices/appDataSlice';
 import { AVAILABLE_CONCENTRATIONS } from '../constants';
+
+import Legend from './Legend'
 
 // import axios from 'axios';
 
@@ -197,7 +199,7 @@ export default function HomePage() {
         }
 
       </center>
-
+      <Stack>
       <Box>
         <Box p={5} style={styles.boxContainer}>
           <h1><b>Saved Loadouts</b></h1>
@@ -215,6 +217,8 @@ export default function HomePage() {
           // JSON.stringify(savedAnnotations) 
         }
       </Box>
+      <Legend />
+      </Stack>
 
     </React.Fragment>
   );
