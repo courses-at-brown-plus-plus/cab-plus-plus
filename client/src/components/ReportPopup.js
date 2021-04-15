@@ -107,7 +107,7 @@ export default function ReportPopup() {
       }
       else {
         dispatch(broadcastError({
-          errorMessage: "This prerequisite does not exists", 
+          errorMessage: "This prerequisite does not exist", 
           issueReportState: -1
         }));
       }

@@ -201,9 +201,9 @@ export default function HomePage() {
 
       </center>
       <Stack>
-        <Box>
+        <Box ml={10}>
           <Box p={5} style={styles.boxContainer}>
-            <h1><b>Saved Loadouts</b></h1>
+            <h1><b>Saved Annotations</b></h1>
             { 
               Object.keys(savedAnnotations).map((key) => 
                 <AnnotationButton 
@@ -218,7 +218,10 @@ export default function HomePage() {
             // JSON.stringify(savedAnnotations) 
           }
         </Box>
-        <Legend />
+
+        <Box m="0 auto">
+          <Legend />
+        </Box>
       </Stack>
 
     </React.Fragment>
@@ -237,7 +240,6 @@ export default function HomePage() {
 const styles = {
   boxContainer: {
     width: "14vw", 
-    marginLeft: "3rem",
     height: "40vh",
     border: "2px solid black",
     borderRadius: "0.3rem",

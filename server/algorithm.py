@@ -4,8 +4,8 @@ import os
 # Prevent warnings and info messages of imports from outputting, but not errors
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-import tensorflow as tf
-import tensorflow_hub as hub
+#  import tensorflow as tf
+#  import tensorflow_hub as hub
 import pandas as pd
 import math
 
