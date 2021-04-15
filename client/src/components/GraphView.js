@@ -82,8 +82,6 @@ function GraphView(props) {
         max = layers[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b));
       }
 
-      //TODO: Fix bug
-
       for (let j = layers[i].length - 1; j >= 0; j--) {
         if (isNaN(layers[i][j].coord)) {
           layers[i].splice(j, 1)
@@ -111,17 +109,20 @@ function GraphView(props) {
 
   useEffect(() => {
     let newNextCourses = [];
+
+    let startCourses = coursesTaken.concat(annotations);
+
     if (nodeGraph) {
-      for (let i = 0; i < coursesTaken.length; i++) {
-        if (nodeGraph.has(coursesTaken[i])) {
-          for (let j = 0; j < nodeGraph.get(coursesTaken[i]).edges.length; j++) {
-            newNextCourses.push(nodeGraph.get(coursesTaken[i]).edges[j].end);
+      for (let i = 0; i < startCourses.length; i++) {
+        if (nodeGraph.has(startCourses[i])) {
+          for (let j = 0; j < nodeGraph.get(startCourses[i]).edges.length; j++) {
+            newNextCourses.push(nodeGraph.get(startCourses[i]).edges[j].end);
           }
         }
       }
     }
     setNextCourses(newNextCourses);
-  }, [coursesTaken]);
+  }, [coursesTaken, annotations]);
 
 
   function handleMouseMove(event) {

@@ -9,7 +9,8 @@ import { useSelector } from 'react-redux';
 import { selectPathwayData, selectAnnotations } from '../store/slices/appDataSlice';
 import { AVAILABLE_CONCENTRATIONS } from '../constants';
 
-import Legend from './Legend'
+import Legend from '../components/Legend'
+import SearchBar from '../components/SearchBar'
 
 // import axios from 'axios';
 
@@ -187,6 +188,7 @@ export default function HomePage() {
           >
             { renderDropdownItems() }
           </Select>
+          <SearchBar />
 
         </GraphView>
 
