@@ -7,6 +7,7 @@ import { Button, Box, Flex, useDisclosure } from "@chakra-ui/react"
 import { useSelector } from 'react-redux';
 import { selectCoursesTaken } from '../store/slices/appDataSlice';
 import AnnotationSave from './AnnotationSave';
+import SearchBar from './SearchBar'
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -131,8 +132,8 @@ function GraphView(props) {
     setMouseY(event.clientY - event.target.getBoundingClientRect().top);
 
     if (mouseDown) {
-      setXOffset(origXOffset + (event.clientX - mouseDownX) / scaleFactor);
-      setYOffset(origYOffset + (event.clientY - mouseDownY) / scaleFactor);
+      setXOffset(origXOffset + (mouseX - mouseDownX) / scaleFactor);
+      setYOffset(origYOffset + (mouseY - mouseDownY) / scaleFactor);
     }
 
     for (let [node, coords] of nodeCoords.current) {
@@ -179,13 +180,16 @@ function GraphView(props) {
         return;
       }
     }
-    setFocus(false);
+    
+    if (Math.abs(mouseX - mouseDownX) < 1 && Math.abs(mouseY - mouseDownY) < 1) {
+      setFocus(false);
+    }
   }
 
   function handleMouseDown(e) {
     setMouseDown(true);
-    setMouseDownX(e.clientX);
-    setMouseDownY(e.clientY);
+    setMouseDownX(e.clientX - e.target.getBoundingClientRect().left);
+    setMouseDownY(e.clientY - e.target.getBoundingClientRect().top);
     setOrigXOffset(xOffset);
     setOrigYOffset(yOffset);
   }
@@ -208,13 +212,17 @@ function GraphView(props) {
   function enterScroll() { 
     let style = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    setActiveNodes([])
+    if (!focus) {
+      setActiveNodes([])
+    }
   } 
 
   function leaveScroll() { 
     let style = document.body.style.overflow;
     document.body.style.overflow = 'auto';
-    setActiveNodes([])
+    if (!focus) {
+      setActiveNodes([])
+    }
   } 
 
   function addAnnotation(id) {
@@ -418,8 +426,9 @@ function GraphView(props) {
           />
           <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Annotations</Button>
         </Box>
-        <Box> { props.children } </Box>
+        <SearchBar update={(s) => {let l = []; makeActive(s, l); setActiveNodes(l); setFocus(true);}}/>
       </Flex>
+      <Box width={200} float="right" marginRight="10px"> { props.children } </Box>
     </React.Fragment>
   );
 }

@@ -188,7 +188,6 @@ export default function HomePage() {
           >
             { renderDropdownItems() }
           </Select>
-          <SearchBar />
 
         </GraphView>
 

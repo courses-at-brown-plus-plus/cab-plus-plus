@@ -6,23 +6,32 @@ import { InputGroup, Input, useToast,
   Button, Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
 
 function SearchBar(props) {
+
+    let [courseInputValue, setCourseInputValue] = useState("");
+
+
     return (
         <InputGroup style={styles.inputGroup}>
             <Input 
-              
+              value={courseInputValue} 
+              onChange={(e) => setCourseInputValue(e.target.value)}
               style={styles.courseInput}
               placeholder="Course ID"
             />
-            <Button style={styles.findCourseButton}>Search</Button>
+            <Button style={styles.findCourseButton} 
+                    onClick={(e) => props.update(courseInputValue)}>
+                Find Course
+            </Button>
         </InputGroup>
     )
 }
 
 const styles = {
   inputGroup: {
-    marginTop: "1rem",
     border: "1px solid lightgrey", 
-    borderRadius: "0.3rem"
+    borderRadius: "0.3rem",
+    width: "300px",
+    float: "right"
   },
   inputGroupError: {
     border: "2px solid red", 
