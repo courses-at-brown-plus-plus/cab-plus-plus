@@ -180,7 +180,7 @@ function GraphView(props) {
         return;
       }
     }
-    
+
     if (Math.abs(mouseX - mouseDownX) < 1 && Math.abs(mouseY - mouseDownY) < 1) {
       setFocus(false);
     }
@@ -427,8 +427,8 @@ function GraphView(props) {
           <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Annotations</Button>
         </Box>
         <SearchBar update={(s) => {let l = []; makeActive(s, l); setActiveNodes(l); setFocus(true);}}/>
+        <Box width={100} float="right" marginRight="10px"> { props.children } </Box>
       </Flex>
-      <Box width={200} float="right" marginRight="10px"> { props.children } </Box>
     </React.Fragment>
   );
 }
