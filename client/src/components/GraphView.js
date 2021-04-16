@@ -33,11 +33,11 @@ function GraphView(props) {
   let layersRef = useRef(null);
   let alone = useRef(new Map());
 
-  const [xOffset, setXOffset] = useState(100.5);
-  const [yOffset, setYOffset] = useState(0.5);
+  const [xOffset, setXOffset] = useState(props.x);
+  const [yOffset, setYOffset] = useState(props.y);
 
-  let [origYOffset, setOrigYOffset] = useState(100.5);
-  let [origXOffset, setOrigXOffset] = useState(0.5);
+  let [origYOffset, setOrigYOffset] = useState(props.x);
+  let [origXOffset, setOrigXOffset] = useState(props.y);
 
   // Screen coordinates of center of each node
   const nodeCoords = useRef(new Map());
@@ -88,10 +88,10 @@ function GraphView(props) {
     maxX.current = max;
     alone.current = p[0];
 
-    if (layersRef.current[0].length > 0) {
+    /*if (layersRef.current[0].length > 0) {
       setXOffset(-layersRef.current[0].reduce((a, b) => a + b.coord, 0) / layersRef.current[0].length * 100);
       setOrigXOffset(-layersRef.current[0].reduce((a, b) => a + b.coord, 0) / layersRef.current[0].length * 100);
-    }
+    }*/
 
     setScaleFactor(0.4)
 
@@ -146,6 +146,8 @@ function GraphView(props) {
     if (mouseDown) {
       setXOffset(origXOffset + (mouseX - mouseDownX) / scaleFactor);
       setYOffset(origYOffset + (mouseY - mouseDownY) / scaleFactor);
+      props.updateX(xOffset);
+      props.updateY(yOffset);
     }
 
     for (let [node, coords] of nodeCoords.current) {
@@ -232,7 +234,7 @@ function GraphView(props) {
     if (!focus) {
       setActiveNodes([])
     }
-  } 
+  }
 
   function addAnnotation(id) {
     setAnnotations(annotations.concat([id]))
@@ -285,11 +287,9 @@ function GraphView(props) {
     }
     activeList.push(node);
     for (let edge of props.graph.get(node).edges) {
-
       if (!props.graph.has(edge.end)) {
         continue;
       }
-
       //Avoid crashing on a cyclic graph
       if (!activeList.includes(edge.end)) {
         makeActive(edge.end, activeList);

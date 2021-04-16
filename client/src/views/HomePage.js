@@ -22,6 +22,8 @@ export default function HomePage() {
   const [selectedConcentration, setSelectedConcentration] = useState("");
 
   const [currentGraph, setCurrentGraph] = useState(null);
+  const [graphX, setGraphX] = useState(0);
+  const [graphY, setGraphY] = useState(0);
 
   useEffect(() => {
     if (!selectedConcentration) {
@@ -191,6 +193,10 @@ export default function HomePage() {
           concentration={selectedConcentration}
           displayedAnnotation={displayedAnnotation}
           graph={(pathwayData && selectedConcentration && currentGraph) ? currentGraph : emptyGraph}
+          x={graphX}
+          y={graphY}
+          updateX={setGraphX}
+          updateY={setGraphY}
         >
 
           <Select 
