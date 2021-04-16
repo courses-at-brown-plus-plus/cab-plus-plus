@@ -351,14 +351,17 @@ function orderedMapFromCoords(coordMap) {
 
 function tempAssignCoords(nodeGraph, layeredGraph) {
   let result = [[]]
-  for (let i = 1; i < layeredGraph[0].length; i++) {
+  for (let i = 0; i < layeredGraph[0].length; i++) {
     result[0].push({id: layeredGraph[0][i].id, coord: i});
   }
 
-  for (let i = 1; i < layeredGraph.length; i++) {
+  for (let i = 0; i < layeredGraph.length; i++) {
     let medians = medianHeuristic1(nodeGraph, result.slice(0, i), layeredGraph[i]);
     result.push(arrangeNodes(orderedMapFromCoords(medians)))
   }
+
+  console.log(layeredGraph, result)
+
   return result;
 }
 
@@ -495,12 +498,15 @@ function expandGroup(group, layer) {
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
+
   let alone = separateGraph(result[0]);
+
   //addDummyVertices(nodeGraph, result[1]);
   //result = permuteGraph(result[1], nodeGraph);
   //removeDummyVertices(result[1], nodeGraph);
   //addInvisibleNodes(result);
   let temp = tempAssignCoords(nodeGraph, result);
+
   /*for (let i = 0; i < temp.length - 1; i++) {
     temp[i] = arrangeNodes(temp[i]);
   }*/

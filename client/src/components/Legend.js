@@ -21,10 +21,6 @@ function Legend(props) {
             </Thead>
             <Tbody>
                 <Tr>
-                    <Td><span id="grayDot"></span></Td>
-                    <Td>Unselected Course</Td>
-                </Tr>
-                <Tr>
                     <Td><span id="whiteDot"></span></Td>
                     <Td>Selected Course</Td>
                 </Tr>

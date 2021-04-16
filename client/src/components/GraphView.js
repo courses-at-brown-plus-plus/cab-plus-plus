@@ -16,6 +16,7 @@ const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 4;
 
 function GraphView(props) {
+
   const canvasRef = useRef(null);
 
   // access redux var for courses taken input on the sidebar
@@ -84,7 +85,7 @@ function GraphView(props) {
 
       for (let j = layers[i].length - 1; j >= 0; j--) {
         if (isNaN(layers[i][j].coord)) {
-          layers[i].splice(j, 1)
+          layers[i][j].coord = 0;
         }
       }
     }
