@@ -11,7 +11,10 @@ from selenium.common.exceptions import ElementClickInterceptedException
 
 
 class CABScraper:
+    """Class for scraping pages from Courses @ Brown."""
+
     def __init__(self, timeout=10):
+        """Uses Selenium to create a WebDriver and navigate to the C@B page."""
         self.driver = webdriver.Chrome()
         self.driver.get("https://cab.brown.edu/")
 
@@ -20,6 +23,7 @@ class CABScraper:
         self.course_codes = []
 
     def scrape_semester(self, semester):
+        """Selects a semester and scrapes all courses."""
         select_semester = Select(self.driver.find_element_by_id("crit-srcdb"))
         select_semester.select_by_visible_text(semester)
 
@@ -28,6 +32,7 @@ class CABScraper:
         self.scrape_course_range("coursetype_high")
 
     def scrape_course_range(self, value):
+        """Selects a course range (i.e. 0000-0999, 1000-1999, or 2000+) and scrapes all courses."""
         submit_button = self.driver.find_element_by_id("search-button")
         select_course_type = Select(self.driver.find_element_by_id("crit-coursetype"))
 
@@ -63,6 +68,7 @@ class CABScraper:
                     self.course_codes.append(course_code)
 
     def scrape_course(self, page_source):
+        """Scrapes information about a specific course based on the HTML source code."""
         course_info = {}
         soup = BeautifulSoup(page_source, 'lxml')
 
@@ -81,14 +87,10 @@ class CABScraper:
         if reg_restrictions is not None:
             if "Prerequisites:" in reg_restrictions:
                 if "minimum score of WAIVE" in reg_restrictions:
-                    prereqs = reg_restrictions[reg_restrictions.index(": ") + 2:reg_restrictions.index(" or minimum score of WAIVE")]
+                    prereqs = reg_restrictions[reg_restrictions.index(": ") +
+                                               2:reg_restrictions.index(" or minimum score of WAIVE")]
                 else:
                     prereqs = reg_restrictions[reg_restrictions.index(": ") + 2:reg_restrictions.index(".")]
-            # else:
-            #     if "Prerequisite" in course_desc_value:
-            #         starting_index = course_desc_value.index(": ")
-            #         prereqs = course_desc_value[starting_index + 2
-            #                                     :course_desc_value.index(";", starting_index)]
 
         course_info["courseName"] = course_name
         course_info["courseDesc"] = course_desc_value
@@ -106,15 +108,19 @@ class CABScraper:
         return course_info
 
     def wait(self, condition):
+        """Pauses the driver until a certain condition is met."""
         return WebDriverWait(self.driver, self.timeout).until(condition)
     
     def check_section(self, section):
+        """Checks whether a section exists and returns the text if so."""
         if section is None:
             return None
         else:
             return section.find('div', class_='section__content').get_text()
 
     def parse_prereqs(self, prereqs):
+        """Parses the prerequisites for a class into a list format, where each element is either a list of
+        equivalent prereqs or a single prereq."""
         class_name_regex = r"[A-Z]{3,4} \d{4}[A-Z]?"
 
         if prereqs[:2] == "((":
@@ -175,6 +181,7 @@ class CABScraper:
         return cleaned_with_departments
 
     def save_to_csv(self, filename):
+        """Saves scraped course data to the specified file."""
         csv_columns = ["courseCode", "courseName", "courseDesc", "preReqs",
                        "FYS", "SOPH", "DIAP", "WRIT", "CBLR", "COEX"]
         try:

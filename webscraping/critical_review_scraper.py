@@ -15,6 +15,8 @@ from cookies import COOKIES
 
 
 def avg(l):
+    """Averages the elements of l, converting them from string to numeric representation, and returns both the average
+    and total number of nonempty elements."""
     count = len(l)
     sum = 0
     for review in l:
@@ -31,6 +33,7 @@ def avg(l):
 
 
 def count_elem(l, elem):
+    """Counts the number of times elem is in l."""
     count = 0
     for review in l:
         if review == elem:
@@ -39,12 +42,17 @@ def count_elem(l, elem):
 
 
 def compile_courses(filename):
+    """Reads all courses from a C@B data file."""
     cab_data = pd.read_csv(filename)
     return cab_data["courseCode"]
 
 
 class CritReviewScraper:
-    def __init__(self, filename, timeout=10):
+    """Class for scraping pages from Courses @ Brown."""
+
+    def __init__(self, timeout=10):
+        """Uses Selenium to create a WebDriver, navigate to the Critical Review homepage, and add in a cookie
+        to bypass two-factor authentication."""
         self.driver = webdriver.Chrome()
         self.driver.get("https://thecriticalreview.org")
 
@@ -54,10 +62,10 @@ class CritReviewScraper:
                                 "value": COOKIES["Critical Review"]})
 
         self.timeout = timeout
-        self.filename = filename
         self.courses = []
 
     def scrape_course(self, course):
+        """Searches for a course and scrapes its most recent review."""
         print(course)
 
         department = course[:course.index(" ")]
@@ -137,6 +145,7 @@ class CritReviewScraper:
             self.courses.append(course_review_info)
 
     def save_to_csv(self, filename):
+        """Saves course review data to a CSV specified by filename."""
         csv_columns = ["courseCode", "courseRating", "freshmen", "sophomores", "juniors", "seniors", "gradStudents",
                        "avgHrs", "maxHrs", "readingsWorthwhile", "materialsUseful", "difficult", "learnedALot",
                        "enjoyedCourse", "timelyGrading", "fairGrading",
@@ -155,7 +164,7 @@ class CritReviewScraper:
 
 courses = compile_courses("../server/data/CAB_v2.csv")
 filename = input("What file should data be saved to (ex: CritReview_data.csv)?\t")
-scraper = CritReviewScraper(filename)
+scraper = CritReviewScraper()
 for course in courses:
     scraper.scrape_course(course)
 scraper.save_to_csv(filename)
