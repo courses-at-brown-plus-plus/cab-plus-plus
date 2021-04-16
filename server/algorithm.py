@@ -155,7 +155,7 @@ class MetadataComparison(object):
         self.data = CsvLoader(metadata_loc, ind_col=0)
 
         # Hyperparams
-        self.priority_weight = [0.4, 0.25, 0.15, 0.1]
+        self.priority_weight = [0.5, 0.25, 0.15, 0.1]
         self.total = 1.0
 
     def __str__(self):
@@ -251,8 +251,8 @@ class Algorithm(object):
         self.metadata_compare = metadata_compare
 
         # Hyperparams
-        self.text_weight = 0.8
-        self.metadata_weight = 0.2
+        self.text_weight = 0.7
+        self.metadata_weight = 0.3
     
     def get_recs(self, course_list: list, priorities: list, num: int = 1):
         """Gets course recommendations based on the course list and priorities. If a num is specified,
