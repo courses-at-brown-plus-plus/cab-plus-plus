@@ -239,7 +239,7 @@ export default function HomePage() {
           }
         </Box>
 
-        <Box m="0 auto">
+        <Box ml={"0 auto"}>
           <Legend />
         </Box>
       </Stack>

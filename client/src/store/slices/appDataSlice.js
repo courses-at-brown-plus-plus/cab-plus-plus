@@ -37,6 +37,7 @@ export const slice = createSlice({
       });
 
       state.recommendedCourses = { ...newRecommendedCourseData };
+      console.log(state.recommendedCourses)
     },
     addCourseTaken: (state, action) => {
       state.coursesTaken.push(action.payload);
