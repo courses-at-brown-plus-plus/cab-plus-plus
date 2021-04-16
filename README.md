@@ -58,13 +58,23 @@ _On your first meeting with your mentor TA, you should plan dates for at least t
 **Adversary Checkpoint:** _(Schedule for on or before April 12 once you are assigned an adversary TA)_
 
 ## How to Build and Run
-_A necessary part of any README!_
+
+### Frontend
+1. `npm install` in `client/`
+2. `npm start` in `client` to start the webpage on localhost port 3000
+
+### Backend
+1. `pip install -r requirements.txt` in `server/`
+2. Add a `CABPP_MONGO_CONNECTION` environment variable, with the connection string for your MongoDB setup to store issue reports
+3. `python app.py` in `server/` to start the server on localhost port 5000
+4. Either generate your own `data/similarities_v2.csv`, or contact us and we'll either give you the file download, or send you the remote access url to use in an environment variable.
 
 
 ## Resources & REST API table
-| URL/ENDPOINT             | VERB | DESCRIPTION                                             |
-|--------------------------|------|---------------------------------------------------------|
-| /allPathwayData/         | GET  | Retrieves pathway data scraped                          |
-| /allCourseCodes/         | GET  | Returns all available course codes                      |
-| /generateRecommendations | POST | Generates recommendations { courses_taken, priorities } |
+| URL/ENDPOINT             | VERB | DESCRIPTION                                                   |
+|--------------------------|------|---------------------------------------------------------------|
+| /allPathwayData          | GET  | Retrieves pathway data scraped                                |
+| /allCourseCodes          | GET  | Returns all available course codes                            |
+| /generateRecommendations | POST | Generates recommendations { courses_taken, priorities }       |
+| /logIssue                | POST | Logs issue to database { issue_type, prereq_id, unlocked_id } |
 
