@@ -185,7 +185,7 @@ function arrangeNodes(layer) {
     }
 
     let counter = 0;
-    while (counter < 1000000) {
+    while (counter < 100000) {
         counter++;
         for (let id of dxMap.keys()) {
           dxMap.set(id, 0);

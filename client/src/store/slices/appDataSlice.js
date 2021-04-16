@@ -36,7 +36,12 @@ export const slice = createSlice({
         newRecommendedCourseData.push(ret);
       });
 
-      state.recommendedCourses = { ...newRecommendedCourseData };
+      /*let filteredData = [];
+      newRecommendedCourseData.forEach((course) => {
+        console.log(state.coursesTaken);
+      })*/
+
+      state.recommendedCourses = { ...newRecommendedCourseData.slice(0, 5) };
     },
     addCourseTaken: (state, action) => {
       state.coursesTaken.push(action.payload);

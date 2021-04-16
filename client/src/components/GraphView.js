@@ -257,7 +257,11 @@ function GraphView(props) {
       ctx.fillStyle = COLORS.courseAvailable;
     }
 
-    ctx.fillRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
+    ctx.fillRect(
+      x - scaleFactor * NODE_WIDTH / 2, 
+      y - scaleFactor * NODE_HEIGHT / 2, 
+      scaleFactor * NODE_WIDTH, 
+      scaleFactor * NODE_HEIGHT);
     if (activeNodes.includes(node.id)) {
       ctx.strokeStyle = 'black';
     } else if (annotations.includes(node.id)) {
@@ -267,7 +271,11 @@ function GraphView(props) {
       ctx.strokeStyle = '#ccc';
     }
 
-    ctx.strokeRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
+    ctx.strokeRect(
+      x - scaleFactor * NODE_WIDTH / 2, 
+      y - scaleFactor * NODE_HEIGHT / 2, 
+      scaleFactor * NODE_WIDTH, 
+      scaleFactor * NODE_HEIGHT);
     ctx.lineWidth = 1 * scaleFactor;
     ctx.setLineDash([]);
     ctx.save()
@@ -275,7 +283,9 @@ function GraphView(props) {
     ctx.fillStyle = 'black';
     ctx.font = "14px Helvetica";
     ctx.textAlign = "center";
-    ctx.fillText(node.id, (x - scaleFactor * NODE_WIDTH / 2 + NODE_WIDTH / 2 * scaleFactor) / scaleFactor, ( y - scaleFactor * NODE_HEIGHT / 2 + 20 * scaleFactor) / scaleFactor);
+    ctx.fillText(node.id, 
+      (x - scaleFactor * NODE_WIDTH / 2 + NODE_WIDTH / 2 * scaleFactor) / scaleFactor, 
+      (y - scaleFactor * NODE_HEIGHT / 2 + 20 * scaleFactor) / scaleFactor);
     ctx.restore();
     ctx.globalAlpha = 1;
   }
@@ -336,7 +346,7 @@ function GraphView(props) {
     for (let [id, coords] of alone.current) {
       let x = maxX.current * 100 + (coords[0] + 5) * 100;
       nodeCoords.current.set(id, 
-        [scaleFactor * (x + xOffset) + props.width / 2,
+        [scaleFactor * (x + xOffset) + props.width / 2 - layersRef.current[0].length / 2 * 100 * scaleFactor,
          scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
@@ -348,7 +358,7 @@ function GraphView(props) {
         let x = props.width / 2 + (layersRef.current[i][j].coord) * 100;
 
         nodeCoords.current.set(layersRef.current[i][j].id, 
-          [scaleFactor * (x + xOffset) + props.width / 2, 
+          [scaleFactor * (x + xOffset) + props.width / 2 - layersRef.current[0].length / 2 * 100 * scaleFactor, 
           scaleFactor * (y + yOffset) + props.height / 2]);
         x += 100;
       }
