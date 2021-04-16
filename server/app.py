@@ -6,7 +6,7 @@ from flask_pymongo import PyMongo, ObjectId
 import os
 from datetime import datetime
 import csv
-from algorithm import TextComparison, MetadataComparison, Algorithm
+from course_recommendations.algorithm import TextComparison, MetadataComparison, Algorithm
 
 # CONSTANTS
 REMOTE_DATA_URL = os.environ.get("CABPP_SIMILARITIES_URL")

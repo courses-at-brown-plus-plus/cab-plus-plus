@@ -1,6 +1,6 @@
 # How to use
 
-Before using the server properly, a data/similarities.csv has to be genenerated. In order to do so, download the model as dictated by the README.md in the models folder, and then generate the csv by running the command `python3 algorithm.py -m "./models/universal-sentence-encoder_4" -d "./data/CAB_v1.csv" -s "./data/similarities.csv"`.
+Before using the server properly, a data/similarities.csv has to be genenerated. In order to do so, download the model as dictated by the README.md in the models folder, and then generate the csv by running the command `python3 algorithm.py -m "./models/universal-sentence-encoder_4" -d "./data/CAB_v2.csv" -s "./data/similarities_v2.csv"`.
 
 # Usage of algorithm.py
 
