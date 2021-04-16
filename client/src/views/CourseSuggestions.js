@@ -48,11 +48,24 @@ export default function CourseSuggestions() {
     }
 
     let priorities = [];
-    Object.keys(priorities).forEach((keyName) => {
-      let value = priorities[keyName];
-      if (value != "")
-        priorities.push(value);
+    Object.keys(priorityContents).forEach((keyName) => {
+      let aPriorityTitle = priorityContents[keyName];
+      if (aPriorityTitle !== "") {
+        priorities.push(aPriorityTitle);
+      }
     });
+
+    let uniquePriorities = [...new Set(priorities)];
+    if (uniquePriorities.length != priorities.length) {
+      toast({
+        title: "Recommendation generation",
+        description: "Contains duplicate priorities", 
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+
     dispatch(GetRecommendations({ 
       priorities: priorities,
       courses_taken: coursesTaken
