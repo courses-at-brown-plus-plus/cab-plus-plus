@@ -214,9 +214,9 @@ class MetadataComparison(object):
                 grading = ((float(self.data.get_data("fairGrading")[course].strip("()").split(", ")[0])) / 5.0)
             else:
                 grading = None
-
-            priority_vals = {"Low Time Commitment": time_commitment, "Low Difficulty": difficulty, "High Enjoyment": enjoyment, 
-                        "Suitability for none-concentrators": non_conc, "Small class size": class_size, "Fair grading": grading}
+            
+            priority_vals = {"Low time commitment": time_commitment, "Low difficulty": difficulty, "High enjoyment": enjoyment, 
+                        "Suitability for non-concentrators": non_conc, "Small class size": class_size, "Fair grading": grading}
             return priority_vals
 
     
