@@ -215,7 +215,7 @@ class MetadataComparison(object):
             else:
                 grading = None
 
-            priority_vals = {"Time Commitment": time_commitment, "Difficulty": difficulty, "Enjoyment": enjoyment, 
+            priority_vals = {"Low Time Commitment": time_commitment, "Low Difficulty": difficulty, "High Enjoyment": enjoyment, 
                         "Suitability for none-concentrators": non_conc, "Small class size": class_size, "Fair grading": grading}
             return priority_vals
 
@@ -302,8 +302,10 @@ if __name__ == "__main__":
             department_similarity_loc = [x[1] for x in opts if x[0]=="-d"][0]
             text_compare.import_department_similarity(department_similarity_loc)
 
+        algorithm = Algorithm(text_compare, metadata_compare)
+
         if '-n' in flags:
-            print(text_compare.get_most_similar(course, int([x[1] for x in opts if x[0]=="-n"][0])))
+            print(algorithm.get_recs([course], [], int([x[1] for x in opts if x[0]=="-n"][0])))
         else:
             print(text_compare.get_most_similar(course))
         sys.exit()

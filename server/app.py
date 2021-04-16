@@ -83,7 +83,7 @@ def generateRecommendations():
     #  print("priorities" + priorities)
 
     # Run algorithm here
-    recommended_courses = algorithm.get_recs(courses_taken, priorities, 5)
+    recommended_courses = algorithm.get_recs(courses_taken, priorities, 10)
     print("request received generate recs")
     print("recommended_courses: ")
     print(recommended_courses)
