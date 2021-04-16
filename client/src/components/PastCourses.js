@@ -6,6 +6,7 @@ import { selectAllCourseCodes, selectCoursesTaken,
 import { InputGroup, Input, useToast, 
   Button, Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
 
+import CourseAutocomplete from '../components/CourseAutocomplete';
 
 export default function PastCourses(props) {
 
@@ -17,24 +18,24 @@ export default function PastCourses(props) {
   const [courseExists, setCourseExists] = useState(true);
   const [courseInputValue, setCourseInputValue] = useState("");
 
-  function handleAddCourse() {
-    if (allCourseCodes.includes(courseInputValue)) {
-      if (!coursesTaken.includes(courseInputValue)) {
-        dispatch(addCourseTaken(courseInputValue));
-      }
-      setCourseInputValue("");
-      setCourseExists(true);
-    }
-    else {
-      setCourseExists(false);
-      toast({
-        title: "Invalid course code",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-  }
+  // function handleAddCourse() {
+  //   if (allCourseCodes.includes(courseInputValue)) {
+  //     if (!coursesTaken.includes(courseInputValue)) {
+  //       dispatch(addCourseTaken(courseInputValue));
+  //     }
+  //     setCourseInputValue("");
+  //     setCourseExists(true);
+  //   }
+  //   else {
+  //     setCourseExists(false);
+  //     toast({
+  //       title: "Invalid course code",
+  //       status: "error",
+  //       duration: 2000,
+  //       isClosable: true,
+  //     });
+  //   }
+  // }
 
   function handleCloseTag(courseName) {
     dispatch(removeCourseTaken(courseName));
@@ -42,15 +43,26 @@ export default function PastCourses(props) {
 
   return (
     <div style={{width: "20vw", marginRight: "3rem"}}>
-      <InputGroup style={(courseExists) ? styles.inputGroup: styles.inputGroupError}>
-        <Input 
-          value={courseInputValue} 
-          onChange={(e) => setCourseInputValue(e.target.value)}
-          style={styles.courseInput}
-          placeholder="Course ID"
-        />
-        <Button onClick={handleAddCourse} style={styles.addCourseButton}>Add Course</Button>
-      </InputGroup>
+      {
+      // <InputGroup style={(courseExists) ? styles.inputGroup: styles.inputGroupError}>
+      //   <Input 
+      //     value={courseInputValue} 
+      //     onChange={(e) => setCourseInputValue(e.target.value)}
+      //     style={styles.courseInput}
+      //     placeholder="Course ID"
+      //   />
+      //   <Button onClick={handleAddCourse} style={styles.addCourseButton}>Add Course</Button>
+      // </InputGroup>
+      }
+
+      <CourseAutocomplete 
+        allCourseCodes={allCourseCodes} 
+        handleAddCourse={(newCourseCode) => {
+          if (!coursesTaken.includes(newCourseCode)) {
+            dispatch(addCourseTaken(newCourseCode));
+          }
+        }}
+      />
       <br/>
 
       <div style={styles.tagContainer}>
@@ -71,7 +83,6 @@ export default function PastCourses(props) {
           ))
         }
       </div>
-
     </div>
   );
 

@@ -8,8 +8,6 @@ import { InputGroup, Input, useToast,
 function SearchBar(props) {
 
     let [courseInputValue, setCourseInputValue] = useState("");
-
-
     return (
         <InputGroup style={styles.inputGroup}>
             <Input 
