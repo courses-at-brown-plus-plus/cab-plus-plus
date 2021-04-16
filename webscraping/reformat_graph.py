@@ -15,10 +15,10 @@ with open('../server/data/CAB_v2.csv') as csvFile:
         # Convert string to nested list
         prereqs = eval(row['preReqs'])
 
-        for prereq in prereqs:
-            port = 0
-            maxPort = 0
+        port = 0
+        maxPort = 0
 
+        for prereq in prereqs:
             if type(prereq) == str:
                 port = 0
                 if prereq not in cab_data:
@@ -32,7 +32,7 @@ with open('../server/data/CAB_v2.csv') as csvFile:
                         cab_data[subreq] = []
                     cab_data[subreq].append((course_code, port))
 
-print(cab_data['CSCI 0160'])
+print(cab_data['MATH 0540'])
 
 for row in rows:
     row['preReqs'] = cab_data[row['courseCode']]

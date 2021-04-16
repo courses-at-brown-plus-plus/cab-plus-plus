@@ -113,11 +113,25 @@ function GraphView(props) {
 
     let startCourses = coursesTaken.concat(annotations);
 
+    let ports = new Map();
+
     if (nodeGraph) {
       for (let i = 0; i < startCourses.length; i++) {
         if (nodeGraph.has(startCourses[i])) {
           for (let j = 0; j < nodeGraph.get(startCourses[i]).edges.length; j++) {
-            newNextCourses.push(nodeGraph.get(startCourses[i]).edges[j].end);
+            let potential = props.graph.get(nodeGraph.get(startCourses[i]).edges[j].end);
+            if (potential === undefined) {
+              continue;
+            }
+            if (!ports.has(potential)) {
+              console.log(potential.id, potential.ports)
+              ports.set(potential, [...Array(potential.ports).keys()]);
+            }
+            console.log(potential.id, ports.get(potential))
+            ports.get(potential).splice(ports.get(potential).indexOf(nodeGraph.get(startCourses[i]).edges[j].port), 1)
+            if (ports.get(potential).length === 0) {
+              newNextCourses.push(potential.id)
+            }
           }
         }
       }

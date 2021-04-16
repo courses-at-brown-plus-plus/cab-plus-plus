@@ -28,6 +28,8 @@ export default function HomePage() {
       return;
     }
     let aGraph = new Map();
+    let ports = new Map();
+
     for (let course in pathwayData) {
       let include = false;
       for (let edge of pathwayData[course]['preReqs']) {
@@ -42,14 +44,26 @@ export default function HomePage() {
       if (aGraph.has(course)) {
         continue;
       }
-      let node = new CourseNode(pathwayData[course]['courseCode'], [], [], false, false, 
+
+      let node = new CourseNode(pathwayData[course]['courseCode'], [], 0, false, false, 
         pathwayData[course]['courseName'], pathwayData[course]['courseDesc'], [pathwayData[course]['FYS'], 
           pathwayData[course]['SOPH'], pathwayData[course]['DIAP'], pathwayData[course]['WRIT'],
           pathwayData[course]['CBLR'], pathwayData[course]['COEX']])
       for (let edge of pathwayData[course]['preReqs']) {
         node.edges.push(new Edge(pathwayData[course]['courseCode'], edge[0], edge[1]))
+        if (!ports.has(edge[0])) {
+          ports.set(edge[0], 0);
+        }
+        if (ports.get(edge[0]) < edge[1]) {
+          ports.set(edge[0], edge[1]);
+        }
       }
       aGraph.set(course, node);
+    }
+    for (let [id, p] of ports) {
+      if (aGraph.has(id)) {
+        aGraph.get(id).ports = p;
+      }
     }
     setCurrentGraph(aGraph);
   }, [selectedConcentration, pathwayData]);

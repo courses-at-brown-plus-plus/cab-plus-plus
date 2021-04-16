@@ -355,12 +355,10 @@ function tempAssignCoords(nodeGraph, layeredGraph) {
     result[0].push({id: layeredGraph[0][i].id, coord: i});
   }
 
-  for (let i = 0; i < layeredGraph.length; i++) {
+  for (let i = 1; i < layeredGraph.length; i++) {
     let medians = medianHeuristic1(nodeGraph, result.slice(0, i), layeredGraph[i]);
     result.push(arrangeNodes(orderedMapFromCoords(medians)))
   }
-
-  console.log(layeredGraph, result)
 
   return result;
 }
