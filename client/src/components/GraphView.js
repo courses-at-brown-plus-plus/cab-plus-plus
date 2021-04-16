@@ -6,7 +6,7 @@ import { Button, Box, Flex, useDisclosure } from "@chakra-ui/react"
 import { useSelector } from 'react-redux';
 import { selectCoursesTaken } from '../store/slices/appDataSlice';
 import AnnotationSave from './AnnotationSave';
-// import SearchBar from './SearchBar'
+import { COLORS } from '../constants'
 import CourseAutocomplete from '../components/CourseAutocomplete';
 
 const NODE_WIDTH = 80;
@@ -250,9 +250,9 @@ function GraphView(props) {
     }
     ctx.fillStyle = 'white';
     if (coursesTaken.includes(node.id)) {
-      ctx.fillStyle = '#6c6';
+      ctx.fillStyle = COLORS.courseTaken;
     } else if (nextCourses.includes(node.id)) {
-      ctx.fillStyle = '#cfc';
+      ctx.fillStyle = COLORS.courseAvailable;
     }
 
     ctx.fillRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
@@ -267,6 +267,7 @@ function GraphView(props) {
 
     ctx.strokeRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
     ctx.lineWidth = 1 * scaleFactor;
+    ctx.setLineDash([]);
     ctx.save()
     ctx.scale(scaleFactor, scaleFactor);
     ctx.fillStyle = 'black';

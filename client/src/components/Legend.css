@@ -2,7 +2,7 @@
 
 }
 
-#greenDot, #lightGreenDot, #whiteDot, #lightGreenDotOutline, #grayDot {
+.dot, .borderlessDot {
   height: 20px;
   width: 20px;
   border-radius: 50%;
@@ -11,27 +11,10 @@
   transform: translate(-50%, 0);
 }
 
-#greenDot {
-  background-color: #4b4;
+.dot {
+  border: 1px solid lightgray;
 }
 
-#lightGreenDot {
-  background-color: #8e8;
-}
-
-#whiteDot {
-  background-color: #fff;
-  border: 1px solid gray;
-}
-
-#lightGreenDotOutline {
-  background-color: #8e8;
-  border: 3px solid #4b4;
-}
-
-#grayDot {
-    background-color: #eee;
-}
 
 Td {
     white-space: nowrap;

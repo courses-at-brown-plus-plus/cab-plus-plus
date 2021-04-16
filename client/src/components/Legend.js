@@ -4,8 +4,9 @@ import { Box, Table,
   Tr,
   Th,
   Td
-} from "@chakra-ui/react"
+} from "@chakra-ui/react";
 import './Legend.css';
+import { COLORS } from '../constants';
 
 function Legend(props) {
     return (
@@ -19,19 +20,21 @@ function Legend(props) {
             </Thead>
             <Tbody>
                 <Tr>
-                    <Td><span id="whiteDot"></span></Td>
+                    <Td><span className="dot" style={{backgroundColor: 'white'}}></span></Td>
                     <Td>Selected Course</Td>
                 </Tr>
                 <Tr>
-                    <Td><span id="greenDot"></span></Td>
+                    <Td><span className="borderlessDot" style={{backgroundColor: COLORS.courseTaken}}></span></Td>
                     <Td>Course Taken</Td>
                 </Tr>
                 <Tr>
-                    <Td><span id="lightGreenDot"></span></Td>
+                    <Td><span className="dot" style={{backgroundColor: COLORS.courseAvailable}}></span></Td>
                     <Td>Available Course</Td>
                 </Tr>
                 <Tr>
-                    <Td><span id="lightGreenDotOutline"></span></Td>
+                    <Td><span className="borderlessDot" 
+                    style={{backgroundColor: COLORS.courseAvailable, borderWidth: "3px", borderColor: COLORS.courseTaken}}
+                    ></span></Td>
                     <Td>Annotated Course</Td>
                 </Tr>
             </Tbody>

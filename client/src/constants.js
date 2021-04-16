@@ -83,3 +83,8 @@ export const PATHWAY_DATA = {
   }
 }
 
+export const COLORS = {
+  'courseTaken': '#6c6',
+  'courseAvailable': '#cfc'
+}
+
