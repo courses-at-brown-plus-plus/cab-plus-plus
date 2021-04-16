@@ -1,5 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const MAX_SIMILARITY = 0.7;
+
+// Additional hard-coded course equivalencies that the algorithm misses
+const COURSE_EQUIVALENCIES = []
+const COURSE_HIERARCHIES = new Map();
+COURSE_HIERARCHIES.set('MUSC 0550', ['MUSC 0400A', 'MUSC 0400B'])
+
 export const slice = createSlice({
   name: 'appData', 
   initialState: {
@@ -33,13 +40,33 @@ export const slice = createSlice({
           link: `https://thecriticalreview.org/search/${aCode.substring(0, 4)}/${aCode.substring(5, aCode.length)}`
           // eg: https://thecriticalreview.org/search/CSCI/0320
         };
-        newRecommendedCourseData.push(ret);
+
+        // Filter out courses that have similar children nodes to remove course equivalencies
+        let shouldAdd = true;
+        state.coursesTaken.forEach((courseTaken) => {
+          let next1 = state.pathwayData[aCode].preReqs.map((e) => e[0]);
+          let next2 = state.pathwayData[courseTaken].preReqs.map((e) => e[0]);
+          let matches = next1.reduce((a, b) => a + next2.includes(b), 0);
+          if (next2.length !== 0 && matches / next2.length > MAX_SIMILARITY) {
+            shouldAdd = false;
+            return;
+          }
+          if (COURSE_HIERARCHIES.has(courseTaken) && COURSE_HIERARCHIES.get(courseTaken).includes(aCode)) {
+            shouldAdd = false;
+            return;
+          }
+          COURSE_EQUIVALENCIES.forEach((eq) => {
+            if (eq.includes(aCode) && eq.includes(courseTaken)) {
+              shouldAdd = false;
+              return;
+            }
+          })
+        })
+        if (shouldAdd) {
+          newRecommendedCourseData.push(ret);
+        }
       });
 
-      /*let filteredData = [];
-      newRecommendedCourseData.forEach((course) => {
-        console.log(state.coursesTaken);
-      })*/
 
       state.recommendedCourses = { ...newRecommendedCourseData.slice(0, 5) };
     },
