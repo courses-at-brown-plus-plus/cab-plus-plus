@@ -20,8 +20,8 @@ export default function CourseAutocomplete(props) {
   }, [allCourseCodes]);
 
   useEffect(() => {
-    if (selectedCourseCode !== "") {
-      let newCourseCode = selectedCourseCode;
+    if (selectedCourseCode !== null && selectedCourseCode !== "") {
+      let newCourseCode = selectedCourseCode
       props.handleAddCourse(newCourseCode);
       setSelectedCourseCode("");
     }
@@ -33,15 +33,21 @@ export default function CourseAutocomplete(props) {
     }
   }
 
+  const widthValue = (props.sm) ? 200 : 380;
+
   return (
     <div>
       <Autocomplete
         options={courseCodes}
         getOptionLabel={(option) => option.title}
-        style={{ width: 380 }}
+        style={{ width: widthValue }}
         value={selectedCourseCode}
         onChange={(event, newInputValue) => {handleSelectCourseCode(newInputValue)}}
-        renderInput={(params) => <TextField {...params} label="Course ID" variant="outlined" /> }
+        renderInput={(params) => 
+          <TextField {...params} 
+            label={(props.title) ? props.title : "Course ID" }
+            variant="outlined" 
+          /> }
       />
     </div>
   );

@@ -7,7 +7,8 @@ import { Button, Box, Flex, useDisclosure } from "@chakra-ui/react"
 import { useSelector } from 'react-redux';
 import { selectCoursesTaken } from '../store/slices/appDataSlice';
 import AnnotationSave from './AnnotationSave';
-import SearchBar from './SearchBar'
+// import SearchBar from './SearchBar'
+import CourseAutocomplete from '../components/CourseAutocomplete';
 
 const NODE_WIDTH = 80;
 const NODE_HEIGHT = 50;
@@ -426,9 +427,22 @@ function GraphView(props) {
           />
           <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Annotations</Button>
         </Box>
-        <SearchBar update={(s) => {let l = []; makeActive(s, l); setActiveNodes(l); setFocus(true);}}/>
-      </Flex>
+        {
+          // <SearchBar update={(s) => {let l = []; makeActive(s, l); setActiveNodes(l); setFocus(true);}}/>
+        }
       <Box width={200} float="right" marginRight="10px"> { props.children } </Box>
+      </Flex>
+      <Flex justifyContent="flex-end">
+        <CourseAutocomplete 
+          title="Search for course ID"
+          handleAddCourse={(newCourseCode) => { 
+            let l = [];
+            makeActive(newCourseCode, l); 
+            setActiveNodes(l); 
+            setFocus(true);
+          }}
+        />
+      </Flex>
     </React.Fragment>
   );
 }

@@ -10,7 +10,7 @@ import { selectPathwayData, selectAnnotations } from '../store/slices/appDataSli
 import { AVAILABLE_CONCENTRATIONS } from '../constants';
 
 import Legend from '../components/Legend'
-import SearchBar from '../components/SearchBar'
+// import SearchBar from '../components/SearchBar'
 
 // import axios from 'axios';
 

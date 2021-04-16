@@ -68,21 +68,22 @@ export default function ReportPopup() {
     setAddUnlockedCourseExists(unlockedValid);
 
     if (prereqValid && unlockedValid) {
-      if (!prereqExists(prereqCourse, unlockedCourse))
+      if (!prereqExists(prereqCourse, unlockedCourse)) {
         dispatch(ReportIssue({
           issueType: "add",
           prereqCourse: addPrereqInputVal, 
           unlockedCourse: addUnlockedInputVal
         }));
-      setAddPrereqInputVal("");
-      setAddUnlockedInputVal("");
-      onClose();
-    }
-    else {
-      dispatch(broadcastError({
-        errorMessage: "This prerequisite already exists", 
-        issueReportState: -1
-      }));
+        setAddPrereqInputVal("");
+        setAddUnlockedInputVal("");
+        onClose();
+      }
+      else {
+        dispatch(broadcastError({
+          errorMessage: "This prerequisite already exists", 
+          issueReportState: -1
+        }));
+      }
     }
   }
 
