@@ -22,10 +22,8 @@ function GraphView(props) {
   const coursesTaken = useSelector(selectCoursesTaken);
   const popup = useDisclosure();
 
+  //Courses that the user may take based on their satisfied reqs
   const [nextCourses, setNextCourses] = useState([]);
-
-  // dummy data equivalent
-  // const coursesTaken = ["CSCI 0190"];
   
   let nodeGraph = props.graph;
   let layersRef = useRef(null);
@@ -181,7 +179,7 @@ function GraphView(props) {
         return;
       }
     }
-    
+
     if (Math.abs(mouseX - mouseDownX) < 1 && Math.abs(mouseY - mouseDownY) < 1) {
       setFocus(false);
     }

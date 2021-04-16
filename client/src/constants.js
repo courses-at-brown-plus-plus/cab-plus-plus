@@ -10,7 +10,11 @@ export const AXIOS_CONFIG = {
 };
 
 export const AVAILABLE_CONCENTRATIONS = [ 
-"AFRI", "PHIL", "CSCI", "VISA", "MATH", "ECON", "BIOL", "ENGL", "PHYS", "ENGN"
+"AFRI", "AMST", "ANTH", "APMA", "ARAB", "ARCH", "ASYR", "BIOL", "CHEM", "CHIN", "CLAS", "CLPS", "COLT", 
+"COST", "CSCI", "DATA", "EAST", "ECON", "EDUC", "EEPS", "ENGL", "ENGN", "ENVS", "ETHN", "FREN", "GNSS",
+"GREK", "GRMN", "HIAA", "HISP", "HIST", "IAPA", "ITAL", "JAPN", "JUDS", "KREA", "LACA", "LATN", "LITR", 
+"MATH", "MCM", "MUSC", "NEUR", "PHIL", "PHP", "PHYS", "POBS", "POLS", "RELS", "RUSS", "SANS", "SAST", 
+"SIGN", "SOC", "TAPS", "VISA"
 ];
 
 export const RECOMMENDED_COURSES = [
