@@ -1,4 +1,4 @@
-import { Edge, CourseNode } from './Graph';
+
 
 /*Sugiyama's algorithm overview
   1) Give each vertex a vertical position based on the longest path from the vertex to the 
@@ -15,7 +15,7 @@ import { Edge, CourseNode } from './Graph';
 // Convert from node representation to edge representation
 function nodeToEdgeGraph(nodeGraph) {
   let result = new Set();
-  for (let [id, node] of nodeGraph.entries()) {
+  for (let node of nodeGraph.values()) {
     for (let edge of node.edges) {
       result.add(edge);
     }
@@ -97,6 +97,10 @@ function layerGraph(nodeGraph) {
   return result;
 }
 
+/*
+Given the top layer of a graph, removes all nodes that have no children, and returns
+those nodes in a separate list
+*/
 function separateGraph(topLayer) {
   let alone = new Map();
   for (let i = topLayer.length - 1; i >= 0; i--) {
@@ -108,96 +112,27 @@ function separateGraph(topLayer) {
   return alone;
 }
 
+/*
+Consumes a map of id : CourseNode, and returns a map of id : [x, y] such that
+the [x, y] coordinates arrange the nodes into a square grid.
+*/
 function box(nodeMap) {
   let width = Math.floor(Math.sqrt(nodeMap.size));
   let i = 0;
   let result = new Map();
 
-  for (let [id, node] of nodeMap) {
+  for (let id of nodeMap.keys()) {
     result.set(id, [i % width, Math.floor(i / width)])
     i++;
   }
   return result;
 }
 
-//Replace edges that span multiple lines with smaller edges that meet at dummy vertices
-function addDummyVertices(nodeGraph, layeredGraph) {
-  let depths = longestPath(nodeGraph);
-  for (let j = 0; j < layeredGraph.length - 1; j++) {
-    for (let k = 0; k < layeredGraph[j].length; k++) {
-      let node = layeredGraph[j][k]; 
-      for (let i = 0; i < node.edges.length; i++) {
-        let edge = node.edges[i];
-        let startDepth = j;
-        let endDepth = depths.get(nodeGraph.get(edge.end));
-        if (endDepth - startDepth === 1) {
-          continue;
-        }
-        let dNode = new CourseNode('' + i + ',' + j + ',' + k, [], [], true)
-        layeredGraph[j + 1].push(dNode)
-        nodeGraph.set('' + i + ',' + j + ',' + k, dNode)
-        node.edges[i] = new Edge(edge.start, dNode.id, edge.port);
-        dNode.edges.push(new Edge(dNode.id, edge.end, edge.port));
-      }
-    }
-  }
-}
-
-// Detect crossings between two layers
-function countCrossings(layer1, layer2, nodeGraph) {
-  let crossings = 0;
-  for (let node1 of layer1) {
-    for (let edge1 of node1.edges) {
-      for (let node2 of layer1) {
-        for (let edge2 of node2.edges) {
-          let start1 = layer1.indexOf(nodeGraph.get(edge1.start));
-          let start2 = layer1.indexOf(nodeGraph.get(edge2.start));
-          let end1 = layer2.indexOf(nodeGraph.get(edge1.end));
-          let end2 = layer2.indexOf(nodeGraph.get(edge2.end));
-          if (start1 !== start2 && end1 !== end2 &&
-            Math.sign(start1 - start2) !== Math.sign(end1 - end2)) {
-            crossings++;
-          }
-        }
-      }
-    }
-  }
-  return crossings / 2;
-}
-
-// Count all crossings throughout a graph
-function countCrossingsGraph(layeredGraph, nodeGraph) {
-  let count = 0;
-  for (let i = 0; i < layeredGraph.length - 1; i++) {
-    count += countCrossings(layeredGraph[i], layeredGraph[i + 1], nodeGraph);
-  }
-  return count;
-}
-
-// Return a map from each node to the average x coordinate of its parent nodes
-function medianHeuristic(layer1, layer2) {
-  let medians = new Map();
-  for (let node2 of layer2) {
-    let l = [];
-    for (let i = 0; i < layer1.length; i++) {
-      let node1 = layer1[i];
-      for (let edge of node1.edges) {
-        if (edge.end === node2.id) {
-          l.push(i)
-        }
-      }
-    }
-    l.sort();
-    if (l.length % 2 === 0) {
-      medians.set(node2.id, (l[l.length / 2 - 1] + l[l.length / 2]) / 2)
-    } else {
-      medians.set(node2.id, l[(l.length - 1) / 2])
-    }
-  }
-  return medians;
-}
-
-function medianHeuristic1(nodeGraph, layers, layer2) {
+/*
+Returns a map from each node id of layer2 to the mean x coordinate of its parent nodes
+in layer 1.
+*/
+function getMeanCoords(nodeGraph, layers, layer2) {
   let medians = new Map();
   for (let node2 of layer2) {
     let l = [];
@@ -220,125 +155,10 @@ function medianHeuristic1(nodeGraph, layers, layer2) {
   return medians;
 }
 
-// Position each node between its neighbors
-function sortByMedian(layer1, layer2) {
-  let medians = medianHeuristic(layer1, layer2)
-  layer2.sort((a, b) => medians.get(a.id) - medians.get(b.id));
-  return layer2;
-}
 /*
-// Permute layer to minimize crossings
-function permuteGraph(layerGraph, nodeGraph) {
-  
-  for (let n = 1; n < layerGraph.length; n++) {
-    let layer1 = [...layerGraph[n - 1]];
-    let layer2 = [...layerGraph[n]];
-    layerGraph[n] =  sortByMedian(layer1, layer2);
-  }
-
-
-  let minCross = countCrossingsGraph(layerGraph, nodeGraph);
-
-  for (let i = 0; i < 100; i++) {
-    let depth = Math.floor(Math.random() * (layerGraph.length - 1))
-    let left = Math.floor(Math.random() * (layerGraph[depth].length - 1))
-    let right = left + 1;
-    [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
-    let c2 = countCrossingsGraph(layerGraph, nodeGraph);
-    if (c2 > minCross) {
-      [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
-    } else if (c2 == minCross) {
-      if (layerGraph[depth][left].id > layerGraph[depth][right].id) {
-        [layerGraph[depth][left], layerGraph[depth][right]] = [layerGraph[depth][right], layerGraph[depth][left]];
-      }
-    }
-    else {
-      minCross = c2;
-    }
-  }
-  return layerGraph
-}
-
-
-// For each dummy vertex, find both connected edges and replace with a single edge
-function removeDummyVertices(layeredGraph, nodeGraph) {
-  for (let i = 1; i < layeredGraph.length; i++) {
-    for (let j = layeredGraph[i].length - 1; j >= 0; j--) {
-      let dNode = layeredGraph[i][j];
-      if (dNode.isDummy) {
-        //Each dummy node has exactly one edge in both directions
-        let edge2 = dNode.edges[0];
-        for (let node of layeredGraph[i - 1]) {
-          for (let k = 0; k < node.edges.length; k++) {
-            if (node.edges[k].end === dNode.id) {
-              node.edges[k] = new Edge(node.id, edge2.end, edge2.port);
-              nodeGraph.delete(dNode.id);
-              layeredGraph[i].splice(j, 1);
-            }
-          }
-        }
-      }
-    }
-  }
-  for (let i = 1; i < layeredGraph.length; i++) {
-    for (let j = layeredGraph[i].length - 1; j >= 0; j--) {
-      if (layeredGraph[i][j].isDummy) {
-        nodeGraph.delete(layeredGraph[i][j].id);
-        layeredGraph[i].splice(j, 1);
-      }
-    }
-  }
-}
-
-// Add invisible nodes to space and position nodes below their parents
-function addInvisibleNodes(layeredGraph) {
-  for (let i = 1; i < layeredGraph.length; i++) {
-    let numInvis = layeredGraph[i - 1].length - layeredGraph[i].length;
-    let medians = medianHeuristic(layeredGraph[i - 1], layeredGraph[i]);
-    let currLayer = [...layeredGraph[i]];
-
-    for (let j = 1; j < medians.length; j++) {
-      for (let k = 1; k < medians.length; k++) {
-
-      }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    let newLayer = [];
-
-    for (let j = 0; j < layeredGraph[i - 1].length; j++) {
-      if (currLayer.length === 0) {
-        break;
-      }
-      if (medians.get(currLayer[0].id) - j < 1) {
-        newLayer.push(currLayer.shift())
-      } else {
-        newLayer.push(new CourseNode('' + i + ',' + j, [], [], false, true));
-      }
-    }
-    newLayer = newLayer.concat(currLayer);
-    let targetLength = layeredGraph[i - 1].length - newLayer.length;
-    for (let j = 0; j < targetLength; j++) {
-      newLayer.push(new CourseNode('' + i + ',' + j * 100, [], [], false, true));
-    }
-    layeredGraph[i] = newLayer;
-
-  }
-}
+Converts the map produced by getMeanCoords into a list of {key, value} pairs sorted in order
+of increasing x coordinate.
 */
-
 function orderedMapFromCoords(coordMap) {
   let result = [];
   for (let [item, coord] of coordMap.entries()) {
@@ -348,31 +168,10 @@ function orderedMapFromCoords(coordMap) {
   return result;
 }
 
-
-function tempAssignCoords(nodeGraph, layeredGraph) {
-  let result = [[]]
-  for (let i = 0; i < layeredGraph[0].length; i++) {
-    result[0].push({id: layeredGraph[0][i].id, coord: i});
-  }
-
-  for (let i = 1; i < layeredGraph.length; i++) {
-    let medians = medianHeuristic1(nodeGraph, result.slice(0, i), layeredGraph[i]);
-    result.push(arrangeNodes(orderedMapFromCoords(medians)))
-  }
-
-  return result;
-}
-
-function arrangeTopLayer(nodeGraph, topLayer, nextLayer) {
-  let targets = new Map();
-  for (let i = 0; i < topLayer.length; i++) {
-    for (let j = 0; j <  nodeGraph.get(topLayer[i]).edges.length; j++) {
-      let n = nodeGraph.get(topLayer[i]).edges[j];
-
-    }
-  }
-}
-
+/*
+Arranges the nodes in a single layers such that each is as close to its average parent coordinate,
+but no nodes overlap.
+*/
 function arrangeNodes(layer) {
     let medians = new Map();
 
@@ -392,6 +191,10 @@ function arrangeNodes(layer) {
           dxMap.set(id, 0);
         }
         for (let i = 0; i < layer.length - 1; i++) {
+            // Assign each node a dx value, which causes it to move left or right
+            // in a manner that pulls it toward its parent nodes and pushes it
+            // away from any overlapping nodes
+
             let dx = 0;
 
             if (!(i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) 
@@ -417,6 +220,7 @@ function arrangeNodes(layer) {
         }
     }
 
+    // Position nodes at the nearest multiple of 0.5, ensuring that none overlap.
     let minCoord = -Infinity;
     for (let i = 0; i < layer.length - 1; i++) {
       layer[i].coord = Math.max(minCoord, Math.round(layer[i].coord * 2) / 2);
@@ -426,89 +230,29 @@ function arrangeNodes(layer) {
     return layer;
 }
 
-
-
 /*
-function space(layer) {
-  let groups = findGroups([...layer]);
-  let result = [...layer];
-  let counter = 0;
-  while (groups.length > 0 && counter < 200) {
-    counter += 1;
-    let toAdd = []
-    for (let i = 0; i < groups.length - 1; i++) {
-      expandGroup(groups[i], layer);
-      toAdd = toAdd.concat(groups[i]);
-    }
-
-    let newLayer = [];
-    let layerCopy = [...layer]
-
-    while (layerCopy.length > 0 || toAdd.length > 0) {
-      if (toAdd.length !== 0 && layerCopy[0].id === toAdd[0].id) {
-        newLayer.push(toAdd.shift());
-        layerCopy.shift();
-      } else {
-        newLayer.push(layerCopy.shift());
-      }
-    }
-    groups = findGroups([...newLayer]);
-    result = [...newLayer];
+Assigns coordinates to each node of layeredGraph such that nodes are placed as close to the
+average location of their parents as possible.
+*/
+function assignCoords(nodeGraph, layeredGraph) {
+  let result = [[]]
+  for (let i = 0; i < layeredGraph[0].length; i++) {
+    result[0].push({id: layeredGraph[0][i].id, coord: i});
   }
+
+  for (let i = 1; i < layeredGraph.length; i++) {
+    let medians = getMeanCoords(nodeGraph, result.slice(0, i), layeredGraph[i]);
+    result.push(arrangeNodes(orderedMapFromCoords(medians)))
+  }
+
   return result;
 }
-
-function findGroups(layer) {
-  let groups = [];
-  let currentGroup = [];
-  for (let i = 0; i < layer.length - 1; i++) {
-    if (layer[i + 1].coord - layer[i].coord < 1) {
-      if (currentGroup.length === 0) {
-        currentGroup.push(layer[i])
-      }
-      currentGroup.push(layer[i + 1])
-    } else {
-      if (currentGroup.length > 0) {
-        groups.push(currentGroup);
-        currentGroup = [];
-      }
-    }
-  }
-  if (currentGroup.length > 0) {
-    groups.push(currentGroup);
-  }
-  return groups;
-}
-
-function expandGroup(group, layer) {
-  let avg = 0;
-  for (let i = 0; i < group.length - 1; i++) {
-    avg += group[i].coord;
-  }
-  avg /= group.length;
-
-  for (let i = 0; i < group.length - 1; i++) {
-    group[i].coord += (group.length / 2 - i) * 0.01;
-  }
-}
-*/
 
 // Combines the above functions into a single method
 function prepareGraph(nodeGraph) {
   let result = layerGraph(nodeGraph);
-
   let alone = separateGraph(result[0]);
-
-  //addDummyVertices(nodeGraph, result[1]);
-  //result = permuteGraph(result[1], nodeGraph);
-  //removeDummyVertices(result[1], nodeGraph);
-  //addInvisibleNodes(result);
-  let temp = tempAssignCoords(nodeGraph, result);
-
-  /*for (let i = 0; i < temp.length - 1; i++) {
-    temp[i] = arrangeNodes(temp[i]);
-  }*/
-
+  let temp = assignCoords(nodeGraph, result);
   return [box(alone), temp];
 }
 

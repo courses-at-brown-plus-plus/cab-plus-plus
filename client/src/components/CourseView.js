@@ -1,14 +1,6 @@
 import './CourseView.css';
 
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
   Divider,
   Button,
   Tag

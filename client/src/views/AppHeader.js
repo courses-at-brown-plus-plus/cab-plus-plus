@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, Button, Box, Text, Heading } from "@chakra-ui/react"
+import { Flex, Box, Text, Heading } from "@chakra-ui/react"
 import { NavLink } from 'react-router-dom';
 import PopupModal from '../components/PopupModal';
 

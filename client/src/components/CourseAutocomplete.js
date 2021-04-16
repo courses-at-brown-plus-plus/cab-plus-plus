@@ -45,7 +45,7 @@ export default function CourseAutocomplete(props) {
         onChange={(event, newInputValue) => {handleSelectCourseCode(newInputValue)}}
         renderInput={(params) => 
           <TextField {...params} 
-            label={(props.title) ? props.title : "Course ID" }
+            label={(props.title) ? props.title : "Add Course ID" }
             variant="outlined" 
           /> }
       />

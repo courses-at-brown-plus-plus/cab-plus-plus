@@ -1,5 +1,4 @@
 import React, {useRef, useEffect, useState} from 'react';
-import { CourseNode, Edge } from './Graph';
 import prepareGraph from './LayerGraph';
 import CourseView from './CourseView';
 
@@ -23,17 +22,22 @@ function GraphView(props) {
   const coursesTaken = useSelector(selectCoursesTaken);
   const popup = useDisclosure();
 
-  //Courses that the user may take based on their satisfied reqs
+  // Courses that the user may take based on their satisfied reqs
   const [nextCourses, setNextCourses] = useState([]);
+  // Courses the user has annotated
+  const [annotations, setAnnotations] = useState([]);
+  // Nodes with darker outline on mouse hover
+  const [activeNodes, setActiveNodes] = useState([]);
   
   let nodeGraph = props.graph;
   let layersRef = useRef(null);
-  let layers = layersRef.current;
+  let alone = useRef(new Map());
 
   const [xOffset, setXOffset] = useState(100.5);
   const [yOffset, setYOffset] = useState(0.5);
 
-  const [activeNodes, setActiveNodes] = useState([]);
+  let [origYOffset, setOrigYOffset] = useState(100.5);
+  let [origXOffset, setOrigXOffset] = useState(0.5);
 
   // Screen coordinates of center of each node
   const nodeCoords = useRef(new Map());
@@ -57,50 +61,41 @@ function GraphView(props) {
   // Canvas zoom level
   let [scaleFactor, setScaleFactor] = useState(1);
 
-  let [origYOffset, setOrigYOffset] = useState(100.5);
-  let [origXOffset, setOrigXOffset] = useState(0.5);
-
-  const [annotations, setAnnotations] = useState([]);
-
-  let alone = useRef(new Map());
-
-  let minX = useRef(null);
+  let maxX = useRef(null);
 
   useEffect(() => {
     if (props.graph.size === 0) {
       return;
     }
     let p = prepareGraph(nodeGraph);
-    layersRef.current = p[1];
-    layers = layersRef.current;
+    layersRef.current= p[1];
 
     let max = 0;
-    for (let i = 0; i < layers.length; i++) {
-      if (layers[i].length === 0) {
+    for (let i = 0; i < layersRef.current.length; i++) {
+      if (layersRef.current[i].length === 0) {
         continue;
       }
-      if (layers[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b)) > max) {
-        max = layers[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b));
+      if (layersRef.current[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b)) > max) {
+        max = layersRef.current[i].map((x) => {return x.coord;}).reduce((a,b) => Math.max(a, b));
       }
 
-      for (let j = layers[i].length - 1; j >= 0; j--) {
-        if (isNaN(layers[i][j].coord)) {
-          layers[i][j].coord = 0;
+      for (let j = layersRef.current[i].length - 1; j >= 0; j--) {
+        if (isNaN(layersRef.current[i][j].coord)) {
+          layersRef.current[i][j].coord = 0;
         }
       }
     }
-    minX.current = max;
-
+    maxX.current = max;
     alone.current = p[0];
 
-    if (layers[0].length > 0) {
-      setXOffset(-layers[0].reduce((a, b) => a + b.coord, 0) / layers[0].length * 100);
-      setOrigXOffset(-layers[0].reduce((a, b) => a + b.coord, 0) / layers[0].length * 100);
+    if (layersRef.current[0].length > 0) {
+      setXOffset(-layersRef.current[0].reduce((a, b) => a + b.coord, 0) / layersRef.current[0].length * 100);
+      setOrigXOffset(-layersRef.current[0].reduce((a, b) => a + b.coord, 0) / layersRef.current[0].length * 100);
     }
 
     setScaleFactor(0.4)
 
-  }, [props.graph]);
+  }, [props.graph, nodeGraph]);
 
   useEffect(() => {
     if (props.displayedAnnotation) {
@@ -108,6 +103,8 @@ function GraphView(props) {
     }
   }, [props.displayedAnnotation]);
 
+
+  // Update the green highlighted courses when coursesTaken and annotations change
   useEffect(() => {
     let newNextCourses = [];
 
@@ -124,11 +121,12 @@ function GraphView(props) {
               continue;
             }
             if (!ports.has(potential)) {
-              console.log(potential.id, potential.ports)
               ports.set(potential, [...Array(potential.ports).keys()]);
             }
-            console.log(potential.id, ports.get(potential))
-            ports.get(potential).splice(ports.get(potential).indexOf(nodeGraph.get(startCourses[i]).edges[j].port), 1)
+            let n = ports.get(potential).indexOf(nodeGraph.get(startCourses[i]).edges[j].port)
+            //if (n !== -1) {
+              ports.get(potential).splice(n, 1)
+            //}
             if (ports.get(potential).length === 0) {
               newNextCourses.push(potential.id)
             }
@@ -137,7 +135,7 @@ function GraphView(props) {
       }
     }
     setNextCourses(newNextCourses);
-  }, [coursesTaken, annotations]);
+  }, [coursesTaken, annotations, nodeGraph, props.graph]);
 
 
   function handleMouseMove(event) {
@@ -172,7 +170,6 @@ function GraphView(props) {
 
   function handleMouseUp(event) {
     setShowCourseView(false)
-    let canvas = canvasRef.current;
     setMouseDown(false);
     setMouseX(event.clientX - event.target.getBoundingClientRect().left);
     setMouseY(event.clientY - event.target.getBoundingClientRect().top);
@@ -185,7 +182,6 @@ function GraphView(props) {
           setShowCourseView(true);
           setCourseView(props.graph.get(node));
         }
-
         setFocus(true);
         props.graph.get(node).active = true;
         let l = [];
@@ -221,18 +217,17 @@ function GraphView(props) {
     }
   }
 
-  // Stop page from scrolling when mouse is over canvas
+  // Stop page from scrolling when mouse is enters canvas
   // Credit to https://stackoverflow.com/questions/55508836/prevent-page-scrolling-when-mouse-is-over-one-particular-div
   function enterScroll() { 
-    let style = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     if (!focus) {
       setActiveNodes([])
     }
   } 
 
+  // Allow page to scroll when mouse is not over canvas
   function leaveScroll() { 
-    let style = document.body.style.overflow;
     document.body.style.overflow = 'auto';
     if (!focus) {
       setActiveNodes([])
@@ -250,7 +245,6 @@ function GraphView(props) {
   }
 
   function drawNode(ctx, node, x, y) {
-
     if (focus && !activeNodes.includes(node.id)) {
       ctx.globalAlpha = 0.5;
     }
@@ -261,7 +255,6 @@ function GraphView(props) {
       ctx.fillStyle = '#cfc';
     }
 
-
     ctx.fillRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
     if (activeNodes.includes(node.id)) {
       ctx.strokeStyle = 'black';
@@ -271,7 +264,6 @@ function GraphView(props) {
     } else {
       ctx.strokeStyle = '#ccc';
     }
-
 
     ctx.strokeRect(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2, scaleFactor * NODE_WIDTH, scaleFactor * NODE_HEIGHT);
     ctx.lineWidth = 1 * scaleFactor;
@@ -285,6 +277,7 @@ function GraphView(props) {
     ctx.globalAlpha = 1;
   }
 
+  // Populates activeList with node, and any CourseNodes downstream of node.
   function makeActive(node, activeList) {
     if (!props.graph.has(node)) {
       return;
@@ -308,15 +301,12 @@ function GraphView(props) {
   }
 
   useEffect(() => {
-
-
+    // Don't update anything if screen is covered by course information view
     if (showCourseView) {
       return;
     }
     let canvas = canvasRef.current;
     let ctx = canvas.getContext('2d');
-
-
 
     // Fix canvas blur
     // https://dev.to/pahund/how-to-fix-blurry-text-on-html-canvases-on-mobile-phones-3iep
@@ -331,6 +321,7 @@ function GraphView(props) {
     ctx.fillStyle = '#ddd';
     ctx.fillRect(0, 0, props.width, props.height);
 
+    // Display message for empty graph
     if (props.graph.size === 0) {
       ctx.fillStyle = '#bbb';
       ctx.font = "28pt Helvetica";
@@ -339,24 +330,23 @@ function GraphView(props) {
       return;
     }
 
+    // Populate nodeCoords with nodes that have no children
     nodeCoords.current = new Map();
-
     for (let [id, coords] of alone.current) {
-      
-      let x = minX.current * 100 + (coords[0] + 5) * 100;
-
+      let x = maxX.current * 100 + (coords[0] + 5) * 100;
       nodeCoords.current.set(id, 
         [scaleFactor * (x + xOffset) + props.width / 2,
          scaleFactor * (coords[1] * 100 + yOffset + 40) + props.height / 2]);
     }
 
+    // Populate nodeCoords with nodes that do have children
     let y = 40;
-    for (let i = 0; i < layers.length; i++) {
-      for (let j = 0; j < layers[i].length; j++) {
+    for (let i = 0; i < layersRef.current.length; i++) {
+      for (let j = 0; j < layersRef.current[i].length; j++) {
 
-        let x = props.width / 2 + (layers[i][j].coord) * 100;
+        let x = props.width / 2 + (layersRef.current[i][j].coord) * 100;
 
-        nodeCoords.current.set(layers[i][j].id, 
+        nodeCoords.current.set(layersRef.current[i][j].id, 
           [scaleFactor * (x + xOffset) + props.width / 2, 
           scaleFactor * (y + yOffset) + props.height / 2]);
         x += 100;
@@ -365,20 +355,18 @@ function GraphView(props) {
     }
     
 
+    // Draw edges
     ctx.lineWidth = scaleFactor;
-
     let activeEdges = [];
-    for (let [node, coords] of nodeCoords.current.entries()) {
+    for (let node of nodeCoords.current.keys()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
-
         for (let i = 0; i < nodeGraph.get(node).edges.length; i++) {
           let edge = props.graph.get(node).edges[i];
           if (activeNodes.includes(edge.start)) {
             activeEdges.push(edge);
             continue;
           }
-          let xOffset1 = 0;//edge.port * 10
 
           let start = nodeCoords.current.get(edge.start);
           let end = nodeCoords.current.get(edge.end);
@@ -386,7 +374,7 @@ function GraphView(props) {
             continue;
           }
           ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
-          ctx.lineTo(end[0] + xOffset1, end[1] - scaleFactor * NODE_HEIGHT / 2);
+          ctx.lineTo(end[0], end[1] - scaleFactor * NODE_HEIGHT / 2);
           ctx.strokeStyle = '#ccc';
           ctx.stroke();
         }
@@ -395,18 +383,18 @@ function GraphView(props) {
     }
 
     for (let edge of activeEdges) {
-      let xOffset1 = 0;//edge.port * 10
       let start = nodeCoords.current.get(edge.start);
       let end = nodeCoords.current.get(edge.end);
       if (start === undefined || end === undefined || !props.graph.has(edge.end)) {
         continue;
       }
       ctx.moveTo(start[0], start[1] + scaleFactor * NODE_HEIGHT / 2);
-      ctx.lineTo(end[0] + xOffset1, end[1] - scaleFactor * NODE_HEIGHT / 2);
+      ctx.lineTo(end[0], end[1] - scaleFactor * NODE_HEIGHT / 2);
       ctx.strokeStyle = '#999';
       ctx.stroke();
     }
 
+    // Draw nodes
     for (let [node, coords] of nodeCoords.current.entries()) {
       ctx.beginPath();
       if (nodeGraph.has(node)) {
@@ -440,9 +428,6 @@ function GraphView(props) {
           />
           <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Annotations</Button>
         </Box>
-        {
-          // <SearchBar update={(s) => {let l = []; makeActive(s, l); setActiveNodes(l); setFocus(true);}}/>
-        }
       <Box width={200} float="right" marginRight="10px"> { props.children } </Box>
       </Flex>
       <Flex justifyContent="flex-end">

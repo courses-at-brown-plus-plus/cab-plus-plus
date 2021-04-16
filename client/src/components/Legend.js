@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Select, Box, Table,
+import { Box, Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
-  Td,
-  TableCaption} from "@chakra-ui/react"
+  Td
+} from "@chakra-ui/react"
 import './Legend.css';
 
 function Legend(props) {
