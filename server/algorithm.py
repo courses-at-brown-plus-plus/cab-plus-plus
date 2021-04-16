@@ -4,8 +4,8 @@ import os
 # Prevent warnings and info messages of imports from outputting, but not errors
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-#  import tensorflow as tf
-#  import tensorflow_hub as hub
+# import tensorflow as tf
+# import tensorflow_hub as hub
 import pandas as pd
 import math
 
@@ -77,6 +77,8 @@ class TextComparison(object):
         temp = list(zip(names, docs))
         unique_indices = []
         items = []
+
+        # Gets unique courses
         for i in range(len(temp)):
             if temp[i][0] not in items:
                 unique_indices.append(i)
@@ -121,26 +123,35 @@ class TextComparison(object):
         """Grabs the course most similar to the given course. If a num is specified,
         it will get that number of similar courses. If num = None, grabs all of the values."""
         if self.data is not None:
-            similarities = [a for a in sorted(list(zip(self.data.columns.tolist(), self.data[column])), key=lambda a: a[1], reverse=True) if a[0] != column]
+            similarities = [a for a in sorted(list(zip(self.data.columns.tolist(), 
+                        self.data[column])), key=lambda a: a[1], reverse=True) if a[0] != column]
+
+            # Use department similarities and re-sort if they exist
             if self.dept_data is not None:
-                similarities_with_dept = sorted([(a[0], a[1]*self.TEXT_WEIGHT + self.dept_data[a[0].split(" ")[0]][column.split(" ")[0]]*self.DEPT_WEIGHT) for a in similarities],
+                similarities_with_dept = sorted([(a[0], a[1]*self.TEXT_WEIGHT
+                             + self.dept_data[a[0].split(" ")[0]][column.split(" ")[0]]
+                             * self.DEPT_WEIGHT) 
+                            for a in similarities],
                             key=lambda a: a[1], reverse=True)
                 return similarities_with_dept[0: num]
             else:
                 return similarities[0: num]
         else:
             return None
-    
+
     def get_most_similar_multiple(self, columns: list, num: int = 1):
         """Grabs the course most similar to the given list of courses. If a num is specified,
         it will get that number of similar courses. If num = None, grabs all of the values."""
         if self.data is not None:
-            similarities = [a for a in sorted(list(zip(self.data.columns.tolist(), (self.data[columns].sum(axis=1)/float(len(columns))))), 
+            similarities = [a for a in sorted(list(zip(self.data.columns.tolist(), 
+                        (self.data[columns].sum(axis=1)/float(len(columns))))), 
                         key=lambda a: a[1], reverse=True) if a[0] not in columns]
+            # Use department similarities and re-sort if they exist
             if self.dept_data is not None:
                 column_depts = [a.split(" ")[0] for a in columns]
                 similarities_with_dept = sorted([(a[0], a[1]*self.TEXT_WEIGHT 
-                            + self.dept_data[column_depts].sum(axis=1)[a[0].split(" ")[0]]*(self.DEPT_WEIGHT / float(len(columns)))) 
+                            + self.dept_data[column_depts].sum(axis=1)[a[0].split(" ")[0]]
+                            * (self.DEPT_WEIGHT / float(len(columns)))) 
                             for a in similarities], key=lambda a: a[1], reverse=True)
                 return similarities_with_dept[0: num]
             else:
@@ -174,22 +185,29 @@ class MetadataComparison(object):
         if math.isnan(self.data.get_data("courseRating")[course]):
             return None
         else:
-            if self.data_is_valid(self.data.get_data("avgHrs")[course]) and self.data_is_valid(self.data.get_data("maxHrs")[course]):
-                time_commitment = ((min(1, 1.5/(float(self.data.get_data("avgHrs")[course].strip("()").split(", ")[0])))
+            # Get all the categories, checking if they exist in the data.
+            if (self.data_is_valid(self.data.get_data("avgHrs")[course]) 
+                        and self.data_is_valid(self.data.get_data("maxHrs")[course])):
+                time_commitment = ((min(1, 
+                            1.5/(float(self.data.get_data("avgHrs")[course].strip("()").split(", ")[0])))
                             + min(1, 1.5/(float(self.data.get_data("maxHrs")[course].strip("()").split(", ")[0]))))/2.0)
             elif self.data_is_valid(self.data.get_data("avgHrs")[course]):
-                time_commitment = min(1, 1.5/(float(self.data.get_data("avgHrs")[course].strip("()").split(", ")[0])))
+                time_commitment = min(1, 
+                            1.5/(float(self.data.get_data("avgHrs")[course].strip("()").split(", ")[0])))
             elif self.data_is_valid(self.data.get_data("maxHrs")[course]):
-                time_commitment = min(1, 1.5/(float(self.data.get_data("maxHrs")[course].strip("()").split(", ")[0])))
+                time_commitment = min(1, 
+                            1.5/(float(self.data.get_data("maxHrs")[course].strip("()").split(", ")[0])))
             else:
                 time_commitment = None
             
             if self.data_is_valid(self.data.get_data("difficult")[course]):
-                difficulty = ((5.0 - float(self.data.get_data("difficult")[course].strip("()").split(", ")[0])) / 5.0)
+                difficulty = ((5.0 - 
+                            float(self.data.get_data("difficult")[course].strip("()").split(", ")[0])) / 5.0)
             else:
                 difficulty = None
             
-            if self.data_is_valid(self.data.get_data("enjoyedCourse")[course]) and self.data_is_valid(self.data.get_data("courseRating")[course]):
+            if (self.data_is_valid(self.data.get_data("enjoyedCourse")[course])
+                        and self.data_is_valid(self.data.get_data("courseRating")[course])):
                 enjoyment = ((float(self.data.get_data("enjoyedCourse")[course].strip("()").split(", ")[0])
                         + float(self.data.get_data("courseRating")[course]))/10.0)
             elif self.data_is_valid(self.data.get_data("enjoyedCourse")[course]):
@@ -198,14 +216,18 @@ class MetadataComparison(object):
                 enjoyment = float(self.data.get_data("courseRating")[course]) / 5.0
             else:
                 enjoyment = None
-            
-            non_conc = ((float(self.data.get_data("concentratorYes")[course]) + 0.5 * float(self.data.get_data("concentratorMaybe")[course])) /
-                        (float(self.data.get_data("concentratorYes")[course]) + float(self.data.get_data("concentratorNo")[course])
+
+            non_conc = ((float(self.data.get_data("concentratorYes")[course])
+                        + 0.5 * float(self.data.get_data("concentratorMaybe")[course])) /
+                        (float(self.data.get_data("concentratorYes")[course])
+                        + float(self.data.get_data("concentratorNo")[course])
                         + float(self.data.get_data("concentratorMaybe")[course])))
             
             try:
-                class_size = min(1, 10.0 / (float(self.data.get_data("freshmen")[course]) + float(self.data.get_data("sophomores")[course])
-                            + float(self.data.get_data("juniors")[course]) + float(self.data.get_data("seniors")[course]) 
+                class_size = min(1, 10.0 / (float(self.data.get_data("freshmen")[course])
+                            + float(self.data.get_data("sophomores")[course])
+                            + float(self.data.get_data("juniors")[course])
+                            + float(self.data.get_data("seniors")[course]) 
                             + float(self.data.get_data("gradStudents")[course])))
             except:
                 class_size = None
@@ -215,8 +237,9 @@ class MetadataComparison(object):
             else:
                 grading = None
             
-            priority_vals = {"Low time commitment": time_commitment, "Low difficulty": difficulty, "High enjoyment": enjoyment, 
-                        "Suitability for non-concentrators": non_conc, "Small class size": class_size, "Fair grading": grading}
+            priority_vals = {"Low time commitment": time_commitment, "Low difficulty": difficulty, 
+                        "High enjoyment": enjoyment, "Suitability for non-concentrators": non_conc, 
+                        "Small class size": class_size, "Fair grading": grading}
             return priority_vals
 
     
@@ -225,16 +248,20 @@ class MetadataComparison(object):
         if math.isnan(self.data.get_data("courseRating")[course]):
             return None
         else:
+            # Calculates fitness based on what values are priorities and what aren't.
             priority_vals = self.get_category_vals(course)
             priority = self.priority_weight[:len(priorities)]
             non_priority = self.total - sum(self.priority_weight[:len(priorities)])
             fit = 0
             total = 0
+
+            # Adding priorities
             for i in range(len(priorities)):
                 if (priority_vals[priorities[i]] is not None):
                     fit += priority_vals[priorities[i]] * priority[i]
                     total += priority[i]
             
+            # Adding non-priorities
             non_priority_vals = [a for a in priority_vals.keys() if a not in priorities]
             for i in range(len(non_priority_vals)):
                 if (priority_vals[non_priority_vals[i]] is not None):
@@ -259,12 +286,14 @@ class Algorithm(object):
         it will get that number of similar courses. If num = None, grabs all of the values. Default num: 1"""
         text_vals = self.text_compare.get_most_similar_multiple(course_list, num=None)
         priority_vals = [self.metadata_compare.get_fit_value(a[0], priorities) for a in text_vals]
-        final = [(a[0][0], a[0][1]*self.text_weight + a[1]*self.metadata_weight) if a[1] is not None else a[0] for a in zip(text_vals, priority_vals)]
+        final = [(a[0][0], a[0][1]*self.text_weight + a[1]*self.metadata_weight) if a[1] is not None 
+                    else a[0] for a in zip(text_vals, priority_vals)]
         final_sorted = sorted(final, key=lambda a: a[1], reverse=True)
         return final_sorted[:num]
 
 if __name__ == "__main__":
-    default_formatting_error = "Arguments not formatted properly. Run `python3 algorithm.py -h` to see the allowed argument formats."
+    default_formatting_error = "Arguments not formatted properly. Run `python3 algorithm.py -h` to see the \
+                allowed argument formats."
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hs:d:m:c:n:t:")
@@ -275,8 +304,9 @@ if __name__ == "__main__":
     flags = [x[0] for x in opts]
 
     if '-h' in flags:
-        print("Usage: python3 algorithm.py -m <model_location> -t <textdata_location> -s <save_location> \n OR \n" + 
-            "python3 algorithm.py -c <course_name> -s <similaritydata_location> -m <metadata_location> [-n <num_recommendations>] [-d <departmentsimilarity_location>]")
+        print("Usage: python3 algorithm.py -m <model_location> -t <textdata_location> -s <save_location> \
+            \n OR \n python3 algorithm.py -c <course_name> -s <similaritydata_location> \
+            -m <metadata_location> [-n <num_recommendations>] [-d <departmentsimilarity_location>]")
         sys.exit()
     elif '-m' in flags and '-s' in flags and '-t' in flags:
         model_loc = [x[1] for x in opts if x[0]=="-m"][0]
