@@ -21,8 +21,12 @@ function Legend(props) {
             </Thead>
             <Tbody>
                 <Tr>
+                    <Td><span id="grayDot"></span></Td>
+                    <Td>Unselected Course</Td>
+                </Tr>
+                <Tr>
                     <Td><span id="whiteDot"></span></Td>
-                    <Td>Course Unavailable</Td>
+                    <Td>Selected Course</Td>
                 </Tr>
                 <Tr>
                     <Td><span id="greenDot"></span></Td>
@@ -30,7 +34,11 @@ function Legend(props) {
                 </Tr>
                 <Tr>
                     <Td><span id="lightGreenDot"></span></Td>
-                    <Td>Course Available</Td>
+                    <Td>Available Course</Td>
+                </Tr>
+                <Tr>
+                    <Td><span id="lightGreenDotOutline"></span></Td>
+                    <Td>Annotated Course</Td>
                 </Tr>
             </Tbody>
           </Table>
