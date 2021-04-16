@@ -36,7 +36,7 @@ export default function CourseSuggestions() {
   function submitPriorityForm() {
     // dispatch(GetRecommendations(priorityContents));
 
-    if (coursesTaken.length == 0) {
+    if (coursesTaken.length === 0) {
       toast({
         title: "Recommendation generation",
         description: "No past course history", 
@@ -56,7 +56,7 @@ export default function CourseSuggestions() {
     });
 
     let uniquePriorities = [...new Set(priorities)];
-    if (uniquePriorities.length != priorities.length) {
+    if (uniquePriorities.length !== priorities.length) {
       toast({
         title: "Recommendation generation",
         description: "Contains duplicate priorities", 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllCourseCodes, selectErrorMessage, selectIssueReportState, selectPathwayData, 
-  addPrereq, removePrereq, resetIssueReportState, broadcastError } from '../store/slices/appDataSlice';
+  resetIssueReportState, broadcastError } from '../store/slices/appDataSlice';
 
 import { ReportIssue } from '../api/Network';
 

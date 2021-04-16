@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectAllCourseCodes, selectCoursesTaken, 
-  addCourseTaken, removeCourseTaken} from '../store/slices/appDataSlice';
+import { selectCoursesTaken, addCourseTaken, removeCourseTaken} from '../store/slices/appDataSlice';
 
-import { InputGroup, Input, Button, Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
+import { Tag, TagLabel, TagCloseButton } from "@chakra-ui/react"
 
 import CourseAutocomplete from '../components/CourseAutocomplete';
 
 export default function PastCourses(props) {
 
   const dispatch = useDispatch();
-  const allCourseCodes = useSelector(selectAllCourseCodes);
   const coursesTaken = useSelector(selectCoursesTaken);
 
   function handleCloseTag(courseName) {
@@ -20,6 +18,7 @@ export default function PastCourses(props) {
   return (
     <div style={{width: "20vw", marginRight: "3rem"}}>
       <CourseAutocomplete 
+        title="Courses Already Taken"
         handleAddCourse={(newCourseCode) => {
           if (!coursesTaken.includes(newCourseCode)) {
             dispatch(addCourseTaken(newCourseCode));

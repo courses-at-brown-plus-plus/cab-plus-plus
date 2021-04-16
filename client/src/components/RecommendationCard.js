@@ -8,7 +8,7 @@ export default function RecommendationCard(props) {
         { props.description }
       </Text>
 
-      <a target="_blank" href={props.link}>
+      <a target="_blank" rel="noreferrer" href={props.link}>
         <Button variant="link" colorScheme="cyan"> Critical Review Link </Button>
       </a>
     </Box>
