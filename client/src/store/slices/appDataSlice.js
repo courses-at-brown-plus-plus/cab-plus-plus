@@ -41,13 +41,30 @@ export const slice = createSlice({
           // eg: https://thecriticalreview.org/search/CSCI/0320
         };
 
+
+        function makeActive(node, activeList) {
+            activeList.push(node);
+            state.pathwayData[node].preReqs.map((e) => e[0]).forEach((e) => {
+            if (!activeList.includes(e)) {
+              makeActive(e, activeList);
+            }
+          });
+          return activeList;
+        }
+
         // Filter out courses that have similar children nodes to remove course equivalencies
         let shouldAdd = true;
         state.coursesTaken.forEach((courseTaken) => {
-          let next1 = state.pathwayData[aCode].preReqs.map((e) => e[0]);
+          /*let next1 = state.pathwayData[aCode].preReqs.map((e) => e[0]);
           let next2 = state.pathwayData[courseTaken].preReqs.map((e) => e[0]);
-          let matches = next1.reduce((a, b) => a + next2.includes(b), 0);
-          if (next2.length !== 0 && matches / next2.length > MAX_SIMILARITY) {
+          let matches = next1.reduce((a, b) => a + next2.includes(b), 0);*/
+
+          let children1 = makeActive(aCode, [])
+          let children2 = makeActive(courseTaken, [])
+          let matches = children1.reduce((a, b) => a + children2.includes(b), 0);
+          console.log(aCode, courseTaken, matches / children2.length)
+
+          if (children2.length !== 0 && matches / children2.length > MAX_SIMILARITY) {
             shouldAdd = false;
             return;
           }
