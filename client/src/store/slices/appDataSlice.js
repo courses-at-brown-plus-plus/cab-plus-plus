@@ -67,7 +67,6 @@ export const slice = createSlice({
         }
       });
 
-
       state.recommendedCourses = { ...newRecommendedCourseData.slice(0, 5) };
     },
     addCourseTaken: (state, action) => {
