@@ -1,17 +1,3 @@
-
-
-/*Sugiyama's algorithm overview
-  1) Give each vertex a vertical position based on the longest path from the vertex to the 
-     top level.
-  2) Add dummy vertices so that edges which span multiple lines are broken into smaller edges
-     which connect at dummy vertices
-  3) Horizontally order vertices to minimize edge crossings - done by positioning each vertex at
-     the median of its parent coordinates, then randomly swapping vertices as long as that
-     decreases the total number of crossings
-  4) Remove dummy vertices
-  5) Add invisible nodes to properly space vertices below their parents
-*/
-
 // Convert from node representation to edge representation
 function nodeToEdgeGraph(nodeGraph) {
   let result = new Set();
