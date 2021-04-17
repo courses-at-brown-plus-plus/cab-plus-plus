@@ -251,10 +251,10 @@ class MetadataComparison(object):
             # Calculates fitness based on what values are priorities and what aren't.
             priority_vals = self.get_category_vals(course)
             priority = self.priority_weight[:len(priorities)]
-            non_priority = self.total - sum(self.priority_weight[:len(priorities)])
+            non_priority = (self.total - sum(self.priority_weight[:len(priorities)]))/(6.0 - len(priorities))
             fit = 0
             total = 0
-
+            
             # Adding priorities
             for i in range(len(priorities)):
                 if (priority_vals[priorities[i]] is not None):
