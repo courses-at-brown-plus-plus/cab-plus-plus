@@ -241,8 +241,9 @@ function GraphView(props) {
   }
 
   function removeAnnotation(id) {
-    console.log(id)
+    console.log(annotations)
     annotations.splice(annotations.indexOf(id), 1);
+    console.log(annotations)
     setAnnotations(annotations);
   }
 
@@ -423,7 +424,7 @@ function GraphView(props) {
         { showCourseView && 
           <CourseView node={courseView} 
           annotation={nextCourses.includes(courseView.id) && !annotations.includes(courseView.id)} 
-          add={addAnnotation} rann={annotations.includes(courseView.id)} remove={removeAnnotation}/>
+          add={addAnnotation} remove={removeAnnotation} rann={annotations.includes(courseView.id)}/>
         }
         <canvas ref={canvasRef} onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={enterScroll}

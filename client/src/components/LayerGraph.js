@@ -185,9 +185,8 @@ function arrangeNodes(layer) {
 
             if (!(i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) 
               && !(i > 0 && layer[i].coord - layer[i - 1].coord < 1)) {
-              dx += 0.01 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
+              dx += 0.03 * Math.sign(medians.get(layer[i].id) - layer[i].coord);
             }
-
 
             if (i < layer.length - 1 && layer[i + 1].coord - layer[i].coord < 1) {
                 dx -= 0.03;
@@ -208,8 +207,12 @@ function arrangeNodes(layer) {
 
     // Position nodes at the nearest multiple of 0.5, ensuring that none overlap.
     let minCoord = -Infinity;
-    for (let i = 0; i < layer.length - 1; i++) {
-      layer[i].coord = Math.max(minCoord, Math.round(layer[i].coord * 2) / 2);
+    for (let i = 0; i < layer.length; i++) {
+      if (false) {
+        layer[i].coord = minCoord + 1;
+      } else {
+        layer[i].coord = Math.max(minCoord, Math.round(layer[i].coord * 2) / 2);
+      }
       minCoord = layer[i].coord + 1;
     }
 

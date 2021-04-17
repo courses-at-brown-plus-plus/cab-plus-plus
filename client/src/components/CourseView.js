@@ -19,7 +19,7 @@ function CourseView(props) {
     }
 
     return (
-        <div style={{width: props.width, height: props.height}} className="courseView">
+        <div style={{width: props.width, height: props.height}} className="courseView" >
             <h1 className="courseTitle">{props.node.id + ": " + props.node.name}</h1>
             <Divider orientation="horizontal" />
             <p className="courseDesc">{props.node.desc}</p>
