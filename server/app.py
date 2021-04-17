@@ -97,10 +97,14 @@ def generateRecommendations():
 def appSetup(): 
     with open('data/CAB_v1_formatted.csv') as csvFile: 
         reader = csv.DictReader(csvFile)
+        ROWCOUNT = 0
         for row in reader: 
+            ROWCOUNT += 1
             #TODO: Don't use eval
             row['preReqs'] = eval(row['preReqs'])
             cabData[row['courseCode']] = row
+        print("ROWCOUNT: ")
+        print(ROWCOUNT)
 
     print("app setup done")
     #  print(cabData)

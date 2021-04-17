@@ -69,6 +69,11 @@ _On your first meeting with your mentor TA, you should plan dates for at least t
 3. `python app.py` in `server/` to start the server on localhost port 5000
 4. Either generate your own `data/similarities_v2.csv`, or contact us and we'll either give you the file download, or send you the remote access url to use in an environment variable.
 
+## Testing the Flask server
+1. `pip install -r requirements.txt` in `server/`
+2. Ensure all environment variables and package installs from the backend build/run instructions were followed
+3. Either copy the `server/data/` directory into `server/tests/endpoints/`, or make a symlink of it in that directory
+4. `python -m pytest` in `server/tests/endpoints/`
 
 ## Resources & REST API table
 | URL/ENDPOINT             | VERB | DESCRIPTION                                                   |
