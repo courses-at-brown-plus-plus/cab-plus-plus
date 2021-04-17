@@ -36,9 +36,9 @@ export const RECOMMENDED_COURSES = [
 ];
 
 export const PRIORITY_OPTIONS = [
-  "Low Time Commitment", 
-  "Low Difficulty",
-  "High Enjoyment", 
+  "Low time commitment", 
+  "Low difficulty",
+  "High enjoyment", 
   "Suitability for non-concentrators", 
   "Small class size",
   "Fair grading"
