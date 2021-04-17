@@ -63,6 +63,19 @@ function GraphView(props) {
 
   let maxX = useRef(null);
 
+
+  function getPrereqs(courseID) {
+    let result = [];
+    for (let [id, node] of props.graph) {
+      let port = node.edges.reduce((acc, e) => (e.end === courseID) ? e.port : acc, -1);
+      console.log(port) 
+      if (port !== -1) {
+        result.push([id, port]);
+      }
+    }
+    return result;
+  }
+
   useEffect(() => {
     if (props.graph.size === 0) {
       return;
@@ -171,7 +184,7 @@ function GraphView(props) {
   }
 
   function handleMouseUp(event) {
-    setShowCourseView(false)
+    setShowCourseView(false);
     setMouseDown(false);
     setMouseX(event.clientX - event.target.getBoundingClientRect().left);
     setMouseY(event.clientY - event.target.getBoundingClientRect().top);
@@ -195,6 +208,7 @@ function GraphView(props) {
 
     if (Math.abs(mouseX - mouseDownX) < 1 && Math.abs(mouseY - mouseDownY) < 1) {
       setFocus(false);
+      setActiveNodes([])
     }
   }
 
@@ -301,7 +315,7 @@ function GraphView(props) {
       if (!props.graph.has(edge.end)) {
         continue;
       }
-      //Avoid crashing on a cyclic graph
+      // Avoid crashing on a cyclic graph and repeating visited nodes
       if (!activeList.includes(edge.end)) {
         makeActive(edge.end, activeList);
       }
@@ -424,7 +438,8 @@ function GraphView(props) {
         { showCourseView && 
           <CourseView node={courseView} 
           annotation={nextCourses.includes(courseView.id) && !annotations.includes(courseView.id)} 
-          add={addAnnotation} remove={removeAnnotation} rann={annotations.includes(courseView.id)}/>
+          add={addAnnotation} remove={removeAnnotation} rann={annotations.includes(courseView.id)}
+          close={(e) => {setShowCourseView(false); }} prereqs={getPrereqs(courseView.id)}/>
         }
         <canvas ref={canvasRef} onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp} onMouseDown={handleMouseDown} onWheel={handleScroll} onMouseEnter={enterScroll}

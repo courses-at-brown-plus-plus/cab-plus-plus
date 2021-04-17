@@ -1,11 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const MAX_SIMILARITY = 0.7;
-
-// Additional hard-coded course equivalencies that the algorithm misses
-const COURSE_EQUIVALENCIES = []
-const COURSE_HIERARCHIES = new Map();
-COURSE_HIERARCHIES.set('MUSC 0550', ['MUSC 0400A', 'MUSC 0400B'])
+const MAX_SIMILARITY = 0.68;
 
 export const slice = createSlice({
   name: 'appData', 
@@ -41,12 +36,11 @@ export const slice = createSlice({
           // eg: https://thecriticalreview.org/search/CSCI/0320
         };
 
-
-        function makeActive(node, activeList) {
+        function allChildren(node, activeList) {
             activeList.push(node);
             state.pathwayData[node].preReqs.map((e) => e[0]).forEach((e) => {
             if (!activeList.includes(e)) {
-              makeActive(e, activeList);
+              allChildren(e, activeList);
             }
           });
           return activeList;
@@ -55,12 +49,8 @@ export const slice = createSlice({
         // Filter out courses that have similar children nodes to remove course equivalencies
         let shouldAdd = true;
         state.coursesTaken.forEach((courseTaken) => {
-          /*let next1 = state.pathwayData[aCode].preReqs.map((e) => e[0]);
-          let next2 = state.pathwayData[courseTaken].preReqs.map((e) => e[0]);
-          let matches = next1.reduce((a, b) => a + next2.includes(b), 0);*/
-
-          let children1 = makeActive(aCode, [])
-          let children2 = makeActive(courseTaken, [])
+          let children1 = allChildren(aCode, [])
+          let children2 = allChildren(courseTaken, [])
           let matches = children1.reduce((a, b) => a + children2.includes(b), 0);
           console.log(aCode, courseTaken, matches / children2.length)
 
@@ -68,16 +58,6 @@ export const slice = createSlice({
             shouldAdd = false;
             return;
           }
-          if (COURSE_HIERARCHIES.has(courseTaken) && COURSE_HIERARCHIES.get(courseTaken).includes(aCode)) {
-            shouldAdd = false;
-            return;
-          }
-          COURSE_EQUIVALENCIES.forEach((eq) => {
-            if (eq.includes(aCode) && eq.includes(courseTaken)) {
-              shouldAdd = false;
-              return;
-            }
-          })
         })
         if (shouldAdd) {
           newRecommendedCourseData.push(ret);

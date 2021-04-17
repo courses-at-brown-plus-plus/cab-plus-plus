@@ -48,5 +48,12 @@
     padding-left: 15px;
     padding-right: 15px;
     margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#link {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 30px;
     margin-bottom: 40px;
 }
