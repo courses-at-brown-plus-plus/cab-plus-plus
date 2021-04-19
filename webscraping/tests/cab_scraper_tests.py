@@ -84,6 +84,9 @@ class TestCABScraper(unittest.TestCase):
                           ["CSCI 1450", "CSCI 0450", "APMA 1650", "APMA 1655", "MATH 1620"],
                           ["CSCI 0220", "CSCI 1010", "CSCI 0510", "CSCI 1550"],
                           ["CSCI 0040", "CSCI 0111", "CSCI 0150", "CSCI 0170", "CSCI 0190"]]) # CSCI 1440
+        self.assertEqual(self.scraper.parse_prereqs("MATH 0100, 0170, 0180, 0190, 0200, 0350, minimum score of 4 in 'AP Calculus BC', minimum score of 5 in 'AP Calculus BC'"),
+                         [["MATH 0100", "MATH 0170", "MATH 0180", "MATH 0190", "MATH 0200", "MATH 0350",
+                           "minimum score of 4 in 'AP Calculus BC'", "minimum score of 5 in 'AP Calculus BC'"]])
 
 
 if __name__ == '__main__':
