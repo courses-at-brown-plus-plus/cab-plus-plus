@@ -194,11 +194,12 @@ class CABScraper:
             print("I/O error")
 
 
-filename = input("What file should data be saved to (ex: CAB_data.csv)?\t")
-scraper = CABScraper()
-scraper.scrape_semester("Fall 2020")
-time.sleep(0.5)
-scraper.scrape_semester("Spring 2021")
-time.sleep(0.5)
-scraper.scrape_semester("Summer 2021")
-scraper.save_to_csv(filename)
+if __name__ == "__main__":
+    filename = input("What file should data be saved to (ex: CAB_data.csv)?\t")
+    scraper = CABScraper()
+    scraper.scrape_semester("Fall 2020")
+    time.sleep(0.5)
+    scraper.scrape_semester("Spring 2021")
+    time.sleep(0.5)
+    scraper.scrape_semester("Summer 2021")
+    scraper.save_to_csv(filename)
