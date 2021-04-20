@@ -453,7 +453,7 @@ function GraphView(props) {
             popup={popup}
             annotations={annotations}
           />
-          <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Annotations</Button>
+          <Button colorScheme="cyan" style={{marginLeft: "10px"}} onClick={clearAnnotations}>Clear Wishlist</Button>
         </Box>
       <Box width={200} float="right" marginRight="10px"> { props.children } </Box>
       </Flex>

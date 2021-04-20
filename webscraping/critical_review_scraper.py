@@ -14,39 +14,6 @@ from selenium.common.exceptions import NoSuchElementException
 from cookies import COOKIES
 
 
-def avg(l):
-    """Averages the elements of l, converting them from string to numeric representation, and returns both the average
-    and total number of nonempty elements."""
-    count = len(l)
-    sum = 0
-    for review in l:
-        if review == "" or review == "na":
-            count -= 1
-        else:
-            try:
-                sum += float(review)
-            except:
-                sum += 0
-    if count == 0:
-        return ""
-    return sum/count, count
-
-
-def count_elem(l, elem):
-    """Counts the number of times elem is in l."""
-    count = 0
-    for review in l:
-        if review == elem:
-            count += 1
-    return count
-
-
-def compile_courses(filename):
-    """Reads all courses from a C@B data file."""
-    cab_data = pd.read_csv(filename)
-    return cab_data["courseCode"]
-
-
 class CritReviewScraper:
     """Class for scraping pages from Courses @ Brown."""
 
@@ -103,44 +70,44 @@ class CritReviewScraper:
 
             # hours spent on course
             if "minhours" in reviews:
-                course_review_info["avgHrs"] = avg(reviews["minhours"])
+                course_review_info["avgHrs"] = self.avg(reviews["minhours"])
             if "maxhours" in reviews:
-                course_review_info["maxHrs"] = avg(reviews["maxhours"])
+                course_review_info["maxHrs"] = self.avg(reviews["maxhours"])
 
             # course feedback statistics
             if "readings" in reviews:
-                course_review_info["readingsWorthwhile"] = avg(reviews["readings"])
+                course_review_info["readingsWorthwhile"] = self.avg(reviews["readings"])
             if "class-materials" in reviews:
-                course_review_info["materialsUseful"] = avg(reviews["class-materials"])
+                course_review_info["materialsUseful"] = self.avg(reviews["class-materials"])
             if "difficult" in reviews:
-                course_review_info["difficult"] = avg(reviews["difficult"])
+                course_review_info["difficult"] = self.avg(reviews["difficult"])
             if "learned" in reviews:
-                course_review_info["learnedALot"] = avg(reviews["learned"])
+                course_review_info["learnedALot"] = self.avg(reviews["learned"])
             if "loved" in reviews:
-                course_review_info["enjoyedCourse"] = avg(reviews["loved"])
+                course_review_info["enjoyedCourse"] = self.avg(reviews["loved"])
             if "grading-speed" in reviews:
-                course_review_info["timelyGrading"] = avg(reviews["grading-speed"])
+                course_review_info["timelyGrading"] = self.avg(reviews["grading-speed"])
             if "grading-fairness" in reviews:
-                course_review_info["fairGrading"] = avg(reviews["grading-fairness"])
+                course_review_info["fairGrading"] = self.avg(reviews["grading-fairness"])
 
             # concentrator demographics
             if "conc" in reviews:
-                course_review_info["concentratorYes"] = count_elem(reviews["conc"], "C")
-                course_review_info["concentratorNo"] = count_elem(reviews["conc"], "N")
-                course_review_info["concentratorMaybe"] = count_elem(reviews["conc"], "D")
+                course_review_info["concentratorYes"] = self.count_elem(reviews["conc"], "C")
+                course_review_info["concentratorNo"] = self.count_elem(reviews["conc"], "N")
+                course_review_info["concentratorMaybe"] = self.count_elem(reviews["conc"], "D")
 
             # taken as requirement?
             if "requirement" in reviews:
-                course_review_info["requirementYes"] = count_elem(reviews["requirement"], "Y")
-                course_review_info["requirementNo"] = count_elem(reviews["requirement"], "N")
+                course_review_info["requirementYes"] = self.count_elem(reviews["requirement"], "Y")
+                course_review_info["requirementNo"] = self.count_elem(reviews["requirement"], "N")
 
             # expected grades
             if "grade" in reviews:
-                course_review_info["expectedA"] = count_elem(reviews["grade"], "A")
-                course_review_info["expectedB"] = count_elem(reviews["grade"], "B")
-                course_review_info["expectedC"] = count_elem(reviews["grade"], "C")
-                course_review_info["expectedS"] = count_elem(reviews["grade"], "S")
-                course_review_info["expectedNC"] = count_elem(reviews["grade"], "NC")
+                course_review_info["expectedA"] = self.count_elem(reviews["grade"], "A")
+                course_review_info["expectedB"] = self.count_elem(reviews["grade"], "B")
+                course_review_info["expectedC"] = self.count_elem(reviews["grade"], "C")
+                course_review_info["expectedS"] = self.count_elem(reviews["grade"], "S")
+                course_review_info["expectedNC"] = self.count_elem(reviews["grade"], "NC")
 
             self.courses.append(course_review_info)
 
@@ -161,10 +128,42 @@ class CritReviewScraper:
         except IOError:
             print("I/O error")
 
+    def avg(self, l):
+        """Averages the elements of l, converting them from string to numeric representation, and returns both the average
+        and total number of nonempty elements."""
+        count = len(l)
+        sum = 0
+        for review in l:
+            if review == "" or review == "na":
+                count -= 1
+            else:
+                try:
+                    sum += float(review)
+                except:
+                    sum += 0
+        if count == 0:
+            return ""
+        return sum/count, count
 
-courses = compile_courses("../server/data/CAB_v2.csv")
-filename = input("What file should data be saved to (ex: CritReview_data.csv)?\t")
-scraper = CritReviewScraper()
-for course in courses:
-    scraper.scrape_course(course)
-scraper.save_to_csv(filename)
+    def count_elem(self, l, elem):
+        """Counts the number of times elem is in l."""
+        count = 0
+        for review in l:
+            if review == elem:
+                count += 1
+        return count
+
+    def compile_courses(self, filename):
+        """Reads all courses from a C@B data file."""
+        cab_data = pd.read_csv(filename)
+        return cab_data["courseCode"]
+
+
+if __name__ == "__main__":
+    read_from_file = input("Which file should courses be read from (ex: CAB_data.csv)?\t")
+    courses = compile_courses(read_from_file)
+    filename = input("What file should data be saved to (ex: CritReview_data.csv)?\t")
+    scraper = CritReviewScraper()
+    for course in courses:
+        scraper.scrape_course(course)
+    scraper.save_to_csv(filename)
