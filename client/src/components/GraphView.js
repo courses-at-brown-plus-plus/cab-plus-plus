@@ -136,10 +136,11 @@ function GraphView(props) {
             if (!ports.has(potential)) {
               ports.set(potential, [...Array(potential.ports).keys()]);
             }
-            let n = ports.get(potential).indexOf(nodeGraph.get(startCourses[i]).edges[j].port)
-            //if (n !== -1) {
+            let n = ports.get(potential).indexOf(nodeGraph.get(startCourses[i]).edges[j].port - 1)
+            console.log(n, ports.get(potential), nodeGraph.get(startCourses[i]).edges[j].port - 1)
+            if (n !== -1) {
               ports.get(potential).splice(n, 1)
-            //}
+            }
             if (ports.get(potential).length === 0) {
               newNextCourses.push(potential.id)
             }
@@ -261,22 +262,28 @@ function GraphView(props) {
     setAnnotations(annotations);
   }
 
+  function cornerRect(ctx, x, y, r) {
+    ctx.beginPath();
+    ctx.moveTo(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2);
+    
+    ctx.lineTo(x + scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2);
+
+    ctx.lineTo(x + scaleFactor * NODE_WIDTH / 2, y + scaleFactor * NODE_HEIGHT / 2 - r);
+
+    ctx.lineTo(x + scaleFactor * NODE_WIDTH / 2 - r, y + scaleFactor * NODE_HEIGHT / 2);
+
+    ctx.lineTo(x - scaleFactor * NODE_WIDTH / 2, y + scaleFactor * NODE_HEIGHT / 2);
+    ctx.lineTo(x - scaleFactor * NODE_WIDTH / 2, y - scaleFactor * NODE_HEIGHT / 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
   function drawNode(ctx, node, x, y) {
     if (focus && !activeNodes.includes(node.id)) {
       ctx.globalAlpha = 0.5;
     }
-    ctx.fillStyle = 'white';
-    if (coursesTaken.includes(node.id)) {
-      ctx.fillStyle = COLORS.courseTaken;
-    } else if (nextCourses.includes(node.id)) {
-      ctx.fillStyle = COLORS.courseAvailable;
-    }
 
-    ctx.fillRect(
-      x - scaleFactor * NODE_WIDTH / 2, 
-      y - scaleFactor * NODE_HEIGHT / 2, 
-      scaleFactor * NODE_WIDTH, 
-      scaleFactor * NODE_HEIGHT);
     if (activeNodes.includes(node.id)) {
       ctx.strokeStyle = 'black';
     } else if (annotations.includes(node.id)) {
@@ -286,13 +293,29 @@ function GraphView(props) {
       ctx.strokeStyle = '#ccc';
     }
 
-    ctx.strokeRect(
-      x - scaleFactor * NODE_WIDTH / 2, 
-      y - scaleFactor * NODE_HEIGHT / 2, 
-      scaleFactor * NODE_WIDTH, 
-      scaleFactor * NODE_HEIGHT);
+    if (nextCourses.includes(node.id)) {
+      ctx.fillStyle = COLORS.courseAvailable;
+      cornerRect(ctx, x, y, 15 * scaleFactor);
+    } else {
+
+      ctx.fillStyle = 'white';
+      if (coursesTaken.includes(node.id)) {
+        ctx.fillStyle = COLORS.courseTaken;
+      } else if (nextCourses.includes(node.id)) {
+        ctx.fillStyle = COLORS.courseAvailable;
+      }
+      ctx.fillRect(
+        x - scaleFactor * NODE_WIDTH / 2, 
+        y - scaleFactor * NODE_HEIGHT / 2, 
+        scaleFactor * NODE_WIDTH, 
+        scaleFactor * NODE_HEIGHT);
+      ctx.strokeRect(
+        x - scaleFactor * NODE_WIDTH / 2, 
+        y - scaleFactor * NODE_HEIGHT / 2, 
+        scaleFactor * NODE_WIDTH, 
+        scaleFactor * NODE_HEIGHT);
+    }
     ctx.lineWidth = 1 * scaleFactor;
-    ctx.setLineDash([]);
     ctx.save()
     ctx.scale(scaleFactor, scaleFactor);
     ctx.fillStyle = 'black';
@@ -437,7 +460,10 @@ function GraphView(props) {
       <div style={{position: "relative", width: props.width, height: props.height}} className="canvasContainer">
         { showCourseView && 
           <CourseView node={courseView} 
-          annotation={nextCourses.includes(courseView.id) && !annotations.includes(courseView.id)} 
+          annotation={(nextCourses.includes(courseView.id) 
+            || alone.current.has(courseView.id) 
+            || layersRef.current[0].reduce((acc, x) => acc || x.id === courseView.id, false)) 
+            && !annotations.includes(courseView.id)} 
           add={addAnnotation} remove={removeAnnotation} rann={annotations.includes(courseView.id)}
           close={(e) => {setShowCourseView(false); }} prereqs={getPrereqs(courseView.id)}/>
         }

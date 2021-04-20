@@ -35,7 +35,7 @@ function Legend(props) {
                     <Td><span className="borderlessDot" 
                     style={{backgroundColor: COLORS.courseAvailable, borderWidth: "3px", borderColor: COLORS.courseTaken}}
                     ></span></Td>
-                    <Td>Annotated Course</Td>
+                    <Td>Course in Wishlist</Td>
                 </Tr>
             </Tbody>
           </Table>
