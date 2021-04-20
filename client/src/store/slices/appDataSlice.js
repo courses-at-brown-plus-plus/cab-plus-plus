@@ -32,7 +32,7 @@ export const slice = createSlice({
         const ret = {
           title: `${aCode} ${state.pathwayData[aCode]["courseName"]}`,
           description: state.pathwayData[aCode]["courseDesc"], 
-          link: `https://thecriticalreview.org/search/${aCode.substring(0, 4)}/${aCode.substring(5, aCode.length)}`
+          link: `https://thecriticalreview.org/search/${aCode.substring(0, 4).replace('EEPS', 'GEOL')}/${aCode.substring(5, aCode.length)}`
           // eg: https://thecriticalreview.org/search/CSCI/0320
         };
 

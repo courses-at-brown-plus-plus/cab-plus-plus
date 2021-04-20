@@ -27,6 +27,13 @@ function CourseView(props) {
       return result;
     }
 
+    let critReviewCourseCode = `${props.node.id.substring(0, 4)}`;
+
+    //Naming inconsitency between CAB and Critical Review
+    if (critReviewCourseCode === 'EEPS') {
+      critReviewCourseCode = 'GEOL';
+    }
+
     return (
         <div style={{width: props.width, height: props.height}} className="courseView" >
             <CloseButton style={{float: 'right'}} onClick={props.close}/>
@@ -46,7 +53,7 @@ function CourseView(props) {
             }
 
              <a id="link" target="_blank" rel="noreferrer" 
-              href={`https://thecriticalreview.org/search/${props.node.id.substring(0, 4)}/${props.node.id.substring(5, props.node.id.length)}`} >
+              href={`https://thecriticalreview.org/search/${critReviewCourseCode}/${props.node.id.substring(5, props.node.id.length)}`} >
               <Button variant="link" colorScheme="cyan"> Critical Review Link </Button>
             </a>
 
