@@ -295,6 +295,9 @@ function GraphView(props) {
 
     if (nextCourses.includes(node.id)) {
       ctx.fillStyle = COLORS.courseAvailable;
+      if (coursesTaken.includes(node.id)) {
+        ctx.fillStyle = COLORS.courseTaken;
+      }
       cornerRect(ctx, x, y, 15 * scaleFactor);
     } else {
 
