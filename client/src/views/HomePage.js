@@ -25,6 +25,7 @@ export default function HomePage() {
   const [graphX, setGraphX] = useState(0);
   const [graphY, setGraphY] = useState(0);
 
+
   useEffect(() => {
     if (!selectedConcentration) {
       return;
@@ -32,35 +33,45 @@ export default function HomePage() {
     let aGraph = new Map();
     let ports = new Map();
 
-    for (let course in pathwayData) {
-      let include = false;
-      for (let edge of pathwayData[course]['preReqs']) {
-        if (edge[0].startsWith(selectedConcentration)) {
-          include = true;
-          break;
+    let shouldContinue = true;
+    while (shouldContinue) {
+      shouldContinue = false;
+      for (let course in pathwayData) {
+        let include = false;
+        for (let edge of pathwayData[course]['preReqs']) {
+          if (edge[0].startsWith(selectedConcentration) || aGraph.has(edge[0])) {
+            include = true;
+            break;
+          }
         }
-      }
-      if (!include && !course.startsWith(selectedConcentration)) {
-        continue;
-      }
-      if (aGraph.has(course)) {
-        continue;
-      }
+        if (!include && !course.startsWith(selectedConcentration)) {
+          continue;
+        }
+        if (aGraph.has(course)) {
+          continue;
+        }
+        shouldContinue = true;
 
-      let node = new CourseNode(pathwayData[course]['courseCode'], [], 0, false, false, 
-        pathwayData[course]['courseName'], pathwayData[course]['courseDesc'], [pathwayData[course]['FYS'], 
-          pathwayData[course]['SOPH'], pathwayData[course]['DIAP'], pathwayData[course]['WRIT'],
-          pathwayData[course]['CBLR'], pathwayData[course]['COEX']])
-      for (let edge of pathwayData[course]['preReqs']) {
-        node.edges.push(new Edge(pathwayData[course]['courseCode'], edge[0], edge[1]))
-        if (!ports.has(edge[0])) {
-          ports.set(edge[0], 0);
+        let courseCode = pathwayData[course]['courseCode'];
+        if (courseCode.endsWith('*')) {
+          courseCode = courseCode.substring(0, courseCode.length);
         }
-        if (ports.get(edge[0]) < edge[1]) {
-          ports.set(edge[0], edge[1]);
+
+        let node = new CourseNode(courseCode, [], 0, false, false, 
+          pathwayData[course]['courseName'], pathwayData[course]['courseDesc'], [pathwayData[course]['FYS'], 
+            pathwayData[course]['SOPH'], pathwayData[course]['DIAP'], pathwayData[course]['WRIT'],
+            pathwayData[course]['CBLR'], pathwayData[course]['COEX']])
+        for (let edge of pathwayData[course]['preReqs']) {
+          node.edges.push(new Edge(courseCode, edge[0], edge[1]))
+          if (!ports.has(edge[0])) {
+            ports.set(edge[0], 0);
+          }
+          if (ports.get(edge[0]) < edge[1]) {
+            ports.set(edge[0], edge[1]);
+          }
         }
+        aGraph.set(course, node);
       }
-      aGraph.set(course, node);
     }
     for (let [id, p] of ports) {
       if (aGraph.has(id)) {
