@@ -1,7 +1,7 @@
 import './CourseView.css';
 
 import {
-  Divider, Button, Tag, CloseButton, Table, Thead, Th, Tbody, Tr, Td, Link
+  Divider, Button, Tag, CloseButton, Table, Thead, Th, Tbody, Tr, Td, Link, Tooltip
 } from "@chakra-ui/react"
 
 function CourseView(props) {
@@ -75,12 +75,14 @@ function CourseView(props) {
 
             <br/>
             {props.annotation &&
+            <Tooltip label="Save the courses you plan on taking!" aria-label="A tooltip">
               <Button colorScheme="green" style={{display: 'block', margin: 'auto', }}
-              onClick={(e) => props.add(props.node.id)}>Add annotation</Button>
+                onClick={(e) => props.add(props.node.id)}>Add to wishlist</Button>
+            </Tooltip>
             }
             {props.rann &&
               <Button colorScheme="red" style={{display: 'block', margin: 'auto', }}
-              onClick={(e) => props.remove(props.node.id)}>Remove annotation</Button>
+              onClick={(e) => props.remove(props.node.id)}>Remove from wishlist</Button>
             }
         </div>);
 }

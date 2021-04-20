@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAnnotations, addAnnotation } from '../store/slices/appDataSlice';
 
-import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, 
+import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, Tooltip, 
   AlertDialogCloseButton, AlertDialogBody, AlertDialogFooter, Input, Text, Button } from "@chakra-ui/react";
 
 export default function AnnotationSave(props) {
@@ -45,7 +45,13 @@ export default function AnnotationSave(props) {
 
   return (
     <>
-      <Button colorScheme="cyan" onClick={props.popup.onOpen}>Save Annotations</Button>
+      <Tooltip 
+        label="Name and save wishlist to the right" 
+        aria-label="A tooltip"
+      >
+        <Button colorScheme="cyan" onClick={props.popup.onOpen}>Save wishlist</Button>
+      </Tooltip>
+
       <AlertDialog
         motionPreset="slideInBottom"
         leastDestructiveRef={cancelRef}
@@ -56,10 +62,10 @@ export default function AnnotationSave(props) {
         <AlertDialogOverlay />
 
         <AlertDialogContent>
-          <AlertDialogHeader>Save Annotations</AlertDialogHeader>
+          <AlertDialogHeader>Save Wishlist</AlertDialogHeader>
           <AlertDialogCloseButton />
           <AlertDialogBody>
-            <Text> Save your annotations for the { props.concentration } concentration?  </Text>
+            <Text> Save your wishlist for the { props.concentration } concentration?  </Text>
             <Input 
               style={ nameInvalid ? {border: "2px solid red"} : {} }
               value={name} 

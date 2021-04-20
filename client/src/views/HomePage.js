@@ -223,7 +223,7 @@ export default function HomePage() {
       <Stack>
         <Box ml={10}>
           <Box p={5} style={styles.boxContainer}>
-            <h1><b>Saved Annotations</b></h1>
+            <h1><b>Saved Wishlists</b></h1>
             { 
               Object.keys(savedAnnotations).map((key) => 
                 <AnnotationButton 
