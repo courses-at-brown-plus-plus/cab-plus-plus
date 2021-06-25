@@ -59,16 +59,6 @@ the code to see our overall project, which can be done by following the followin
 
 **Team Members:** Emily Ye, Gareth Mansfield, Kevin Hsu, William Sun
 
-**Team Strengths and Weaknesses:**
-
-_Emily:_ Strengths - Python, Java, web scraping, project management; Weaknesses - Web dev, design
-
-_Gareth:_ Strengths - Python, SQL, React; Weaknesses - design, Python web dev
-
-_Kevin:_ Strengths - Web dev / frontend, React, Flask, Rails, Linux; Weaknesses - Machine learning, Selenium
-
-_William:_ Strengths - Python (e.g. Flask), machine learning (PyTorch), Express.js; Weaknesses - React, design
-
 **Project Idea:**
 ### C@B Visualizer
 _Problem:_ Having a lot of interests comes with the struggle of keeping track of what courses are interesting, 
@@ -102,17 +92,6 @@ _Algorithmic Complexity Features:_
   the user, which will have to be updated every time new courses are added or new user information is provided.
 * We are hoping to use Python for the backend of this project because there is a significant amount of data 
   science/machine learning and web scraping involved, which we are most familiar with in Python.
-
-**Mentor TA:** Sarah Rockhill (sarah_rockhill@brown.edu)
-
-## Meetings
-_On your first meeting with your mentor TA, you should plan dates for at least the following meetings:_
-
-**Specs, Mockup, and Design Meeting:** March 15
-
-**4-Way Checkpoint:** April 5
-
-**Adversary Checkpoint:** April 12
 
 ## Resources & REST API table
 | URL/ENDPOINT             | VERB | DESCRIPTION                                                   |
